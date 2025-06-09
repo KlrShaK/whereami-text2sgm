@@ -14,12 +14,23 @@ import spacy
 import en_core_web_lg
 nlp = spacy.load("en_core_web_lg")
 
-sys.path.insert(0, '/home/julia/Documents/h_coarse_loc/playground')
+sys.path.insert(0, '/home/klrshak/work/VisionLang/whereami-text2sgm/playground')
 from graph_models.src.utils import load_text_dataset
 
+# -------------------------------------------------------------------------------------------
+# CHANGED to implement clip embeddings
+from transformers import CLIPTokenizer, CLIPModel
 
-with open(os.path.join(os.path.dirname(__file__), '/home/julia/Documents/h_coarse_loc/data/openai/openai_api_key.txt'), 'r') as f:
-    api_key = f.read().strip()
+# CHANGED to implement clip embeddings: initialize CLIP tokenizer & model
+_clip_tokenizer = CLIPTokenizer.from_pretrained("openai/clip-vit-base-patch32")
+_clip_model     = CLIPModel.from_pretrained("openai/clip-vit-base-patch32", use_safetensors=True)
+
+# -------------------------------------------------------------------------------------------
+
+# Load OpenAI API key
+# with open(os.path.join(os.path.dirname(__file__), '/home/julia/Documents/h_coarse_loc/data/openai/openai_api_key.txt'), 'r') as f:
+#     api_key = f.read().strip()
+api_key = "sdauhdsihuais"
 openai.api_key = api_key
 
 def num_tokens_from_string(string: str, encoding_name: str) -> int:
@@ -47,6 +58,42 @@ def check_tokens():
     num_tokens = num_tokens_from_dict(dict_of_texts, 'cl100k_base')
     print(num_tokens)
     
+# -------------------------------------------------------------------------------------------
+# Function to create an embedding using OpenAI's API
+# CHANGED to implement clip embeddings
+def create_embedding_clip(text: str) -> torch.Tensor:
+    """
+    Returns a 512-dimensional CLIP text embedding for the given string.
+    """
+    inputs = _clip_tokenizer(
+        text,
+        padding=True,
+        truncation=True,
+        max_length=77,
+        return_tensors="pt"
+    )
+    with torch.no_grad():
+        outputs   = _clip_model.get_text_features(**inputs)
+        embedding = outputs.squeeze(0)
+    return embedding
+
+# CHANGED to implement clip embeddings (optional batch version)
+def create_embeddings_clip_batch(texts: list[str]) -> torch.Tensor:
+    """
+    Returns an (N × 512) tensor of CLIP embeddings for a list of N strings.
+    """
+    inputs = _clip_tokenizer(
+        texts,
+        padding=True,
+        truncation=True,
+        max_length=77,
+        return_tensors="pt"
+    )
+    with torch.no_grad():
+        outputs = _clip_model.get_text_features(**inputs)  # (N, 512)
+    return outputs
+# -------------------------------------------------------------------------------------------
+
 def create_embedding(text):
     response = openai.Embedding.create(
         input=text,

@@ -1,0 +1,52 @@
+2025-03-19 18:43:03,154 INFO    MainThread:7848 [wandb_setup.py:_flush():67] Current SDK version is 0.19.8
+2025-03-19 18:43:03,154 INFO    MainThread:7848 [wandb_setup.py:_flush():67] Configure stats pid to 7848
+2025-03-19 18:43:03,154 INFO    MainThread:7848 [wandb_setup.py:_flush():67] Loading settings from /home/klrshak/.config/wandb/settings
+2025-03-19 18:43:03,154 INFO    MainThread:7848 [wandb_setup.py:_flush():67] Loading settings from /home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/wandb/settings
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_setup.py:_flush():67] Loading settings from environment variables
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_init.py:setup_run_log_directory():647] Logging user logs to /home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/wandb/run-20250319_184303-a23kzvbf/logs/debug.log
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_init.py:setup_run_log_directory():648] Logging internal logs to /home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/wandb/run-20250319_184303-a23kzvbf/logs/debug-internal.log
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_init.py:init():761] calling init triggers
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_init.py:init():766] wandb.init called with sweep_config: {}
+config: {'architecture': 'self attention cross attention', 'dataset': 'ScanScribe_cleaned', 'mode': 'online', 'epoch': 100, 'lr': 0.0001, 'weight_decay': 5e-05, 'N': 1, 'overlap_thr': 0.8, 'cos_sim_thr': 0.5, 'batch_size': 16, 'training_set_size': 2847, 'test_set_size': 712, 'graph_size_min': 4, 'contrastive_loss': True, 'valid_top_k': [1, 2, 3, 5], 'use_attributes': True, 'training_with_cross_val': True, 'folds': 10, 'skip_k_fold': True, 'entire_training_set': False, 'subgraph_ablation': True, 'eval_iters': 30, 'eval_iter_count': 10, 'out_of': 10, 'model_name': 'model_NO_subg_100_epochs_30_eval_iters_loss_ablation_m_cut_cross', 'loss_ablation_m': True, 'loss_ablation_c': False, 'eval_only_c': False, 'continue_training': 0, 'continue_training_model': None, 'eval_entire_dataset': False, 'heads': 2, 'scannet': False, 'scanscribe_auto_gen': False, '_wandb': {}}
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_init.py:init():784] starting backend
+2025-03-19 18:43:03,155 INFO    MainThread:7848 [wandb_init.py:init():788] sending inform_init request
+2025-03-19 18:43:03,167 INFO    MainThread:7848 [backend.py:_multiprocessing_setup():101] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2025-03-19 18:43:03,167 INFO    MainThread:7848 [wandb_init.py:init():798] backend started and connected
+2025-03-19 18:43:03,170 INFO    MainThread:7848 [wandb_init.py:init():891] updated telemetry
+2025-03-19 18:43:03,179 INFO    MainThread:7848 [wandb_init.py:init():915] communicating run to backend with 90.0 second timeout
+2025-03-19 18:43:03,180 WARNING MsgRouterThr:7848 [router.py:message_loop():63] message_loop has been closed
+Traceback (most recent call last):
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/interface/router_sock.py", line 27, in _read_message
+    return self._sock_client.read_server_response(timeout=1)
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 235, in read_server_response
+    data = self._read_packet_bytes(timeout=timeout)
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/lib/sock_client.py", line 220, in _read_packet_bytes
+    raise SockClientClosedError
+wandb.sdk.lib.sock_client.SockClientClosedError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/interface/router.py", line 56, in message_loop
+    msg = self._read_message()
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/interface/router_sock.py", line 29, in _read_message
+    raise MessageRouterClosedError from e
+wandb.sdk.interface.router.MessageRouterClosedError
+2025-03-19 18:43:03,181 INFO    MsgRouterThr:7848 [mailbox.py:close():129] Closing mailbox, abandoning 1 handles.
+2025-03-19 18:43:03,182 ERROR   MainThread:7848 [wandb_init.py:init():1478] error in wandb.init()
+Traceback (most recent call last):
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 1468, in init
+    return wi.init(run_settings, run_config)
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/wandb_init.py", line 941, in init
+    result = wait_with_progress(
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/mailbox/wait_with_progress.py", line 24, in wait_with_progress
+    return wait_all_with_progress(
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/mailbox/wait_with_progress.py", line 70, in wait_all_with_progress
+    return _wait_handles(handle_list, timeout=progress_after)
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/mailbox/wait_with_progress.py", line 110, in _wait_handles
+    results.append(handle.wait_or(timeout=remaining_timeout))
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/mailbox/mailbox_handle.py", line 122, in wait_or
+    return self._fn(self._handle.wait_or(timeout=timeout))
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/wandb/sdk/mailbox/response_handle.py", line 98, in wait_or
+    raise HandleAbandonedError()
+wandb.sdk.mailbox.mailbox_handle.HandleAbandonedError

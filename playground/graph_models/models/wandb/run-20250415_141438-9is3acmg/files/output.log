@@ -1,0 +1,91 @@
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:676: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _3dssg_scenes = torch.load('../data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt')
+100%|███████████████████████████████████████████████████████████████| 1335/1335 [00:01<00:00, 1108.46it/s]
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:687: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  scanscribe_scenes = torch.load('../data_checkpoints/processed_data/training/scanscribe_graphs_train_final_no_graph_min.pt')
+100%|██████████████████████████████████████████████████████████████████| 163/163 [00:01<00:00, 150.68it/s]
+number of scanscribe graphs before removing graphs with 1 edge: 3356
+number of scanscribe graphs after removing graphs with 1 edge: 3159
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:714: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  scanscribe_scenes_test = torch.load('../data_checkpoints/processed_data/testing/scanscribe_graphs_test_final_no_graph_min.pt')
+100%|████████████████████████████████████████████████████████████████████| 55/55 [00:00<00:00, 426.70it/s]
+number of scanscribe test graphs before removing: 1116
+number of scanscribe test graphs after removing: 1116
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:738: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  h_graphs_test = torch.load('../data_checkpoints/processed_data/human/human_graphs_processed.pt')
+to remove human_graphs, hopefully none: ['c9fb7aa1-2a5b-2cf7-9222-6f111cb28b2b_2', 'bf9a3da4-45a5-2e80-8082-be634b241693_0']
+SCANSCRIBE b_n: 2400000, b_e: 279456, b_f: 20959200, total: 23638656
+HUMAN b_n_h: 6075600, b_e_h: 628272, b_f_h: 47120400, total: 53824272
+length of training set in fold 0: 2857
+length of validation set in fold 0: 302
+  1%|▌                                                            | 1/100 [1:06:22<109:31:25, 3982.69s/it]
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 214.85856119791666
+accuracies: {1: (np.float64(0.38), np.float64(0.08760179264189788)), 2: (np.float64(0.6188888888888889), np.float64(0.07873223883580832)), 3: (np.float64(0.7544444444444444), np.float64(0.0800385709486756)), 5: (np.float64(0.8744444444444446), np.float64(0.05352973097975957))}
+Evaluation information: {'fold': 0, 'epoch': 1, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 214.8585662841797, 'val_acc_from_train': {1: (np.float64(0.38), np.float64(0.08760179264189788)), 2: (np.float64(0.6188888888888889), np.float64(0.07873223883580832)), 3: (np.float64(0.7544444444444444), np.float64(0.0800385709486756)), 5: (np.float64(0.8744444444444446), np.float64(0.05352973097975957))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 214.86170620388455
+accuracies: {1: (np.float64(0.4111111111111112), np.float64(0.10657403385139376)), 2: (np.float64(0.6488888888888891), np.float64(0.10210137784586795)), 3: (np.float64(0.7833333333333333), np.float64(0.08333333333333336)), 5: (np.float64(0.9255555555555552), np.float64(0.04609437447264786))}
+Evaluation information: {'fold': 0, 'epoch': 2, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 214.86170959472656, 'val_acc_from_train': {1: (np.float64(0.4111111111111112), np.float64(0.10657403385139376)), 2: (np.float64(0.6488888888888891), np.float64(0.10210137784586795)), 3: (np.float64(0.7833333333333333), np.float64(0.08333333333333336)), 5: (np.float64(0.9255555555555552), np.float64(0.04609437447264786))}}
+Traceback (most recent call last):
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py", line 805, in <module>
+    model = train_with_cross_val(database_3dssg=_3dssg_graphs,
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py", line 385, in train_with_cross_val
+    _ = train(model=model,
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py", line 75, in train
+    x_p, p_p, m_p = model(torch.tensor(np.array(x_node_ft), dtype=torch.float32).to('cuda'), torch.tensor(np.array(p_node_ft), dtype=torch.float32).to('cuda'),
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1736, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1747, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/model_graph2graph.py", line 69, in forward
+    edge_index_1_cross, edge_attr_1_cross = make_cross_graph(x_1.shape, x_2.shape) # First half of x_1_cross should be the original x_1
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/../../../playground/graph_models/src/utils.py", line 152, in make_cross_graph
+    edge_attr_cross = torch.cat((edge_attr_cross, torch.zeros((1, 300), dtype=torch.float)), dim=0) # TODO: dimension 300
+KeyboardInterrupt

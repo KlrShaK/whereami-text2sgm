@@ -22,3 +22,5 @@ playground/graph_models/hungarian/list_of_graph_scanscribe_gpt_noplacenode_noatt
 torch_cuda_sanity_check.py
 website_data_labeling/
 
+playground/graph_models/processed_data/*
+datasets/*

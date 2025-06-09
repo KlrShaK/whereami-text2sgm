@@ -1,0 +1,15 @@
+python - <<'PY'
+import torch, pathlib, collections
+
+pt_file = pathlib.Path("/home/klrshak/Downloads/3RScan-Test/graphs/"
+                       "scanscribe_text_graphs_from_image_desc_node_edge_features.pt")
+
+caps = torch.load(pt_file)
+# each key looks like  "<scan_id>_<five-digit txt id>"
+prefixes = [k.split('_')[0] for k in caps]
+counter  = collections.Counter(prefixes)
+
+print(f"{len(counter)} unique scan-IDs in file {pt_file.name}:\n")
+for sid, n in counter.most_common():
+    print(f"{sid}   ({n} captions)")
+PY

@@ -193,19 +193,19 @@ if __name__ == "__main__":
     #     f.write(f'{scanscribe_test_acc}')
 
 
-    # start = time.time()
-    # human_timer = Timer()
-    # human_test_acc = eval(model=model,
-    #                                 database_3dssg=_3dssg_graphs,
-    #                                 dataset=list(human_graphs_test.values()),
-    #                                 fold=None,
-    #                                 mode='human_test',
-    #                                 valid_top_k=args.valid_top_k,
-    #                                 timer=human_timer)
-    # # human_timer.save(f'../eval_outputs/{model_name}_human_test_time.txt', args)
-    # print(f'accuracy on human test set: {human_test_acc}')
-    # end_human = time.time()
-    # print(f'time for human test set: {end_human - start}')
-    # with open(f'../eval_outputs/{model_name}_human_test_acc.txt', 'w') as f:
-    #     human_test_acc = format_to_latex(human_test_acc)
-    #     f.write(f'{human_test_acc}')
+    start = time.time()
+    human_timer = Timer()
+    human_test_acc = eval(model=model,
+                                    database_3dssg=_3dssg_graphs,
+                                    dataset=list(human_graphs_test.values()),
+                                    fold=None,
+                                    mode='human_test',
+                                    valid_top_k=args.valid_top_k,
+                                    timer=human_timer)
+    # human_timer.save(f'../eval_outputs/{model_name}_human_test_time.txt', args)
+    print(f'accuracy on human test set: {human_test_acc}')
+    end_human = time.time()
+    print(f'time for human test set: {end_human - start}')
+    with open(f'../eval_outputs/{model_name}_human_test_acc.txt', 'w') as f:
+        human_test_acc = format_to_latex(human_test_acc)
+        f.write(f'{human_test_acc}')

@@ -1,0 +1,35 @@
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:676: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _3dssg_scenes = torch.load('../data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt')
+100%|█████████████████████████████████████| 1335/1335 [00:01<00:00, 1094.67it/s]
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:687: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  scanscribe_scenes = torch.load('../data_checkpoints/processed_data/training/scanscribe_graphs_train_final_no_graph_min.pt')
+100%|████████████████████████████████████████| 163/163 [00:00<00:00, 180.74it/s]
+number of scanscribe graphs before removing graphs with 1 edge: 3356
+number of scanscribe graphs after removing graphs with 1 edge: 3159
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:714: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  scanscribe_scenes_test = torch.load('../data_checkpoints/processed_data/testing/scanscribe_graphs_test_final_no_graph_min.pt')
+100%|██████████████████████████████████████████| 55/55 [00:00<00:00, 408.12it/s]
+number of scanscribe test graphs before removing: 1116
+number of scanscribe test graphs after removing: 1116
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:738: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  h_graphs_test = torch.load('../data_checkpoints/processed_data/human/human_graphs_processed.pt')
+to remove human_graphs, hopefully none: ['c9fb7aa1-2a5b-2cf7-9222-6f111cb28b2b_2', 'bf9a3da4-45a5-2e80-8082-be634b241693_0']
+SCANSCRIBE b_n: 2400000, b_e: 279456, b_f: 20959200, total: 23638656
+HUMAN b_n_h: 6075600, b_e_h: 628272, b_f_h: 47120400, total: 53824272
+length of training set in fold 0: 2857
+length of validation set in fold 0: 302
+  0%|                                                         | 0/100 [05:07<?, ?it/s]
+Traceback (most recent call last):
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py", line 805, in <module>
+    model = train_with_cross_val(database_3dssg=_3dssg_graphs,
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py", line 385, in train_with_cross_val
+    _ = train(model=model,
+  File "/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py", line 100, in train
+    loss.backward()
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/torch/_tensor.py", line 581, in backward
+    torch.autograd.backward(
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/torch/autograd/__init__.py", line 347, in backward
+    _engine_run_backward(
+  File "/home/klrshak/work/VisionLang/coarseLocal_env/lib/python3.10/site-packages/torch/autograd/graph.py", line 825, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

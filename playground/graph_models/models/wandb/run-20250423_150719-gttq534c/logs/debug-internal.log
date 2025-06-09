@@ -1,0 +1,7 @@
+{"time":"2025-04-23T15:07:19.221933244+02:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/wandb/run-20250423_150719-gttq534c/logs/debug-core.log"}
+{"time":"2025-04-23T15:07:19.325822689+02:00","level":"INFO","msg":"created new stream","id":"gttq534c"}
+{"time":"2025-04-23T15:07:19.325864501+02:00","level":"INFO","msg":"stream: started","id":"gttq534c"}
+{"time":"2025-04-23T15:07:19.32590622+02:00","level":"INFO","msg":"writer: Do: started","stream_id":"gttq534c"}
+{"time":"2025-04-23T15:07:19.32596312+02:00","level":"INFO","msg":"sender: started","stream_id":"gttq534c"}
+{"time":"2025-04-23T15:07:19.326079734+02:00","level":"INFO","msg":"handler: started","stream_id":"gttq534c"}
+{"time":"2025-04-23T15:07:19.726334352+02:00","level":"INFO","msg":"Starting system monitor"}

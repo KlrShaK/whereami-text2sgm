@@ -1,0 +1,2 @@
+{"time":"2025-03-19T18:43:03.171798925+01:00","level":"INFO","msg":"stream: starting","core version":"0.19.8","symlink path":"/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/wandb/run-20250319_184303-a23kzvbf/logs/debug-core.log"}
+{"time":"2025-03-19T18:43:03.172900834+01:00","level":"ERROR+4","msg":"stream_init: failed to fetch credentials: api: couldn't get API key: settings: failed to get API key from netrc: open /home/klrshak/.netrc: no such file or directory"}

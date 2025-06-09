@@ -1,0 +1,2725 @@
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:676: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  _3dssg_scenes = torch.load('../data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt')
+100%|█████████████████████████████████████| 1335/1335 [00:01<00:00, 1197.42it/s]
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:687: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  scanscribe_scenes = torch.load('../data_checkpoints/processed_data/training/scanscribe_graphs_train_final_no_graph_min.pt')
+100%|████████████████████████████████████████| 163/163 [00:00<00:00, 485.90it/s]
+number of scanscribe graphs before removing graphs with 1 edge: 3356
+number of scanscribe graphs after removing graphs with 1 edge: 3159
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:714: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  scanscribe_scenes_test = torch.load('../data_checkpoints/processed_data/testing/scanscribe_graphs_test_final_no_graph_min.pt')
+100%|██████████████████████████████████████████| 55/55 [00:00<00:00, 547.07it/s]
+number of scanscribe test graphs before removing: 1116
+number of scanscribe test graphs after removing: 1116
+/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models/train.py:738: FutureWarning: You are using `torch.load` with `weights_only=False` (the current default value), which uses the default pickle module implicitly. It is possible to construct malicious pickle data which will execute arbitrary code during unpickling (See https://github.com/pytorch/pytorch/blob/main/SECURITY.md#untrusted-models for more details). In a future release, the default value for `weights_only` will be flipped to `True`. This limits the functions that could be executed during unpickling. Arbitrary objects will no longer be allowed to be loaded via this mode unless they are explicitly allowlisted by the user via `torch.serialization.add_safe_globals`. We recommend you start setting `weights_only=True` for any use case where you don't have full control of the loaded file. Please open an issue on GitHub for any issues related to this experimental feature.
+  h_graphs_test = torch.load('../data_checkpoints/processed_data/human/human_graphs_processed.pt')
+to remove human_graphs, hopefully none: ['c9fb7aa1-2a5b-2cf7-9222-6f111cb28b2b_2', 'bf9a3da4-45a5-2e80-8082-be634b241693_0']
+SCANSCRIBE b_n: 2400000, b_e: 279456, b_f: 20959200, total: 23638656
+HUMAN b_n_h: 6075600, b_e_h: 628272, b_f_h: 47120400, total: 53824272
+length of training set in fold 0: 2857
+length of validation set in fold 0: 302
+  1%|▍                                     | 1/100 [55:38<91:48:02, 3338.21s/it]
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.15919748942058
+accuracies: {1: (np.float64(0.19888888888888892), np.float64(0.05543319859229521)), 2: (np.float64(0.4), np.float64(0.07252075054258099)), 3: (np.float64(0.5366666666666666), np.float64(0.07904522849703292)), 5: (np.float64(0.7355555555555554), np.float64(0.06881716696534235))}
+Evaluation information: {'fold': 0, 'epoch': 1, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.1592025756836, 'val_acc_from_train': {1: (np.float64(0.19888888888888892), np.float64(0.05543319859229521)), 2: (np.float64(0.4), np.float64(0.07252075054258099)), 3: (np.float64(0.5366666666666666), np.float64(0.07904522849703292)), 5: (np.float64(0.7355555555555554), np.float64(0.06881716696534235))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.0884501139323
+accuracies: {1: (np.float64(0.3622222222222223), np.float64(0.07588164923983944)), 2: (np.float64(0.5733333333333334), np.float64(0.08580770922803475)), 3: (np.float64(0.7466666666666667), np.float64(0.06970838729492501)), 5: (np.float64(0.8999999999999999), np.float64(0.05163977794943222))}
+Evaluation information: {'fold': 0, 'epoch': 2, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.08844757080078, 'val_acc_from_train': {1: (np.float64(0.3622222222222223), np.float64(0.07588164923983944)), 2: (np.float64(0.5733333333333334), np.float64(0.08580770922803475)), 3: (np.float64(0.7466666666666667), np.float64(0.06970838729492501)), 5: (np.float64(0.8999999999999999), np.float64(0.05163977794943222))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.02020772298177
+accuracies: {1: (np.float64(0.49111111111111116), np.float64(0.10253575106719401)), 2: (np.float64(0.6944444444444444), np.float64(0.09232925515796549)), 3: (np.float64(0.7844444444444445), np.float64(0.07539197979416613)), 5: (np.float64(0.8988888888888888), np.float64(0.04751867728965131))}
+Evaluation information: {'fold': 0, 'epoch': 3, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.02021026611328, 'val_acc_from_train': {1: (np.float64(0.49111111111111116), np.float64(0.10253575106719401)), 2: (np.float64(0.6944444444444444), np.float64(0.09232925515796549)), 3: (np.float64(0.7844444444444445), np.float64(0.07539197979416613)), 5: (np.float64(0.8988888888888888), np.float64(0.04751867728965131))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98508538140192
+accuracies: {1: (np.float64(0.47222222222222227), np.float64(0.07985326048369311)), 2: (np.float64(0.6977777777777777), np.float64(0.06718318425702657)), 3: (np.float64(0.8066666666666666), np.float64(0.06406015691288701)), 5: (np.float64(0.9277777777777777), np.float64(0.04135065347984087))}
+Evaluation information: {'fold': 0, 'epoch': 4, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9850845336914, 'val_acc_from_train': {1: (np.float64(0.47222222222222227), np.float64(0.07985326048369311)), 2: (np.float64(0.6977777777777777), np.float64(0.06718318425702657)), 3: (np.float64(0.8066666666666666), np.float64(0.06406015691288701)), 5: (np.float64(0.9277777777777777), np.float64(0.04135065347984087))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.00141228569879
+accuracies: {1: (np.float64(0.4811111111111111), np.float64(0.08678766482301559)), 2: (np.float64(0.7511111111111113), np.float64(0.07187094057242771)), 3: (np.float64(0.8422222222222222), np.float64(0.05833068777069638)), 5: (np.float64(0.9299999999999998), np.float64(0.0368681333845268))}
+Evaluation information: {'fold': 0, 'epoch': 5, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.00141143798828, 'val_acc_from_train': {1: (np.float64(0.4811111111111111), np.float64(0.08678766482301559)), 2: (np.float64(0.7511111111111113), np.float64(0.07187094057242771)), 3: (np.float64(0.8422222222222222), np.float64(0.05833068777069638)), 5: (np.float64(0.9299999999999998), np.float64(0.0368681333845268))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97545793321397
+accuracies: {1: (np.float64(0.47111111111111104), np.float64(0.10843442576671869)), 2: (np.float64(0.7477777777777778), np.float64(0.07826040734640152)), 3: (np.float64(0.8422222222222222), np.float64(0.05230489909306587)), 5: (np.float64(0.9233333333333331), np.float64(0.04803548071381618))}
+Evaluation information: {'fold': 0, 'epoch': 6, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97545623779297, 'val_acc_from_train': {1: (np.float64(0.47111111111111104), np.float64(0.10843442576671869)), 2: (np.float64(0.7477777777777778), np.float64(0.07826040734640152)), 3: (np.float64(0.8422222222222222), np.float64(0.05230489909306587)), 5: (np.float64(0.9233333333333331), np.float64(0.04803548071381618))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.99772050645616
+accuracies: {1: (np.float64(0.5033333333333333), np.float64(0.08875684637129563)), 2: (np.float64(0.7144444444444445), np.float64(0.0810502054437195)), 3: (np.float64(0.8055555555555555), np.float64(0.07307192465536617)), 5: (np.float64(0.9033333333333331), np.float64(0.04970282054743343))}
+Evaluation information: {'fold': 0, 'epoch': 7, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.99771881103516, 'val_acc_from_train': {1: (np.float64(0.5033333333333333), np.float64(0.08875684637129563)), 2: (np.float64(0.7144444444444445), np.float64(0.0810502054437195)), 3: (np.float64(0.8055555555555555), np.float64(0.07307192465536617)), 5: (np.float64(0.9033333333333331), np.float64(0.04970282054743343))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96764543321397
+accuracies: {1: (np.float64(0.5444444444444444), np.float64(0.10657403385139376)), 2: (np.float64(0.7433333333333333), np.float64(0.10079315085490313)), 3: (np.float64(0.8344444444444444), np.float64(0.09046519008593279)), 5: (np.float64(0.9288888888888888), np.float64(0.04924115512480075))}
+Evaluation information: {'fold': 0, 'epoch': 8, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96764373779297, 'val_acc_from_train': {1: (np.float64(0.5444444444444444), np.float64(0.10657403385139376)), 2: (np.float64(0.7433333333333333), np.float64(0.10079315085490313)), 3: (np.float64(0.8344444444444444), np.float64(0.09046519008593279)), 5: (np.float64(0.9288888888888888), np.float64(0.04924115512480075))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96225060356988
+accuracies: {1: (np.float64(0.4788888888888889), np.float64(0.10054788184347731)), 2: (np.float64(0.7233333333333334), np.float64(0.08569973421454964)), 3: (np.float64(0.8244444444444442), np.float64(0.06550845765770522)), 5: (np.float64(0.9177777777777777), np.float64(0.04365973934308554))}
+Evaluation information: {'fold': 0, 'epoch': 9, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96224975585938, 'val_acc_from_train': {1: (np.float64(0.4788888888888889), np.float64(0.10054788184347731)), 2: (np.float64(0.7233333333333334), np.float64(0.08569973421454964)), 3: (np.float64(0.8244444444444442), np.float64(0.06550845765770522)), 5: (np.float64(0.9177777777777777), np.float64(0.04365973934308554))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98025343153212
+accuracies: {1: (np.float64(0.551111111111111), np.float64(0.09534861312411079)), 2: (np.float64(0.7622222222222224), np.float64(0.07238443322178816)), 3: (np.float64(0.83), np.float64(0.05859465277082316)), 5: (np.float64(0.9222222222222222), np.float64(0.051159397480983713))}
+Evaluation information: {'fold': 0, 'epoch': 10, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98025512695312, 'val_acc_from_train': {1: (np.float64(0.551111111111111), np.float64(0.09534861312411079)), 2: (np.float64(0.7622222222222224), np.float64(0.07238443322178816)), 3: (np.float64(0.83), np.float64(0.05859465277082316)), 5: (np.float64(0.9222222222222222), np.float64(0.051159397480983713))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97640143500433
+accuracies: {1: (np.float64(0.45333333333333337), np.float64(0.09760085002665667)), 2: (np.float64(0.7100000000000001), np.float64(0.08261916197787247)), 3: (np.float64(0.8233333333333334), np.float64(0.06391545341453181)), 5: (np.float64(0.931111111111111), np.float64(0.040307460327149))}
+Evaluation information: {'fold': 0, 'epoch': 11, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97639465332031, 'val_acc_from_train': {1: (np.float64(0.45333333333333337), np.float64(0.09760085002665667)), 2: (np.float64(0.7100000000000001), np.float64(0.08261916197787247)), 3: (np.float64(0.8233333333333334), np.float64(0.06391545341453181)), 5: (np.float64(0.931111111111111), np.float64(0.040307460327149))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95951588948567
+accuracies: {1: (np.float64(0.5288888888888889), np.float64(0.07636817901084259)), 2: (np.float64(0.7366666666666667), np.float64(0.06795968303721348)), 3: (np.float64(0.8366666666666667), np.float64(0.06403124237432849)), 5: (np.float64(0.9355555555555555), np.float64(0.04629481479111034))}
+Evaluation information: {'fold': 0, 'epoch': 12, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95951843261719, 'val_acc_from_train': {1: (np.float64(0.5288888888888889), np.float64(0.07636817901084259)), 2: (np.float64(0.7366666666666667), np.float64(0.06795968303721348)), 3: (np.float64(0.8366666666666667), np.float64(0.06403124237432849)), 5: (np.float64(0.9355555555555555), np.float64(0.04629481479111034))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95404307047527
+accuracies: {1: (np.float64(0.5266666666666666), np.float64(0.09124651185621246)), 2: (np.float64(0.7533333333333333), np.float64(0.10277627626530828)), 3: (np.float64(0.851111111111111), np.float64(0.09015761233378132)), 5: (np.float64(0.9344444444444444), np.float64(0.057402628235953275))}
+Evaluation information: {'fold': 0, 'epoch': 13, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95404052734375, 'val_acc_from_train': {1: (np.float64(0.5266666666666666), np.float64(0.09124651185621246)), 2: (np.float64(0.7533333333333333), np.float64(0.10277627626530828)), 3: (np.float64(0.851111111111111), np.float64(0.09015761233378132)), 5: (np.float64(0.9344444444444444), np.float64(0.057402628235953275))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93556298149957
+accuracies: {1: (np.float64(0.5477777777777778), np.float64(0.09648770151273102)), 2: (np.float64(0.7622222222222224), np.float64(0.07238443322178816)), 3: (np.float64(0.8533333333333333), np.float64(0.05062571444397563)), 5: (np.float64(0.941111111111111), np.float64(0.035153982265680825))}
+Evaluation information: {'fold': 0, 'epoch': 14, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93556213378906, 'val_acc_from_train': {1: (np.float64(0.5477777777777778), np.float64(0.09648770151273102)), 2: (np.float64(0.7622222222222224), np.float64(0.07238443322178816)), 3: (np.float64(0.8533333333333333), np.float64(0.05062571444397563)), 5: (np.float64(0.941111111111111), np.float64(0.035153982265680825))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95653364393446
+accuracies: {1: (np.float64(0.48000000000000004), np.float64(0.07962876829852851)), 2: (np.float64(0.7344444444444442), np.float64(0.08186860897683847)), 3: (np.float64(0.8344444444444445), np.float64(0.07017614522061391)), 5: (np.float64(0.931111111111111), np.float64(0.04210510071443647))}
+Evaluation information: {'fold': 0, 'epoch': 15, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95654296875, 'val_acc_from_train': {1: (np.float64(0.48000000000000004), np.float64(0.07962876829852851)), 2: (np.float64(0.7344444444444442), np.float64(0.08186860897683847)), 3: (np.float64(0.8344444444444445), np.float64(0.07017614522061391)), 5: (np.float64(0.931111111111111), np.float64(0.04210510071443647))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93045806884766
+accuracies: {1: (np.float64(0.5711111111111111), np.float64(0.09138171197756483)), 2: (np.float64(0.7822222222222222), np.float64(0.06249938271300106)), 3: (np.float64(0.888888888888889), np.float64(0.04740162001711453)), 5: (np.float64(0.9655555555555553), np.float64(0.0327542288288526))}
+Evaluation information: {'fold': 0, 'epoch': 16, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93045806884766, 'val_acc_from_train': {1: (np.float64(0.5711111111111111), np.float64(0.09138171197756483)), 2: (np.float64(0.7822222222222222), np.float64(0.06249938271300106)), 3: (np.float64(0.888888888888889), np.float64(0.04740162001711453)), 5: (np.float64(0.9655555555555553), np.float64(0.0327542288288526))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92532433403863
+accuracies: {1: (np.float64(0.5522222222222222), np.float64(0.08330369843434027)), 2: (np.float64(0.7799999999999999), np.float64(0.08146801235477051)), 3: (np.float64(0.8911111111111112), np.float64(0.0649406186497887)), 5: (np.float64(0.9677777777777778), np.float64(0.03160325034072864))}
+Evaluation information: {'fold': 0, 'epoch': 17, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.92532348632812, 'val_acc_from_train': {1: (np.float64(0.5522222222222222), np.float64(0.08330369843434027)), 2: (np.float64(0.7799999999999999), np.float64(0.08146801235477051)), 3: (np.float64(0.8911111111111112), np.float64(0.0649406186497887)), 5: (np.float64(0.9677777777777778), np.float64(0.03160325034072864))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94363996717665
+accuracies: {1: (np.float64(0.5455555555555556), np.float64(0.08410017542296114)), 2: (np.float64(0.7644444444444446), np.float64(0.07299585646958599)), 3: (np.float64(0.8933333333333332), np.float64(0.059876415934699896)), 5: (np.float64(0.9688888888888888), np.float64(0.028458329944145988))}
+Evaluation information: {'fold': 0, 'epoch': 18, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94364166259766, 'val_acc_from_train': {1: (np.float64(0.5455555555555556), np.float64(0.08410017542296114)), 2: (np.float64(0.7644444444444446), np.float64(0.07299585646958599)), 3: (np.float64(0.8933333333333332), np.float64(0.059876415934699896)), 5: (np.float64(0.9688888888888888), np.float64(0.028458329944145988))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93222978379991
+accuracies: {1: (np.float64(0.5955555555555556), np.float64(0.08638129655811913)), 2: (np.float64(0.7855555555555557), np.float64(0.07585724083865907)), 3: (np.float64(0.861111111111111), np.float64(0.07307192465536615)), 5: (np.float64(0.9388888888888888), np.float64(0.044790320823880826))}
+Evaluation information: {'fold': 0, 'epoch': 19, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9322280883789, 'val_acc_from_train': {1: (np.float64(0.5955555555555556), np.float64(0.08638129655811913)), 2: (np.float64(0.7855555555555557), np.float64(0.07585724083865907)), 3: (np.float64(0.861111111111111), np.float64(0.07307192465536615)), 5: (np.float64(0.9388888888888888), np.float64(0.044790320823880826))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92491912841797
+accuracies: {1: (np.float64(0.6266666666666667), np.float64(0.09676240469812107)), 2: (np.float64(0.7933333333333332), np.float64(0.08362172320989682)), 3: (np.float64(0.878888888888889), np.float64(0.06693464658590682)), 5: (np.float64(0.9433333333333332), np.float64(0.04229525846816506))}
+Evaluation information: {'fold': 0, 'epoch': 20, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.92491149902344, 'val_acc_from_train': {1: (np.float64(0.6266666666666667), np.float64(0.09676240469812107)), 2: (np.float64(0.7933333333333332), np.float64(0.08362172320989682)), 3: (np.float64(0.878888888888889), np.float64(0.06693464658590682)), 5: (np.float64(0.9433333333333332), np.float64(0.04229525846816506))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9483396742079
+accuracies: {1: (np.float64(0.5622222222222223), np.float64(0.09138171197756484)), 2: (np.float64(0.7322222222222223), np.float64(0.07910767782812253)), 3: (np.float64(0.8611111111111112), np.float64(0.053112970678742745)), 5: (np.float64(0.9611111111111109), np.float64(0.03857012212824395))}
+Evaluation information: {'fold': 0, 'epoch': 21, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9483413696289, 'val_acc_from_train': {1: (np.float64(0.5622222222222223), np.float64(0.09138171197756484)), 2: (np.float64(0.7322222222222223), np.float64(0.07910767782812253)), 3: (np.float64(0.8611111111111112), np.float64(0.053112970678742745)), 5: (np.float64(0.9611111111111109), np.float64(0.03857012212824395))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9452150132921
+accuracies: {1: (np.float64(0.5766666666666665), np.float64(0.09704905212581169)), 2: (np.float64(0.7677777777777777), np.float64(0.09208825611108211)), 3: (np.float64(0.8566666666666667), np.float64(0.07705217087815915)), 5: (np.float64(0.9455555555555554), np.float64(0.04258615088163732))}
+Evaluation information: {'fold': 0, 'epoch': 22, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94522094726562, 'val_acc_from_train': {1: (np.float64(0.5766666666666665), np.float64(0.09704905212581169)), 2: (np.float64(0.7677777777777777), np.float64(0.09208825611108211)), 3: (np.float64(0.8566666666666667), np.float64(0.07705217087815915)), 5: (np.float64(0.9455555555555554), np.float64(0.04258615088163732))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93094380696614
+accuracies: {1: (np.float64(0.5644444444444443), np.float64(0.11019623349526611)), 2: (np.float64(0.782222222222222), np.float64(0.07685162873684706)), 3: (np.float64(0.8733333333333332), np.float64(0.08317763232094622)), 5: (np.float64(0.9655555555555554), np.float64(0.04080970593823768))}
+Evaluation information: {'fold': 0, 'epoch': 23, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93093872070312, 'val_acc_from_train': {1: (np.float64(0.5644444444444443), np.float64(0.11019623349526611)), 2: (np.float64(0.782222222222222), np.float64(0.07685162873684706)), 3: (np.float64(0.8733333333333332), np.float64(0.08317763232094622)), 5: (np.float64(0.9655555555555554), np.float64(0.04080970593823768))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93933190239801
+accuracies: {1: (np.float64(0.5588888888888889), np.float64(0.08763701794093774)), 2: (np.float64(0.7633333333333334), np.float64(0.08043861243439232)), 3: (np.float64(0.8744444444444445), np.float64(0.05622924857279998)), 5: (np.float64(0.9622222222222221), np.float64(0.025434495871687987))}
+Evaluation information: {'fold': 0, 'epoch': 24, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9393310546875, 'val_acc_from_train': {1: (np.float64(0.5588888888888889), np.float64(0.08763701794093774)), 2: (np.float64(0.7633333333333334), np.float64(0.08043861243439232)), 3: (np.float64(0.8744444444444445), np.float64(0.05622924857279998)), 5: (np.float64(0.9622222222222221), np.float64(0.025434495871687987))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94471401638455
+accuracies: {1: (np.float64(0.5855555555555555), np.float64(0.13352301322891272)), 2: (np.float64(0.7766666666666667), np.float64(0.11060440015358042)), 3: (np.float64(0.8733333333333332), np.float64(0.0790686527762542)), 5: (np.float64(0.9466666666666667), np.float64(0.04988876515698587))}
+Evaluation information: {'fold': 0, 'epoch': 25, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94470977783203, 'val_acc_from_train': {1: (np.float64(0.5855555555555555), np.float64(0.13352301322891272)), 2: (np.float64(0.7766666666666667), np.float64(0.11060440015358042)), 3: (np.float64(0.8733333333333332), np.float64(0.0790686527762542)), 5: (np.float64(0.9466666666666667), np.float64(0.04988876515698587))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92548539903429
+accuracies: {1: (np.float64(0.62), np.float64(0.07726817178094983)), 2: (np.float64(0.7866666666666667), np.float64(0.06000000000000002)), 3: (np.float64(0.8611111111111109), np.float64(0.05649210586171627)), 5: (np.float64(0.9266666666666666), np.float64(0.049740065079109747))}
+Evaluation information: {'fold': 0, 'epoch': 26, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.92548370361328, 'val_acc_from_train': {1: (np.float64(0.62), np.float64(0.07726817178094983)), 2: (np.float64(0.7866666666666667), np.float64(0.06000000000000002)), 3: (np.float64(0.8611111111111109), np.float64(0.05649210586171627)), 5: (np.float64(0.9266666666666666), np.float64(0.049740065079109747))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94952477349176
+accuracies: {1: (np.float64(0.5833333333333334), np.float64(0.07441126955668095)), 2: (np.float64(0.7966666666666666), np.float64(0.07269927912424709)), 3: (np.float64(0.9), np.float64(0.05510931896727664)), 5: (np.float64(0.9755555555555555), np.float64(0.02712567914607489))}
+Evaluation information: {'fold': 0, 'epoch': 27, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94953918457031, 'val_acc_from_train': {1: (np.float64(0.5833333333333334), np.float64(0.07441126955668095)), 2: (np.float64(0.7966666666666666), np.float64(0.07269927912424709)), 3: (np.float64(0.9), np.float64(0.05510931896727664)), 5: (np.float64(0.9755555555555555), np.float64(0.02712567914607489))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9407450358073
+accuracies: {1: (np.float64(0.5477777777777778), np.float64(0.07730810571910644)), 2: (np.float64(0.7477777777777778), np.float64(0.07585724083865907)), 3: (np.float64(0.8633333333333332), np.float64(0.05044248650140519)), 5: (np.float64(0.9422222222222221), np.float64(0.03644715437079272))}
+Evaluation information: {'fold': 0, 'epoch': 28, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94074249267578, 'val_acc_from_train': {1: (np.float64(0.5477777777777778), np.float64(0.07730810571910644)), 2: (np.float64(0.7477777777777778), np.float64(0.07585724083865907)), 3: (np.float64(0.8633333333333332), np.float64(0.05044248650140519)), 5: (np.float64(0.9422222222222221), np.float64(0.03644715437079272))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93784671359592
+accuracies: {1: (np.float64(0.5444444444444444), np.float64(0.09596810169639637)), 2: (np.float64(0.7611111111111112), np.float64(0.07357703613841471)), 3: (np.float64(0.8499999999999999), np.float64(0.05884694523051272)), 5: (np.float64(0.9511111111111109), np.float64(0.037251232476089344))}
+Evaluation information: {'fold': 0, 'epoch': 29, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93783569335938, 'val_acc_from_train': {1: (np.float64(0.5444444444444444), np.float64(0.09596810169639637)), 2: (np.float64(0.7611111111111112), np.float64(0.07357703613841471)), 3: (np.float64(0.8499999999999999), np.float64(0.05884694523051272)), 5: (np.float64(0.9511111111111109), np.float64(0.037251232476089344))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.91204833984375
+accuracies: {1: (np.float64(0.5944444444444444), np.float64(0.10437941237808851)), 2: (np.float64(0.7833333333333333), np.float64(0.0718795288428261)), 3: (np.float64(0.8688888888888889), np.float64(0.05896221849520711)), 5: (np.float64(0.9611111111111109), np.float64(0.03229875967499696))}
+Evaluation information: {'fold': 0, 'epoch': 30, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.91205596923828, 'val_acc_from_train': {1: (np.float64(0.5944444444444444), np.float64(0.10437941237808851)), 2: (np.float64(0.7833333333333333), np.float64(0.0718795288428261)), 3: (np.float64(0.8688888888888889), np.float64(0.05896221849520711)), 5: (np.float64(0.9611111111111109), np.float64(0.03229875967499696))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93974473741319
+accuracies: {1: (np.float64(0.5888888888888888), np.float64(0.08874989132318158)), 2: (np.float64(0.8033333333333332), np.float64(0.07951240294584377)), 3: (np.float64(0.8755555555555554), np.float64(0.06773222512945853)), 5: (np.float64(0.9444444444444443), np.float64(0.039752319599996255))}
+Evaluation information: {'fold': 0, 'epoch': 31, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93974304199219, 'val_acc_from_train': {1: (np.float64(0.5888888888888888), np.float64(0.08874989132318158)), 2: (np.float64(0.8033333333333332), np.float64(0.07951240294584377)), 3: (np.float64(0.8755555555555554), np.float64(0.06773222512945853)), 5: (np.float64(0.9444444444444443), np.float64(0.039752319599996255))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94393751356337
+accuracies: {1: (np.float64(0.6055555555555555), np.float64(0.10889455767556991)), 2: (np.float64(0.7822222222222224), np.float64(0.08243216440440627)), 3: (np.float64(0.8699999999999999), np.float64(0.07421190879776243)), 5: (np.float64(0.9544444444444443), np.float64(0.03386611256472926))}
+Evaluation information: {'fold': 0, 'epoch': 32, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94393920898438, 'val_acc_from_train': {1: (np.float64(0.6055555555555555), np.float64(0.10889455767556991)), 2: (np.float64(0.7822222222222224), np.float64(0.08243216440440627)), 3: (np.float64(0.8699999999999999), np.float64(0.07421190879776243)), 5: (np.float64(0.9544444444444443), np.float64(0.03386611256472926))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9316168891059
+accuracies: {1: (np.float64(0.5944444444444446), np.float64(0.0720510792749932)), 2: (np.float64(0.8099999999999999), np.float64(0.06563084189165494)), 3: (np.float64(0.9022222222222221), np.float64(0.05370242654930921)), 5: (np.float64(0.9722222222222222), np.float64(0.034516054593353475))}
+Evaluation information: {'fold': 0, 'epoch': 33, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9316177368164, 'val_acc_from_train': {1: (np.float64(0.5944444444444446), np.float64(0.0720510792749932)), 2: (np.float64(0.8099999999999999), np.float64(0.06563084189165494)), 3: (np.float64(0.9022222222222221), np.float64(0.05370242654930921)), 5: (np.float64(0.9722222222222222), np.float64(0.034516054593353475))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92408243815105
+accuracies: {1: (np.float64(0.5844444444444444), np.float64(0.08680899993166492)), 2: (np.float64(0.7922222222222222), np.float64(0.08931149539603817)), 3: (np.float64(0.8911111111111111), np.float64(0.0660714166547489)), 5: (np.float64(0.9511111111111109), np.float64(0.04280302285390714))}
+Evaluation information: {'fold': 0, 'epoch': 34, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.92407989501953, 'val_acc_from_train': {1: (np.float64(0.5844444444444444), np.float64(0.08680899993166492)), 2: (np.float64(0.7922222222222222), np.float64(0.08931149539603817)), 3: (np.float64(0.8911111111111111), np.float64(0.0660714166547489)), 5: (np.float64(0.9511111111111109), np.float64(0.04280302285390714))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92319234212239
+accuracies: {1: (np.float64(0.5922222222222222), np.float64(0.08418820773117607)), 2: (np.float64(0.7588888888888888), np.float64(0.06305983832738986)), 3: (np.float64(0.8544444444444445), np.float64(0.06581868097608838)), 5: (np.float64(0.9444444444444444), np.float64(0.04499657051403684))}
+Evaluation information: {'fold': 0, 'epoch': 35, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9231948852539, 'val_acc_from_train': {1: (np.float64(0.5922222222222222), np.float64(0.08418820773117607)), 2: (np.float64(0.7588888888888888), np.float64(0.06305983832738986)), 3: (np.float64(0.8544444444444445), np.float64(0.06581868097608838)), 5: (np.float64(0.9444444444444444), np.float64(0.04499657051403684))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93279859754774
+accuracies: {1: (np.float64(0.6355555555555557), np.float64(0.07450246495217872)), 2: (np.float64(0.83), np.float64(0.07997684850190272)), 3: (np.float64(0.8955555555555555), np.float64(0.051448164012400995)), 5: (np.float64(0.9444444444444443), np.float64(0.03478327964999672))}
+Evaluation information: {'fold': 0, 'epoch': 36, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93280029296875, 'val_acc_from_train': {1: (np.float64(0.6355555555555557), np.float64(0.07450246495217872)), 2: (np.float64(0.83), np.float64(0.07997684850190272)), 3: (np.float64(0.8955555555555555), np.float64(0.051448164012400995)), 5: (np.float64(0.9444444444444443), np.float64(0.03478327964999672))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97395579020183
+accuracies: {1: (np.float64(0.5977777777777777), np.float64(0.10678234468207969)), 2: (np.float64(0.8066666666666665), np.float64(0.0634793638092698)), 3: (np.float64(0.8588888888888888), np.float64(0.056884114382978676)), 5: (np.float64(0.9255555555555556), np.float64(0.04007708621526984))}
+Evaluation information: {'fold': 0, 'epoch': 37, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97396087646484, 'val_acc_from_train': {1: (np.float64(0.5977777777777777), np.float64(0.10678234468207969)), 2: (np.float64(0.8066666666666665), np.float64(0.0634793638092698)), 3: (np.float64(0.8588888888888888), np.float64(0.056884114382978676)), 5: (np.float64(0.9255555555555556), np.float64(0.04007708621526984))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9194090101454
+accuracies: {1: (np.float64(0.5788888888888888), np.float64(0.08712839964495707)), 2: (np.float64(0.7466666666666665), np.float64(0.06699917080747263)), 3: (np.float64(0.8644444444444445), np.float64(0.061423444271490026)), 5: (np.float64(0.9411111111111111), np.float64(0.043617303169756705))}
+Evaluation information: {'fold': 0, 'epoch': 38, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.91940307617188, 'val_acc_from_train': {1: (np.float64(0.5788888888888888), np.float64(0.08712839964495707)), 2: (np.float64(0.7466666666666665), np.float64(0.06699917080747263)), 3: (np.float64(0.8644444444444445), np.float64(0.061423444271490026)), 5: (np.float64(0.9411111111111111), np.float64(0.043617303169756705))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94182925754123
+accuracies: {1: (np.float64(0.5855555555555555), np.float64(0.08330369843434027)), 2: (np.float64(0.7844444444444446), np.float64(0.08061492065429804)), 3: (np.float64(0.861111111111111), np.float64(0.0672658260785125)), 5: (np.float64(0.9333333333333332), np.float64(0.047919685895217376))}
+Evaluation information: {'fold': 0, 'epoch': 39, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94183349609375, 'val_acc_from_train': {1: (np.float64(0.5855555555555555), np.float64(0.08330369843434027)), 2: (np.float64(0.7844444444444446), np.float64(0.08061492065429804)), 3: (np.float64(0.861111111111111), np.float64(0.0672658260785125)), 5: (np.float64(0.9333333333333332), np.float64(0.047919685895217376))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92995029025607
+accuracies: {1: (np.float64(0.5777777777777778), np.float64(0.0785674201318386)), 2: (np.float64(0.7766666666666667), np.float64(0.0731057073315377)), 3: (np.float64(0.8666666666666665), np.float64(0.05773502691896258)), 5: (np.float64(0.9544444444444442), np.float64(0.03700183512299269))}
+Evaluation information: {'fold': 0, 'epoch': 40, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9299545288086, 'val_acc_from_train': {1: (np.float64(0.5777777777777778), np.float64(0.0785674201318386)), 2: (np.float64(0.7766666666666667), np.float64(0.0731057073315377)), 3: (np.float64(0.8666666666666665), np.float64(0.05773502691896258)), 5: (np.float64(0.9544444444444442), np.float64(0.03700183512299269))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94513702392578
+accuracies: {1: (np.float64(0.6333333333333333), np.float64(0.07601169500660919)), 2: (np.float64(0.7944444444444445), np.float64(0.07605228870510047)), 3: (np.float64(0.8955555555555555), np.float64(0.05425135829214978)), 5: (np.float64(0.9544444444444444), np.float64(0.03700183512299269))}
+Evaluation information: {'fold': 0, 'epoch': 41, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94513702392578, 'val_acc_from_train': {1: (np.float64(0.6333333333333333), np.float64(0.07601169500660919)), 2: (np.float64(0.7944444444444445), np.float64(0.07605228870510047)), 3: (np.float64(0.8955555555555555), np.float64(0.05425135829214978)), 5: (np.float64(0.9544444444444444), np.float64(0.03700183512299269))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95776621500652
+accuracies: {1: (np.float64(0.548888888888889), np.float64(0.09802997777827899)), 2: (np.float64(0.7544444444444446), np.float64(0.07225640216839606)), 3: (np.float64(0.88), np.float64(0.04914076530554662)), 5: (np.float64(0.9422222222222221), np.float64(0.04629481479111034))}
+Evaluation information: {'fold': 0, 'epoch': 42, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95777130126953, 'val_acc_from_train': {1: (np.float64(0.548888888888889), np.float64(0.09802997777827899)), 2: (np.float64(0.7544444444444446), np.float64(0.07225640216839606)), 3: (np.float64(0.88), np.float64(0.04914076530554662)), 5: (np.float64(0.9422222222222221), np.float64(0.04629481479111034))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92290496826172
+accuracies: {1: (np.float64(0.5700000000000001), np.float64(0.08135427781326879)), 2: (np.float64(0.7822222222222222), np.float64(0.07539197979416615)), 3: (np.float64(0.8744444444444444), np.float64(0.04995059287330893)), 5: (np.float64(0.9344444444444443), np.float64(0.04751867728965132))}
+Evaluation information: {'fold': 0, 'epoch': 43, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.92289733886719, 'val_acc_from_train': {1: (np.float64(0.5700000000000001), np.float64(0.08135427781326879)), 2: (np.float64(0.7822222222222222), np.float64(0.07539197979416615)), 3: (np.float64(0.8744444444444444), np.float64(0.04995059287330893)), 5: (np.float64(0.9344444444444443), np.float64(0.04751867728965132))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95455000135634
+accuracies: {1: (np.float64(0.6066666666666667), np.float64(0.08666666666666667)), 2: (np.float64(0.7644444444444446), np.float64(0.07145748973694904)), 3: (np.float64(0.8588888888888887), np.float64(0.06305983832738983)), 5: (np.float64(0.9433333333333332), np.float64(0.03121015978930697))}
+Evaluation information: {'fold': 0, 'epoch': 44, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95455932617188, 'val_acc_from_train': {1: (np.float64(0.6066666666666667), np.float64(0.08666666666666667)), 2: (np.float64(0.7644444444444446), np.float64(0.07145748973694904)), 3: (np.float64(0.8588888888888887), np.float64(0.06305983832738983)), 5: (np.float64(0.9433333333333332), np.float64(0.03121015978930697))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92970784505208
+accuracies: {1: (np.float64(0.5633333333333332), np.float64(0.07904522849703292)), 2: (np.float64(0.7577777777777778), np.float64(0.08207193472275287)), 3: (np.float64(0.8588888888888889), np.float64(0.06187402574367047)), 5: (np.float64(0.941111111111111), np.float64(0.04188461516660169))}
+Evaluation information: {'fold': 0, 'epoch': 45, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9297103881836, 'val_acc_from_train': {1: (np.float64(0.5633333333333332), np.float64(0.07904522849703292)), 2: (np.float64(0.7577777777777778), np.float64(0.08207193472275287)), 3: (np.float64(0.8588888888888889), np.float64(0.06187402574367047)), 5: (np.float64(0.941111111111111), np.float64(0.04188461516660169))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93019443088107
+accuracies: {1: (np.float64(0.6055555555555556), np.float64(0.08077556163855927)), 2: (np.float64(0.8122222222222223), np.float64(0.07721222956929641)), 3: (np.float64(0.8955555555555555), np.float64(0.06190394789859609)), 5: (np.float64(0.9711111111111111), np.float64(0.02543449587168799))}
+Evaluation information: {'fold': 0, 'epoch': 46, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93019104003906, 'val_acc_from_train': {1: (np.float64(0.6055555555555556), np.float64(0.08077556163855927)), 2: (np.float64(0.8122222222222223), np.float64(0.07721222956929641)), 3: (np.float64(0.8955555555555555), np.float64(0.06190394789859609)), 5: (np.float64(0.9711111111111111), np.float64(0.02543449587168799))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.92094167073567
+accuracies: {1: (np.float64(0.5844444444444444), np.float64(0.09878271453730164)), 2: (np.float64(0.7744444444444444), np.float64(0.06975264940319785)), 3: (np.float64(0.8944444444444443), np.float64(0.05311297067874274)), 5: (np.float64(0.9666666666666663), np.float64(0.03103164454170875))}
+Evaluation information: {'fold': 0, 'epoch': 47, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.92094421386719, 'val_acc_from_train': {1: (np.float64(0.5844444444444444), np.float64(0.09878271453730164)), 2: (np.float64(0.7744444444444444), np.float64(0.06975264940319785)), 3: (np.float64(0.8944444444444443), np.float64(0.05311297067874274)), 5: (np.float64(0.9666666666666663), np.float64(0.03103164454170875))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93585883246527
+accuracies: {1: (np.float64(0.5566666666666666), np.float64(0.07461009761866462)), 2: (np.float64(0.74), np.float64(0.059876415934699945)), 3: (np.float64(0.8455555555555555), np.float64(0.05992794026738578)), 5: (np.float64(0.9299999999999997), np.float64(0.03882534491034699))}
+Evaluation information: {'fold': 0, 'epoch': 48, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93585968017578, 'val_acc_from_train': {1: (np.float64(0.5566666666666666), np.float64(0.07461009761866462)), 2: (np.float64(0.74), np.float64(0.059876415934699945)), 3: (np.float64(0.8455555555555555), np.float64(0.05992794026738578)), 5: (np.float64(0.9299999999999997), np.float64(0.03882534491034699))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94057040744357
+accuracies: {1: (np.float64(0.5988888888888888), np.float64(0.10416629629563787)), 2: (np.float64(0.7855555555555555), np.float64(0.06814110269538654)), 3: (np.float64(0.8833333333333333), np.float64(0.06483597538175626)), 5: (np.float64(0.9444444444444442), np.float64(0.04740162001711453))}
+Evaluation information: {'fold': 0, 'epoch': 49, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94056701660156, 'val_acc_from_train': {1: (np.float64(0.5988888888888888), np.float64(0.10416629629563787)), 2: (np.float64(0.7855555555555555), np.float64(0.06814110269538654)), 3: (np.float64(0.8833333333333333), np.float64(0.06483597538175626)), 5: (np.float64(0.9444444444444442), np.float64(0.04740162001711453))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93885548909505
+accuracies: {1: (np.float64(0.6), np.float64(0.0894427190999916)), 2: (np.float64(0.7977777777777777), np.float64(0.06550845765770524)), 3: (np.float64(0.8855555555555557), np.float64(0.05352973097975958)), 5: (np.float64(0.9577777777777777), np.float64(0.03212629398844657))}
+Evaluation information: {'fold': 0, 'epoch': 50, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93885803222656, 'val_acc_from_train': {1: (np.float64(0.6), np.float64(0.0894427190999916)), 2: (np.float64(0.7977777777777777), np.float64(0.06550845765770524)), 3: (np.float64(0.8855555555555557), np.float64(0.05352973097975958)), 5: (np.float64(0.9577777777777777), np.float64(0.03212629398844657))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95547570122613
+accuracies: {1: (np.float64(0.5433333333333332), np.float64(0.08261916197787243)), 2: (np.float64(0.7311111111111113), np.float64(0.05769224438109856)), 3: (np.float64(0.8366666666666666), np.float64(0.05044248650140518)), 5: (np.float64(0.9144444444444442), np.float64(0.03914203323068563))}
+Evaluation information: {'fold': 0, 'epoch': 51, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95547485351562, 'val_acc_from_train': {1: (np.float64(0.5433333333333332), np.float64(0.08261916197787243)), 2: (np.float64(0.7311111111111113), np.float64(0.05769224438109856)), 3: (np.float64(0.8366666666666666), np.float64(0.05044248650140518)), 5: (np.float64(0.9144444444444442), np.float64(0.03914203323068563))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96367899576823
+accuracies: {1: (np.float64(0.5933333333333334), np.float64(0.0804616310676963)), 2: (np.float64(0.781111111111111), np.float64(0.07387844537724132)), 3: (np.float64(0.8588888888888889), np.float64(0.05688411438297868)), 5: (np.float64(0.9455555555555555), np.float64(0.04673275743291797))}
+Evaluation information: {'fold': 0, 'epoch': 52, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96369171142578, 'val_acc_from_train': {1: (np.float64(0.5933333333333334), np.float64(0.0804616310676963)), 2: (np.float64(0.781111111111111), np.float64(0.07387844537724132)), 3: (np.float64(0.8588888888888889), np.float64(0.05688411438297868)), 5: (np.float64(0.9455555555555555), np.float64(0.04673275743291797))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96229722764757
+accuracies: {1: (np.float64(0.6), np.float64(0.09269623828717427)), 2: (np.float64(0.7677777777777777), np.float64(0.06468346479034619)), 3: (np.float64(0.8755555555555553), np.float64(0.05769224438109853)), 5: (np.float64(0.9577777777777776), np.float64(0.04121608220220312))}
+Evaluation information: {'fold': 0, 'epoch': 53, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96229553222656, 'val_acc_from_train': {1: (np.float64(0.6), np.float64(0.09269623828717427)), 2: (np.float64(0.7677777777777777), np.float64(0.06468346479034619)), 3: (np.float64(0.8755555555555553), np.float64(0.05769224438109853)), 5: (np.float64(0.9577777777777776), np.float64(0.04121608220220312))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9432390001085
+accuracies: {1: (np.float64(0.5888888888888888), np.float64(0.07950463919999251)), 2: (np.float64(0.777777777777778), np.float64(0.08089010988089466)), 3: (np.float64(0.8677777777777779), np.float64(0.057402628235953275)), 5: (np.float64(0.9244444444444444), np.float64(0.05159194118330621))}
+Evaluation information: {'fold': 0, 'epoch': 54, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9432373046875, 'val_acc_from_train': {1: (np.float64(0.5888888888888888), np.float64(0.07950463919999251)), 2: (np.float64(0.777777777777778), np.float64(0.08089010988089466)), 3: (np.float64(0.8677777777777779), np.float64(0.057402628235953275)), 5: (np.float64(0.9244444444444444), np.float64(0.05159194118330621))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95339626736111
+accuracies: {1: (np.float64(0.6088888888888889), np.float64(0.08774260898844281)), 2: (np.float64(0.8055555555555556), np.float64(0.07407870355903684)), 3: (np.float64(0.8811111111111111), np.float64(0.05622924857279997)), 5: (np.float64(0.9266666666666666), np.float64(0.04422166387140532))}
+Evaluation information: {'fold': 0, 'epoch': 55, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95339965820312, 'val_acc_from_train': {1: (np.float64(0.6088888888888889), np.float64(0.08774260898844281)), 2: (np.float64(0.8055555555555556), np.float64(0.07407870355903684)), 3: (np.float64(0.8811111111111111), np.float64(0.05622924857279997)), 5: (np.float64(0.9266666666666666), np.float64(0.04422166387140532))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95201195610895
+accuracies: {1: (np.float64(0.5688888888888889), np.float64(0.09306840707276408)), 2: (np.float64(0.7555555555555554), np.float64(0.08663817195385748)), 3: (np.float64(0.8555555555555557), np.float64(0.07062332703142536)), 5: (np.float64(0.9266666666666665), np.float64(0.05192587309132409))}
+Evaluation information: {'fold': 0, 'epoch': 56, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9520034790039, 'val_acc_from_train': {1: (np.float64(0.5688888888888889), np.float64(0.09306840707276408)), 2: (np.float64(0.7555555555555554), np.float64(0.08663817195385748)), 3: (np.float64(0.8555555555555557), np.float64(0.07062332703142536)), 5: (np.float64(0.9266666666666665), np.float64(0.05192587309132409))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93964555528429
+accuracies: {1: (np.float64(0.6233333333333334), np.float64(0.08783401855098522)), 2: (np.float64(0.78), np.float64(0.05747785402834474)), 3: (np.float64(0.861111111111111), np.float64(0.05097808776424204)), 5: (np.float64(0.9388888888888887), np.float64(0.03759760959041916))}
+Evaluation information: {'fold': 0, 'epoch': 57, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93965911865234, 'val_acc_from_train': {1: (np.float64(0.6233333333333334), np.float64(0.08783401855098522)), 2: (np.float64(0.78), np.float64(0.05747785402834474)), 3: (np.float64(0.861111111111111), np.float64(0.05097808776424204)), 5: (np.float64(0.9388888888888887), np.float64(0.03759760959041916))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95889960394965
+accuracies: {1: (np.float64(0.6099999999999999), np.float64(0.06999999999999998)), 2: (np.float64(0.7744444444444445), np.float64(0.06814110269538652)), 3: (np.float64(0.8766666666666666), np.float64(0.055210036661354864)), 5: (np.float64(0.9466666666666664), np.float64(0.03610683735393759))}
+Evaluation information: {'fold': 0, 'epoch': 58, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95890045166016, 'val_acc_from_train': {1: (np.float64(0.6099999999999999), np.float64(0.06999999999999998)), 2: (np.float64(0.7744444444444445), np.float64(0.06814110269538652)), 3: (np.float64(0.8766666666666666), np.float64(0.055210036661354864)), 5: (np.float64(0.9466666666666664), np.float64(0.03610683735393759))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95197380913629
+accuracies: {1: (np.float64(0.6311111111111111), np.float64(0.07400367024598539)), 2: (np.float64(0.8111111111111111), np.float64(0.05258737584977438)), 3: (np.float64(0.8966666666666665), np.float64(0.05044248650140518)), 5: (np.float64(0.941111111111111), np.float64(0.04099081499043714))}
+Evaluation information: {'fold': 0, 'epoch': 59, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95197296142578, 'val_acc_from_train': {1: (np.float64(0.6311111111111111), np.float64(0.07400367024598539)), 2: (np.float64(0.8111111111111111), np.float64(0.05258737584977438)), 3: (np.float64(0.8966666666666665), np.float64(0.05044248650140518)), 5: (np.float64(0.941111111111111), np.float64(0.04099081499043714))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9670647515191
+accuracies: {1: (np.float64(0.6322222222222222), np.float64(0.07526906468639975)), 2: (np.float64(0.7922222222222223), np.float64(0.0636444599627542)), 3: (np.float64(0.8788888888888889), np.float64(0.05867887078449286)), 5: (np.float64(0.9455555555555555), np.float64(0.034942633763369736))}
+Evaluation information: {'fold': 0, 'epoch': 60, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96705627441406, 'val_acc_from_train': {1: (np.float64(0.6322222222222222), np.float64(0.07526906468639975)), 2: (np.float64(0.7922222222222223), np.float64(0.0636444599627542)), 3: (np.float64(0.8788888888888889), np.float64(0.05867887078449286)), 5: (np.float64(0.9455555555555555), np.float64(0.034942633763369736))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97748480902777
+accuracies: {1: (np.float64(0.6088888888888889), np.float64(0.07248669524577817)), 2: (np.float64(0.7677777777777777), np.float64(0.06803230895485173)), 3: (np.float64(0.8733333333333333), np.float64(0.056699336987435865)), 5: (np.float64(0.9522222222222221), np.float64(0.04188461516660169))}
+Evaluation information: {'fold': 0, 'epoch': 61, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97748565673828, 'val_acc_from_train': {1: (np.float64(0.6088888888888889), np.float64(0.07248669524577817)), 2: (np.float64(0.7677777777777777), np.float64(0.06803230895485173)), 3: (np.float64(0.8733333333333333), np.float64(0.056699336987435865)), 5: (np.float64(0.9522222222222221), np.float64(0.04188461516660169))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96629418267145
+accuracies: {1: (np.float64(0.6088888888888888), np.float64(0.10608638455360009)), 2: (np.float64(0.7822222222222222), np.float64(0.08288024977320678)), 3: (np.float64(0.8722222222222219), np.float64(0.06889784887967776)), 5: (np.float64(0.9344444444444442), np.float64(0.05126787553359699))}
+Evaluation information: {'fold': 0, 'epoch': 62, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9662857055664, 'val_acc_from_train': {1: (np.float64(0.6088888888888888), np.float64(0.10608638455360009)), 2: (np.float64(0.7822222222222222), np.float64(0.08288024977320678)), 3: (np.float64(0.8722222222222219), np.float64(0.06889784887967776)), 5: (np.float64(0.9344444444444442), np.float64(0.05126787553359699))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95186275906033
+accuracies: {1: (np.float64(0.6066666666666668), np.float64(0.05799105933644394)), 2: (np.float64(0.7622222222222224), np.float64(0.06008224815375903)), 3: (np.float64(0.8477777777777776), np.float64(0.05880497165510773)), 5: (np.float64(0.9511111111111109), np.float64(0.03189488909868293))}
+Evaluation information: {'fold': 0, 'epoch': 63, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95185852050781, 'val_acc_from_train': {1: (np.float64(0.6066666666666668), np.float64(0.05799105933644394)), 2: (np.float64(0.7622222222222224), np.float64(0.06008224815375903)), 3: (np.float64(0.8477777777777776), np.float64(0.05880497165510773)), 5: (np.float64(0.9511111111111109), np.float64(0.03189488909868293))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9463127983941
+accuracies: {1: (np.float64(0.6144444444444443), np.float64(0.0897252321476552)), 2: (np.float64(0.7588888888888888), np.float64(0.0901370698326981)), 3: (np.float64(0.85), np.float64(0.07084150279686703)), 5: (np.float64(0.9366666666666666), np.float64(0.04333333333333332))}
+Evaluation information: {'fold': 0, 'epoch': 64, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94631958007812, 'val_acc_from_train': {1: (np.float64(0.6144444444444443), np.float64(0.0897252321476552)), 2: (np.float64(0.7588888888888888), np.float64(0.0901370698326981)), 3: (np.float64(0.85), np.float64(0.07084150279686703)), 5: (np.float64(0.9366666666666666), np.float64(0.04333333333333332))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.93868849012587
+accuracies: {1: (np.float64(0.5977777777777776), np.float64(0.08982836858403437)), 2: (np.float64(0.7744444444444444), np.float64(0.054217212883359366)), 3: (np.float64(0.8544444444444446), np.float64(0.049802077402255465)), 5: (np.float64(0.9322222222222221), np.float64(0.03386611256472926))}
+Evaluation information: {'fold': 0, 'epoch': 65, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.93869018554688, 'val_acc_from_train': {1: (np.float64(0.5977777777777776), np.float64(0.08982836858403437)), 2: (np.float64(0.7744444444444444), np.float64(0.054217212883359366)), 3: (np.float64(0.8544444444444446), np.float64(0.049802077402255465)), 5: (np.float64(0.9322222222222221), np.float64(0.03386611256472926))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94837019178603
+accuracies: {1: (np.float64(0.61), np.float64(0.08655976312694365)), 2: (np.float64(0.76), np.float64(0.07221367470787524)), 3: (np.float64(0.8588888888888888), np.float64(0.054896085897936105)), 5: (np.float64(0.9344444444444444), np.float64(0.04080970593823768))}
+Evaluation information: {'fold': 0, 'epoch': 66, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94835662841797, 'val_acc_from_train': {1: (np.float64(0.61), np.float64(0.08655976312694365)), 2: (np.float64(0.76), np.float64(0.07221367470787524)), 3: (np.float64(0.8588888888888888), np.float64(0.054896085897936105)), 5: (np.float64(0.9344444444444444), np.float64(0.04080970593823768))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.94392903645833
+accuracies: {1: (np.float64(0.6344444444444445), np.float64(0.07122386893572152)), 2: (np.float64(0.7744444444444444), np.float64(0.06593112755176356)), 3: (np.float64(0.8433333333333334), np.float64(0.056535796592038015)), 5: (np.float64(0.9199999999999999), np.float64(0.04181086160494839))}
+Evaluation information: {'fold': 0, 'epoch': 67, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.94393920898438, 'val_acc_from_train': {1: (np.float64(0.6344444444444445), np.float64(0.07122386893572152)), 2: (np.float64(0.7744444444444444), np.float64(0.06593112755176356)), 3: (np.float64(0.8433333333333334), np.float64(0.056535796592038015)), 5: (np.float64(0.9199999999999999), np.float64(0.04181086160494839))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96376207139757
+accuracies: {1: (np.float64(0.5644444444444444), np.float64(0.08296957645597541)), 2: (np.float64(0.7677777777777778), np.float64(0.07327438708354468)), 3: (np.float64(0.8666666666666666), np.float64(0.056437444885334635)), 5: (np.float64(0.9233333333333332), np.float64(0.04566382797341003))}
+Evaluation information: {'fold': 0, 'epoch': 68, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96375274658203, 'val_acc_from_train': {1: (np.float64(0.5644444444444444), np.float64(0.08296957645597541)), 2: (np.float64(0.7677777777777778), np.float64(0.07327438708354468)), 3: (np.float64(0.8666666666666666), np.float64(0.056437444885334635)), 5: (np.float64(0.9233333333333332), np.float64(0.04566382797341003))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97805955674913
+accuracies: {1: (np.float64(0.6322222222222221), np.float64(0.08141495600765498)), 2: (np.float64(0.7944444444444443), np.float64(0.06889784887967777)), 3: (np.float64(0.8722222222222222), np.float64(0.06211299937499414)), 5: (np.float64(0.9288888888888889), np.float64(0.0484831649539365))}
+Evaluation information: {'fold': 0, 'epoch': 69, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97805786132812, 'val_acc_from_train': {1: (np.float64(0.6322222222222221), np.float64(0.08141495600765498)), 2: (np.float64(0.7944444444444443), np.float64(0.06889784887967777)), 3: (np.float64(0.8722222222222222), np.float64(0.06211299937499414)), 5: (np.float64(0.9288888888888889), np.float64(0.0484831649539365))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97291056315105
+accuracies: {1: (np.float64(0.5966666666666666), np.float64(0.06741249472052227)), 2: (np.float64(0.7644444444444443), np.float64(0.08341477501832652)), 3: (np.float64(0.8544444444444443), np.float64(0.06748570950693428)), 5: (np.float64(0.9233333333333333), np.float64(0.04880042501332832))}
+Evaluation information: {'fold': 0, 'epoch': 70, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97290802001953, 'val_acc_from_train': {1: (np.float64(0.5966666666666666), np.float64(0.06741249472052227)), 2: (np.float64(0.7644444444444443), np.float64(0.08341477501832652)), 3: (np.float64(0.8544444444444443), np.float64(0.06748570950693428)), 5: (np.float64(0.9233333333333333), np.float64(0.04880042501332832))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9681413438585
+accuracies: {1: (np.float64(0.6088888888888888), np.float64(0.0965836169426699)), 2: (np.float64(0.7633333333333332), np.float64(0.07997684850190272)), 3: (np.float64(0.8577777777777775), np.float64(0.06773222512945853)), 5: (np.float64(0.9377777777777775), np.float64(0.04693047129320638))}
+Evaluation information: {'fold': 0, 'epoch': 71, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9681396484375, 'val_acc_from_train': {1: (np.float64(0.6088888888888888), np.float64(0.0965836169426699)), 2: (np.float64(0.7633333333333332), np.float64(0.07997684850190272)), 3: (np.float64(0.8577777777777775), np.float64(0.06773222512945853)), 5: (np.float64(0.9377777777777775), np.float64(0.04693047129320638))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97007581922743
+accuracies: {1: (np.float64(0.61), np.float64(0.0890900501573382)), 2: (np.float64(0.7511111111111111), np.float64(0.07969076034240495)), 3: (np.float64(0.8488888888888887), np.float64(0.05946261404559845)), 5: (np.float64(0.9199999999999998), np.float64(0.04438885412319594))}
+Evaluation information: {'fold': 0, 'epoch': 72, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97007751464844, 'val_acc_from_train': {1: (np.float64(0.61), np.float64(0.0890900501573382)), 2: (np.float64(0.7511111111111111), np.float64(0.07969076034240495)), 3: (np.float64(0.8488888888888887), np.float64(0.05946261404559845)), 5: (np.float64(0.9199999999999998), np.float64(0.04438885412319594))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.95534430609808
+accuracies: {1: (np.float64(0.6188888888888889), np.float64(0.08150588860041469)), 2: (np.float64(0.7800000000000001), np.float64(0.06475023237481543)), 3: (np.float64(0.8755555555555555), np.float64(0.0660714166547489)), 5: (np.float64(0.9199999999999999), np.float64(0.04602736706046216))}
+Evaluation information: {'fold': 0, 'epoch': 73, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.95533752441406, 'val_acc_from_train': {1: (np.float64(0.6188888888888889), np.float64(0.08150588860041469)), 2: (np.float64(0.7800000000000001), np.float64(0.06475023237481543)), 3: (np.float64(0.8755555555555555), np.float64(0.0660714166547489)), 5: (np.float64(0.9199999999999999), np.float64(0.04602736706046216))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97481706407335
+accuracies: {1: (np.float64(0.6366666666666668), np.float64(0.07470931321784105)), 2: (np.float64(0.7988888888888889), np.float64(0.058678870784492874)), 3: (np.float64(0.8799999999999998), np.float64(0.056829830455752975)), 5: (np.float64(0.9299999999999998), np.float64(0.05329859980093979))}
+Evaluation information: {'fold': 0, 'epoch': 74, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97482299804688, 'val_acc_from_train': {1: (np.float64(0.6366666666666668), np.float64(0.07470931321784105)), 2: (np.float64(0.7988888888888889), np.float64(0.058678870784492874)), 3: (np.float64(0.8799999999999998), np.float64(0.056829830455752975)), 5: (np.float64(0.9299999999999998), np.float64(0.05329859980093979))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96498107910156
+accuracies: {1: (np.float64(0.6411111111111112), np.float64(0.08285790305556516)), 2: (np.float64(0.7877777777777779), np.float64(0.0747753838150722)), 3: (np.float64(0.8744444444444444), np.float64(0.05068664323536462)), 5: (np.float64(0.931111111111111), np.float64(0.0429757324573638))}
+Evaluation information: {'fold': 0, 'epoch': 75, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96498107910156, 'val_acc_from_train': {1: (np.float64(0.6411111111111112), np.float64(0.08285790305556516)), 2: (np.float64(0.7877777777777779), np.float64(0.0747753838150722)), 3: (np.float64(0.8744444444444444), np.float64(0.05068664323536462)), 5: (np.float64(0.931111111111111), np.float64(0.0429757324573638))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9699952867296
+accuracies: {1: (np.float64(0.5833333333333333), np.float64(0.08638844229966738)), 2: (np.float64(0.8066666666666666), np.float64(0.07221367470787522)), 3: (np.float64(0.898888888888889), np.float64(0.0498020774022555)), 5: (np.float64(0.942222222222222), np.float64(0.042105100714436475))}
+Evaluation information: {'fold': 0, 'epoch': 76, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97000122070312, 'val_acc_from_train': {1: (np.float64(0.5833333333333333), np.float64(0.08638844229966738)), 2: (np.float64(0.8066666666666666), np.float64(0.07221367470787522)), 3: (np.float64(0.898888888888889), np.float64(0.0498020774022555)), 5: (np.float64(0.942222222222222), np.float64(0.042105100714436475))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9880854288737
+accuracies: {1: (np.float64(0.6244444444444444), np.float64(0.08473633762194496)), 2: (np.float64(0.7644444444444445), np.float64(0.08429811883729184)), 3: (np.float64(0.8388888888888887), np.float64(0.0704920974469418)), 5: (np.float64(0.9333333333333332), np.float64(0.045542003404264876))}
+Evaluation information: {'fold': 0, 'epoch': 77, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98808288574219, 'val_acc_from_train': {1: (np.float64(0.6244444444444444), np.float64(0.08473633762194496)), 2: (np.float64(0.7644444444444445), np.float64(0.08429811883729184)), 3: (np.float64(0.8388888888888887), np.float64(0.0704920974469418)), 5: (np.float64(0.9333333333333332), np.float64(0.045542003404264876))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.99253590901692
+accuracies: {1: (np.float64(0.6233333333333333), np.float64(0.09780933834080804)), 2: (np.float64(0.788888888888889), np.float64(0.08447367914999208)), 3: (np.float64(0.8888888888888888), np.float64(0.06402160129283527)), 5: (np.float64(0.9333333333333331), np.float64(0.042163702135578386))}
+Evaluation information: {'fold': 0, 'epoch': 78, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.99253845214844, 'val_acc_from_train': {1: (np.float64(0.6233333333333333), np.float64(0.09780933834080804)), 2: (np.float64(0.788888888888889), np.float64(0.08447367914999208)), 3: (np.float64(0.8888888888888888), np.float64(0.06402160129283527)), 5: (np.float64(0.9333333333333331), np.float64(0.042163702135578386))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96171315511067
+accuracies: {1: (np.float64(0.6111111111111112), np.float64(0.087911290866011)), 2: (np.float64(0.7633333333333334), np.float64(0.07762683766537144)), 3: (np.float64(0.8355555555555557), np.float64(0.08385761006272538)), 5: (np.float64(0.9422222222222222), np.float64(0.05573304979548644))}
+Evaluation information: {'fold': 0, 'epoch': 79, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96171569824219, 'val_acc_from_train': {1: (np.float64(0.6111111111111112), np.float64(0.087911290866011)), 2: (np.float64(0.7633333333333334), np.float64(0.07762683766537144)), 3: (np.float64(0.8355555555555557), np.float64(0.08385761006272538)), 5: (np.float64(0.9422222222222222), np.float64(0.05573304979548644))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.99025302463107
+accuracies: {1: (np.float64(0.581111111111111), np.float64(0.081959038248489)), 2: (np.float64(0.8033333333333333), np.float64(0.0799768485019027)), 3: (np.float64(0.8655555555555555), np.float64(0.06410831883000737)), 5: (np.float64(0.9155555555555553), np.float64(0.05626217289409848))}
+Evaluation information: {'fold': 0, 'epoch': 80, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9902572631836, 'val_acc_from_train': {1: (np.float64(0.581111111111111), np.float64(0.081959038248489)), 2: (np.float64(0.8033333333333333), np.float64(0.0799768485019027)), 3: (np.float64(0.8655555555555555), np.float64(0.06410831883000737)), 5: (np.float64(0.9155555555555553), np.float64(0.05626217289409848))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97712961832683
+accuracies: {1: (np.float64(0.6077777777777779), np.float64(0.08462699566368717)), 2: (np.float64(0.7788888888888889), np.float64(0.07721222956929642)), 3: (np.float64(0.8655555555555555), np.float64(0.06352796603965692)), 5: (np.float64(0.9222222222222222), np.float64(0.052587375849774354))}
+Evaluation information: {'fold': 0, 'epoch': 81, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97712707519531, 'val_acc_from_train': {1: (np.float64(0.6077777777777779), np.float64(0.08462699566368717)), 2: (np.float64(0.7788888888888889), np.float64(0.07721222956929642)), 3: (np.float64(0.8655555555555555), np.float64(0.06352796603965692)), 5: (np.float64(0.9222222222222222), np.float64(0.052587375849774354))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97182379828558
+accuracies: {1: (np.float64(0.6355555555555557), np.float64(0.09581360505471156)), 2: (np.float64(0.8000000000000002), np.float64(0.07403702777314528)), 3: (np.float64(0.8822222222222221), np.float64(0.06190394789859607)), 5: (np.float64(0.9366666666666664), np.float64(0.044179767449046746))}
+Evaluation information: {'fold': 0, 'epoch': 82, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97183227539062, 'val_acc_from_train': {1: (np.float64(0.6355555555555557), np.float64(0.09581360505471156)), 2: (np.float64(0.8000000000000002), np.float64(0.07403702777314528)), 3: (np.float64(0.8822222222222221), np.float64(0.06190394789859607)), 5: (np.float64(0.9366666666666664), np.float64(0.044179767449046746))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.97322675916884
+accuracies: {1: (np.float64(0.6333333333333333), np.float64(0.09813067629253164)), 2: (np.float64(0.7911111111111111), np.float64(0.07931808132255444)), 3: (np.float64(0.8633333333333333), np.float64(0.06227180564089802)), 5: (np.float64(0.9299999999999999), np.float64(0.048951979493134866))}
+Evaluation information: {'fold': 0, 'epoch': 83, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.97323608398438, 'val_acc_from_train': {1: (np.float64(0.6333333333333333), np.float64(0.09813067629253164)), 2: (np.float64(0.7911111111111111), np.float64(0.07931808132255444)), 3: (np.float64(0.8633333333333333), np.float64(0.06227180564089802)), 5: (np.float64(0.9299999999999999), np.float64(0.048951979493134866))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98308478461371
+accuracies: {1: (np.float64(0.6088888888888889), np.float64(0.08161941187647537)), 2: (np.float64(0.7755555555555554), np.float64(0.0988576729757121)), 3: (np.float64(0.851111111111111), np.float64(0.0905674838769548)), 5: (np.float64(0.9066666666666667), np.float64(0.06049181150584977))}
+Evaluation information: {'fold': 0, 'epoch': 84, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98307800292969, 'val_acc_from_train': {1: (np.float64(0.6088888888888889), np.float64(0.08161941187647537)), 2: (np.float64(0.7755555555555554), np.float64(0.0988576729757121)), 3: (np.float64(0.851111111111111), np.float64(0.0905674838769548)), 5: (np.float64(0.9066666666666667), np.float64(0.06049181150584977))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98182932535808
+accuracies: {1: (np.float64(0.6011111111111112), np.float64(0.0772122295692964)), 2: (np.float64(0.8022222222222222), np.float64(0.049391357268650835)), 3: (np.float64(0.8866666666666667), np.float64(0.04521553322083511)), 5: (np.float64(0.9366666666666664), np.float64(0.03480102169636849))}
+Evaluation information: {'fold': 0, 'epoch': 85, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9818344116211, 'val_acc_from_train': {1: (np.float64(0.6011111111111112), np.float64(0.0772122295692964)), 2: (np.float64(0.8022222222222222), np.float64(0.049391357268650835)), 3: (np.float64(0.8866666666666667), np.float64(0.04521553322083511)), 5: (np.float64(0.9366666666666664), np.float64(0.03480102169636849))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98000759548611
+accuracies: {1: (np.float64(0.6133333333333334), np.float64(0.07822095958576906)), 2: (np.float64(0.7866666666666667), np.float64(0.07822095958576909)), 3: (np.float64(0.8744444444444442), np.float64(0.06246974576386932)), 5: (np.float64(0.9333333333333333), np.float64(0.042163702135578386))}
+Evaluation information: {'fold': 0, 'epoch': 86, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9800033569336, 'val_acc_from_train': {1: (np.float64(0.6133333333333334), np.float64(0.07822095958576906)), 2: (np.float64(0.7866666666666667), np.float64(0.07822095958576909)), 3: (np.float64(0.8744444444444442), np.float64(0.06246974576386932)), 5: (np.float64(0.9333333333333333), np.float64(0.042163702135578386))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.96510230170355
+accuracies: {1: (np.float64(0.6511111111111113), np.float64(0.08551947291063937)), 2: (np.float64(0.7844444444444444), np.float64(0.07187094057242771)), 3: (np.float64(0.8677777777777778), np.float64(0.05609735805050817)), 5: (np.float64(0.9188888888888888), np.float64(0.049950592873308934))}
+Evaluation information: {'fold': 0, 'epoch': 87, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.96510314941406, 'val_acc_from_train': {1: (np.float64(0.6511111111111113), np.float64(0.08551947291063937)), 2: (np.float64(0.7844444444444444), np.float64(0.07187094057242771)), 3: (np.float64(0.8677777777777778), np.float64(0.05609735805050817)), 5: (np.float64(0.9188888888888888), np.float64(0.049950592873308934))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.0014411078559
+accuracies: {1: (np.float64(0.6077777777777779), np.float64(0.09176593951091543)), 2: (np.float64(0.802222222222222), np.float64(0.07597920443235007)), 3: (np.float64(0.8811111111111111), np.float64(0.0528333041243055)), 5: (np.float64(0.921111111111111), np.float64(0.04258615088163733))}
+Evaluation information: {'fold': 0, 'epoch': 88, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.00143432617188, 'val_acc_from_train': {1: (np.float64(0.6077777777777779), np.float64(0.09176593951091543)), 2: (np.float64(0.802222222222222), np.float64(0.07597920443235007)), 3: (np.float64(0.8811111111111111), np.float64(0.0528333041243055)), 5: (np.float64(0.921111111111111), np.float64(0.04258615088163733))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.99011823866103
+accuracies: {1: (np.float64(0.6466666666666666), np.float64(0.09293566073922882)), 2: (np.float64(0.7788888888888889), np.float64(0.07225640216839607)), 3: (np.float64(0.8600000000000001), np.float64(0.0722136747078752)), 5: (np.float64(0.9199999999999997), np.float64(0.05135208892573929))}
+Evaluation information: {'fold': 0, 'epoch': 89, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9901123046875, 'val_acc_from_train': {1: (np.float64(0.6466666666666666), np.float64(0.09293566073922882)), 2: (np.float64(0.7788888888888889), np.float64(0.07225640216839607)), 3: (np.float64(0.8600000000000001), np.float64(0.0722136747078752)), 5: (np.float64(0.9199999999999997), np.float64(0.05135208892573929))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.99693552652995
+accuracies: {1: (np.float64(0.628888888888889), np.float64(0.06977919319158925)), 2: (np.float64(0.8344444444444444), np.float64(0.06115150180363117)), 3: (np.float64(0.9166666666666664), np.float64(0.059472994182545036)), 5: (np.float64(0.9477777777777775), np.float64(0.0476743065620554))}
+Evaluation information: {'fold': 0, 'epoch': 90, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.9969253540039, 'val_acc_from_train': {1: (np.float64(0.628888888888889), np.float64(0.06977919319158925)), 2: (np.float64(0.8344444444444444), np.float64(0.06115150180363117)), 3: (np.float64(0.9166666666666664), np.float64(0.059472994182545036)), 5: (np.float64(0.9477777777777775), np.float64(0.0476743065620554))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98254140218098
+accuracies: {1: (np.float64(0.6577777777777778), np.float64(0.07499794235860535)), 2: (np.float64(0.8099999999999999), np.float64(0.08261916197787247)), 3: (np.float64(0.8788888888888888), np.float64(0.07327438708354465)), 5: (np.float64(0.9322222222222222), np.float64(0.046732757432917965))}
+Evaluation information: {'fold': 0, 'epoch': 91, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98253631591797, 'val_acc_from_train': {1: (np.float64(0.6577777777777778), np.float64(0.07499794235860535)), 2: (np.float64(0.8099999999999999), np.float64(0.08261916197787247)), 3: (np.float64(0.8788888888888888), np.float64(0.07327438708354465)), 5: (np.float64(0.9322222222222222), np.float64(0.046732757432917965))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.9953859117296
+accuracies: {1: (np.float64(0.6400000000000001), np.float64(0.08450290374147354)), 2: (np.float64(0.828888888888889), np.float64(0.06130272988503877)), 3: (np.float64(0.8855555555555555), np.float64(0.04528374193847741)), 5: (np.float64(0.9333333333333331), np.float64(0.04388537257362554))}
+Evaluation information: {'fold': 0, 'epoch': 92, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.99539184570312, 'val_acc_from_train': {1: (np.float64(0.6400000000000001), np.float64(0.08450290374147354)), 2: (np.float64(0.828888888888889), np.float64(0.06130272988503877)), 3: (np.float64(0.8855555555555555), np.float64(0.04528374193847741)), 5: (np.float64(0.9333333333333331), np.float64(0.04388537257362554))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98590257432726
+accuracies: {1: (np.float64(0.6477777777777778), np.float64(0.08374712082760565)), 2: (np.float64(0.8044444444444445), np.float64(0.06425258797689318)), 3: (np.float64(0.8644444444444445), np.float64(0.05704665623552637)), 5: (np.float64(0.9322222222222221), np.float64(0.04751867728965131))}
+Evaluation information: {'fold': 0, 'epoch': 93, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98590850830078, 'val_acc_from_train': {1: (np.float64(0.6477777777777778), np.float64(0.08374712082760565)), 2: (np.float64(0.8044444444444445), np.float64(0.06425258797689318)), 3: (np.float64(0.8644444444444445), np.float64(0.05704665623552637)), 5: (np.float64(0.9322222222222221), np.float64(0.04751867728965131))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.0055194430881
+accuracies: {1: (np.float64(0.6122222222222222), np.float64(0.10800662988338)), 2: (np.float64(0.7755555555555556), np.float64(0.07837863150465957)), 3: (np.float64(0.8633333333333333), np.float64(0.060461190490723515)), 5: (np.float64(0.9133333333333332), np.float64(0.05277485372016851))}
+Evaluation information: {'fold': 0, 'epoch': 94, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.00552368164062, 'val_acc_from_train': {1: (np.float64(0.6122222222222222), np.float64(0.10800662988338)), 2: (np.float64(0.7755555555555556), np.float64(0.07837863150465957)), 3: (np.float64(0.8633333333333333), np.float64(0.060461190490723515)), 5: (np.float64(0.9133333333333332), np.float64(0.05277485372016851))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.00425296359592
+accuracies: {1: (np.float64(0.6244444444444445), np.float64(0.07790465841314712)), 2: (np.float64(0.7922222222222222), np.float64(0.0642237600738597)), 3: (np.float64(0.8688888888888889), np.float64(0.04121608220220311)), 5: (np.float64(0.9433333333333331), np.float64(0.032375116187407696))}
+Evaluation information: {'fold': 0, 'epoch': 95, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.0042495727539, 'val_acc_from_train': {1: (np.float64(0.6244444444444445), np.float64(0.07790465841314712)), 2: (np.float64(0.7922222222222222), np.float64(0.0642237600738597)), 3: (np.float64(0.8688888888888889), np.float64(0.04121608220220311)), 5: (np.float64(0.9433333333333331), np.float64(0.032375116187407696))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98680284288194
+accuracies: {1: (np.float64(0.6522222222222225), np.float64(0.08972523214765518)), 2: (np.float64(0.7911111111111111), np.float64(0.08070675465482169)), 3: (np.float64(0.8744444444444444), np.float64(0.06127251412872105)), 5: (np.float64(0.9188888888888889), np.float64(0.048444954125759186))}
+Evaluation information: {'fold': 0, 'epoch': 96, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98680114746094, 'val_acc_from_train': {1: (np.float64(0.6522222222222225), np.float64(0.08972523214765518)), 2: (np.float64(0.7911111111111111), np.float64(0.08070675465482169)), 3: (np.float64(0.8744444444444444), np.float64(0.06127251412872105)), 5: (np.float64(0.9188888888888889), np.float64(0.048444954125759186))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98055860731337
+accuracies: {1: (np.float64(0.618888888888889), np.float64(0.0850635202018809)), 2: (np.float64(0.7900000000000001), np.float64(0.06893367719664935)), 3: (np.float64(0.8677777777777778), np.float64(0.05930669397814453)), 5: (np.float64(0.9255555555555556), np.float64(0.03619221661089406))}
+Evaluation information: {'fold': 0, 'epoch': 97, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98056030273438, 'val_acc_from_train': {1: (np.float64(0.618888888888889), np.float64(0.0850635202018809)), 2: (np.float64(0.7900000000000001), np.float64(0.06893367719664935)), 3: (np.float64(0.8677777777777778), np.float64(0.05930669397814453)), 5: (np.float64(0.9255555555555556), np.float64(0.03619221661089406))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 108.98939090304904
+accuracies: {1: (np.float64(0.5644444444444444), np.float64(0.08296957645597541)), 2: (np.float64(0.7855555555555556), np.float64(0.08330369843434031)), 3: (np.float64(0.871111111111111), np.float64(0.06870944370551246)), 5: (np.float64(0.9344444444444445), np.float64(0.049052755676986914))}
+Evaluation information: {'fold': 0, 'epoch': 98, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 108.98938751220703, 'val_acc_from_train': {1: (np.float64(0.5644444444444444), np.float64(0.08296957645597541)), 2: (np.float64(0.7855555555555556), np.float64(0.08330369843434031)), 3: (np.float64(0.871111111111111), np.float64(0.06870944370551246)), 5: (np.float64(0.9344444444444445), np.float64(0.049052755676986914))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.01252916124132
+accuracies: {1: (np.float64(0.5944444444444446), np.float64(0.07844948048046156)), 2: (np.float64(0.7888888888888889), np.float64(0.07714024425648794)), 3: (np.float64(0.8544444444444445), np.float64(0.06637900902775044)), 5: (np.float64(0.91), np.float64(0.06094928067512211))}
+Evaluation information: {'fold': 0, 'epoch': 99, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.01252746582031, 'val_acc_from_train': {1: (np.float64(0.5944444444444446), np.float64(0.07844948048046156)), 2: (np.float64(0.7888888888888889), np.float64(0.07714024425648794)), 3: (np.float64(0.8544444444444445), np.float64(0.06637900902775044)), 5: (np.float64(0.91), np.float64(0.06094928067512211))}}
+Skipped 0 graphs out of 46992 because one of the subgraphs had too few edges
+number of batches in evaluation: 9
+During evaluation fold 0 skipped 0 graphs out of 4752 because one of the subgraphs had too few edges
+Loss across batches was 109.0055177476671
+accuracies: {1: (np.float64(0.6466666666666666), np.float64(0.08886110676947648)), 2: (np.float64(0.831111111111111), np.float64(0.05958705634574189)), 3: (np.float64(0.8833333333333332), np.float64(0.06309898162000303)), 5: (np.float64(0.9288888888888887), np.float64(0.05072316538005924))}
+Evaluation information: {'fold': 0, 'epoch': 100, 'train_loss': BigGNN(
+  (TSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GSALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (TCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (GCALayers): ModuleList(
+    (0): SimpleTConv()
+  )
+  (SceneText_MLP): Sequential(
+    (0): Linear(in_features=600, out_features=600, bias=True)
+    (1): LeakyReLU(negative_slope=0.01)
+    (2): Linear(in_features=600, out_features=300, bias=True)
+    (3): LeakyReLU(negative_slope=0.01)
+    (4): Linear(in_features=300, out_features=1, bias=True)
+    (5): Sigmoid()
+  )
+), 'val_loss': 109.0055160522461, 'val_acc_from_train': {1: (np.float64(0.6466666666666666), np.float64(0.08886110676947648)), 2: (np.float64(0.831111111111111), np.float64(0.05958705634574189)), 3: (np.float64(0.8833333333333332), np.float64(0.06309898162000303)), 5: (np.float64(0.9288888888888887), np.float64(0.05072316538005924))}}
+accuracies: {1: (np.float64(0.6133333333333334), np.float64(0.11175369742826806)), 2: (np.float64(0.7900000000000001), np.float64(0.14224392195567914)), 3: (np.float64(0.9), np.float64(0.11832159566199232)), 5: (np.float64(0.9666666666666667), np.float64(0.05962847939999437))}
+accuracies: {1: (np.float64(0.47333333333333344), np.float64(0.1806162291219209)), 2: (np.float64(0.6866666666666669), np.float64(0.11469767022723502)), 3: (np.float64(0.7966666666666667), np.float64(0.12512216252748976)), 5: (np.float64(0.8699999999999999), np.float64(0.1004987562112089))}
+Time elapsed in minutes: 1.6794171016168549
+Final test set accuracies: scanscribe {1: (np.float64(0.6133333333333334), np.float64(0.11175369742826806)), 2: (np.float64(0.7900000000000001), np.float64(0.14224392195567914)), 3: (np.float64(0.9), np.float64(0.11832159566199232)), 5: (np.float64(0.9666666666666667), np.float64(0.05962847939999437))}, human {1: (np.float64(0.47333333333333344), np.float64(0.1806162291219209)), 2: (np.float64(0.6866666666666669), np.float64(0.11469767022723502)), 3: (np.float64(0.7966666666666667), np.float64(0.12512216252748976)), 5: (np.float64(0.8699999999999999), np.float64(0.1004987562112089))}

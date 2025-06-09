@@ -789,7 +789,7 @@ if __name__ == '__main__':
 
     print(f'SCANSCRIBE b_n: {b_n}, b_e: {b_e}, b_f: {b_f}, total: {b_n + b_e + b_f}')
     print(f'HUMAN b_n_h: {b_n_h}, b_e_h: {b_e_h}, b_f_h: {b_f_h}, total: {b_n_h + b_e_h + b_f_h}')
-    exit()
+    # exit()# Why EXIT?
 
 
 

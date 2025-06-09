@@ -11,7 +11,8 @@ import en_core_web_lg
 # nlp = spacy.load("en_core_web_md")
 nlp = spacy.load("en_core_web_lg")
 
-from create_text_embeddings import create_embedding
+# CHANGED to implement clip embeddings
+from create_text_embeddings import create_embedding, create_embedding_clip
 
 def plot_relation(obj1, obj2, ax, distance):
     centroid1 = np.array(obj1['obb']['centroid'])
@@ -91,6 +92,21 @@ def get_obj_distance(obj1, obj2, objs):
     dist = np.sqrt(np.sum(u * u) + np.sum(v * v))
     return dist
 
+# -------------------------------------------------------------------------------------------
+# Changed to implement clip embeddings
+def get_clip(desc: str, cache: dict) -> tuple[torch.Tensor, dict]:
+    """
+    If `desc` is already in cache, returns cached clip embedding;
+    otherwise, calls create_embedding_clip(desc) and stores it.
+    """
+    if desc in cache:
+        return cache[desc], cache
+    else:
+        emb = create_embedding_clip(desc)
+        cache[desc] = emb
+        return emb, cache
+# -------------------------------------------------------------------------------------------
+
 def get_ada(desc, hash):
     if desc in hash:
         return hash[desc], hash
@@ -106,13 +122,6 @@ def get_word2vec(desc, hash):
     else:
         hash[desc] = nlp(desc)[0].vector
     return hash[desc], hash
-
-
-
-
-
-
-
 
 def check_and_remove_invalid_edges(all_scenes):
     for scene_id in tqdm(all_scenes):
