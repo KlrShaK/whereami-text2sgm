@@ -8,13 +8,13 @@ import argparse
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from graph_loader_utils import get_obj_distance, bounding_box, plot_relation, get_ada, get_word2vec
-
+from graph_loader_utils import get_obj_distance, bounding_box, plot_relation, get_ada, get_clip, get_word2vec
+# TODO: Refactor everything to show the usage of CLIP embeddings instead of Ada embeddings
 # Parameters for creating scene graphs
 dist_thr = 1.0
 
 # Load the files once
-objects_path = '/home/julia/Documents/h_coarse_loc/data/3DSSG/objects.json'
+objects_path = '/home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3DSSG/objects.json'
 objects = {}
 with open(objects_path, 'r') as f:
     objects = json.load(f)
@@ -23,7 +23,7 @@ scans_dict = {}
 for s in scans:
     scans_dict[s['scan']] = s
 
-relationships_path = '/home/julia/Documents/h_coarse_loc/data/3DSSG/relationships.json'
+relationships_path = '/home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3DSSG/relationships.json'
 relationships = {}
 with open(relationships_path, 'r') as f:
     relationships = json.load(f)
@@ -129,7 +129,8 @@ def add_edge_list(all_scenes):
             relation_list.append(rel[3])
             w2v, hw2v = get_word2vec(rel[3], hw2v)
             relation_word2vec_list.append(w2v)
-            ada, hada = get_ada(rel[3], hada)
+            # ada, hada = get_ada(rel[3], hada)
+            ada, hada = get_clip(rel[3], hada) # Changed to use CLIP embeddings
             relation_ada_list.append(ada)
             dist_list.append(get_obj_distance(str(rel[0]), str(rel[1]), all_scenes[sceneid]['objects']))
         assert(len(obj1_list) == len(obj2_list) == len(relation_list) == len(dist_list))
@@ -140,7 +141,8 @@ def add_edge_list(all_scenes):
         all_scenes[sceneid]['edge_lists']['relation_word2vec'] = relation_word2vec_list
         all_scenes[sceneid]['edge_lists']['relation_ada'] = relation_ada_list
         all_scenes[sceneid]['edge_lists']['distance'] = dist_list
-    torch.save(all_scenes, '/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt') # uncomment to save
+    # torch.save(all_scenes, '/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt') # changed to save with CLIP embeddings
+    torch.save(all_scenes, '/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/data_checkpoints/processed_data/3dssg/clip_3dssg_graphs_processed_edgelists_relationembed.pt') # uncomment to save
 
 def add_node_features(all_scenes):
     hada = {}
@@ -149,7 +151,8 @@ def add_node_features(all_scenes):
     for scene in tqdm(all_scenes):
         objects = all_scenes[scene]['objects']
         for obj in tqdm(objects):
-            label_ada, hada = get_ada(objects[obj]['label'], hada)
+            # label_ada, hada = get_ada(objects[obj]['label'], hada)
+            label_ada, hada = get_clip(objects[obj]['label'], hada) # Changed to use CLIP embeddings
             objects[obj]['label_ada'] = label_ada
             label_word2vec, hw2v = get_word2vec(objects[obj]['label'], hw2v)
             objects[obj]['label_word2vec'] = label_word2vec
@@ -161,11 +164,13 @@ def add_node_features(all_scenes):
                 for attr in objects[obj]['attributes'][attrs]:
                     attr_word2vec, hw2v = get_word2vec(attr, hw2v)
                     attributes_word2vec[attrs].append(attr_word2vec)
-                    attr_ada, hada = get_ada(attr, hada)
+                    # attr_ada, hada = get_ada(attr, hada)
+                    attr_ada, hada = get_clip(attr, hada) # Changed to use CLIP embeddings
                     attributes_ada[attrs].append(attr_ada)
             objects[obj]['attributes_word2vec'] = attributes_word2vec
             objects[obj]['attributes_ada'] = attributes_ada
-    torch.save(all_scenes, '/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed.pt') # uncomment to save
+    # torch.save(all_scenes, '/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed.pt') # changed to save with CLIP embeddings
+    torch.save(all_scenes, '/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/data_checkpoints/processed_data/3dssg/clip_3dssg_graphs_processed.pt') # uncomment to save
 
 def check_num_edges(all_scenes):
     num_edges = []
@@ -192,11 +197,17 @@ def change_w2v_word2vec(all_scenes, p):
 
 
 if __name__ == "__main__":
-    all_scenes = torch.load('/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/raw_data/3dssg/3dssg_graphs_original.pt')
-    add_node_features(all_scenes)
-    all_scenes = torch.load('/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed.pt')
+    # ---------------------CHANGED to implement CLIP embeddings---------------------
+    # all_scenes = torch.load('/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/data_checkpoints/raw_data/3dssg/3dssg_graphs_original.pt')
+    # add_node_features(all_scenes)
+    # all_scenes = torch.load('/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed.pt')
+    # add_edge_list(all_scenes)
+    # -------------------------------------------------------------------------------
+    all_scenes = torch.load('/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt')
     add_edge_list(all_scenes)
 
+
+    # ----------------------------------------ORIGINAL BELOW----------------------------------------
     # p = '/home/julia/Documents/h_coarse_loc/playground/graph_models/data_checkpoints/processed_data/3dssg/3dssg_graphs_processed_edgelists_relationembed.pt'
     # all_scenes = torch.load(p)
     # change_w2v_word2vec(all_scenes, p)

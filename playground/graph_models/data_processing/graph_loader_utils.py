@@ -6,6 +6,7 @@ from tqdm import tqdm
 import warnings
 warnings.filterwarnings("ignore", message=r"\[W095\]", category=UserWarning)
 
+import torch
 import spacy
 import en_core_web_lg
 # nlp = spacy.load("en_core_web_md")
