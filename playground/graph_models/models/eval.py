@@ -30,26 +30,6 @@ args = get_args()
 from timing import Timer
 
 if __name__ == "__main__":
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument('--mode', type=str, default='online')
-    # parser.add_argument('--epoch', type=int, default=10)
-    # parser.add_argument('--lr', type=float, default=0.0001)
-    # parser.add_argument('--weight_decay', type=float, default=5e-5)
-    # parser.add_argument('--N', type=int, default=1)
-    # parser.add_argument('--overlap_thr', type=float, default=0.8)
-    # parser.add_argument('--cos_sim_thr', type=float, default=0.5)
-    # parser.add_argument('--batch_size', type=int, default=16)
-    # parser.add_argument('--training_set_size', type=int, default=2847)
-    # parser.add_argument('--test_set_size', type=int, default=712)
-    # parser.add_argument('--graph_size_min', type=int, default=4, help='minimum number of nodes in a graph')
-    # parser.add_argument('--contrastive_loss', type=bool, default=True)
-    # parser.add_argument('--valid_top_k', nargs='+', type=int, default=[1, 3, 5])
-    # parser.add_argument('--use_attributes', type=bool, default=True)
-    # parser.add_argument('--training_with_cross_val', type=bool, default=True)
-    # parser.add_argument('--folds', type=int, default=5)
-    # parser.add_argument('--skip_k_fold', type=bool, default=False)
-    # args = parser.parse_args()
-
     wandb.config = { "architecture": "self attention cross attention",
                      "dataset": "ScanScribe_cleaned"} # ScanScribe_1 is the cleaned dataset with ada_002 embeddings
     for arg in vars(args): wandb.config[arg] = getattr(args, arg)
