@@ -48,4 +48,7 @@ How particle filter works:
 - Created a new file **inference.py**, it should supposedly handle doing the following tasks:-
     -  We obtain the scene graph and the text graph (CLIP embedding on the nodes, we do not need YET the edges).
     - Calculate cosine similarity between all nodes in the scene and text graphs.
-    - Threshold the similarities to obtain potential matches.
+    - Threshold the similarities to obtain top 5 potential matches.
+
+Problems:
+ - currently there are no direct inference helper script

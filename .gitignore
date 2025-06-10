@@ -24,3 +24,4 @@ website_data_labeling/
 
 playground/graph_models/processed_data/*
 datasets/*
+playground/graph_models/models/wandb/*
