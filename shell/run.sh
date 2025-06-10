@@ -12,7 +12,7 @@ python3 train.py \
     --N 1 \
     --lr 0.0001 \
     --weight_decay 0.00005 \
-    --batch_size 32 \
+    --batch_size 16 \
     --contrastive_loss True \
     --valid_top_k 1 2 3 5 \
     --use_attributes True \
