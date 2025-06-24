@@ -52,3 +52,11 @@ How particle filter works:
 
 Problems:
  - currently there are no direct inference helper script
+
+
+ ### Particle Filter in one interation 
+ ![idea](media_info/Screenshot.png)
+
+- Initialize random points
+- Check how many objects from the Text graph you can see from that random point (give objects based on the point) (give a score based on how many objects are visible)
+- Later on can create a score, with percentage of object visble (how many points of an object are visible compared to all the points)
