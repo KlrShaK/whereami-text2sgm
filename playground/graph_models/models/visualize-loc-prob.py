@@ -1,66 +1,60 @@
+#!/usr/bin/env python3
 """
-visualize-loc-prob.py
-=====================
+visualize-loc-prob.py  ·  dense-grid version  ·  June 2025
+-----------------------------------------------------------
 
-For *each* ScanScribe caption graph:
+For every ScanScribe caption graph:
 
-1. Load its ground-truth 3D-SSG scene-graph and mesh.
-2. Compute cosine similarity between every text node and every scene node;
-   pick the **top-K** scene objects as putative matches (default K=5).
-3. Build a 36-particle ring (uniform 10° steps, omnidirectional camera) around
-   the scene at pedestrian eye-height.
-4. For every particle, cast a single ray towards the centroid of each matched
-   object using Open3D's `RaycastingScene`.  An object counts as *visible* if
-   it is the **first** triangle hit by that ray.
-5. A particle’s **score** is the number of visible matched objects ∈ {0…K}.
-   Normalise the scores → posterior probability `p(x | caption)`.
-6. Optionally visualise the probability field with Matplotlib.
+1.  Load its ground-truth 3D-SSG scene-graph + mesh.
+2.  Compute cosine similarity between all nodes → keep Top-K object matches.
+3.  Generate a dense XY grid (spacing = --grid_step) at eye-height.
+4.  For each grid cell (≙ candidate camera) cast one ray to every matched
+    object centroid; count how many objects are the *first* hit.
+5.  Convert counts → posterior probabilities.
+6.  Visualise
+      • probability heat-map (optional, 2-D)  
+      • full 3-D mesh with matched objects bright and camera spheres whose
+        colour encodes probability (optional, Open3D).
 
-This is a one-shot localisation likelihood, **not** a full particle-filter
-time series (see earlier discussion).
+Author: VLN
 
-Author: VLN · June 2025
+python visualize-loc-prob.py     --root  /home/klrshak/work/VisionLang/3RScan/data/3RScan     --graphs /home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data --top_k 5 --show_heatmap --show_3d
 """
 
 from __future__ import annotations
-import argparse, sys, json, math, itertools
+import argparse, json, math, sys
 from pathlib import Path
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
 import open3d as o3d
-import open3d.core as o3c               # for tgeometry ray-casting
-import matplotlib.pyplot as plt         # optional heat-map
+import open3d.core as o3c
 
-sys.path.append('../data_processing')
-sys.path.append('../../../')
+# --------------------------------------------------------------------------- #
+#  Repo imports (same trick as visualization_graph-object.py)                 #
+# --------------------------------------------------------------------------- #
 
-from scene_graph import SceneGraph
-from model_graph2graph import BigGNN    # only needed for SceneGraph.to_pyg()
-from data_distribution_analysis.helper import get_matching_subgraph
-from typing import Optional
+sys.path.append('../data_processing') # sys.path.append('/home/julia/Documents/h_coarse_loc/playground/graph_models/data_processing')
+sys.path.append('../../../') # sys.path.append('/home/julia/Documents/h_coarse_loc/')
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Helpers                                                                     │
-# ──────────────────────────────────────────────────────────────────────────────
+from scene_graph import SceneGraph                    # noqa: E402
+from data_distribution_analysis.helper import get_matching_subgraph  # noqa: E402
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Utility: load mesh + obj↔face maps (verbatim copy, trimmed)               ═
+# ════════════════════════════════════════════════════════════════════════════
 def load_scene(scan_dir: Path):
-    """
-    **Copied & lightly modified** from visualization_graph-object.py.
-    Returns:
-        mesh_legacy      – o3d.geometry.TriangleMesh
-        tris_np          – (F,3) numpy ints
-        tri2obj          – np.int32[F] mapping triangle-index → object-ID
-        obj2faces        – dict[objID] → np.ndarray[face_ids]
-    """
+    """Return (legacy mesh, faces→object-id array, obj→faces dict)."""
     ply = scan_dir / "labels.instances.annotated.v2.ply"
     if not ply.exists():
         raise FileNotFoundError(ply)
     mesh = o3d.io.read_triangle_mesh(str(ply))
     mesh.compute_vertex_normals()
 
-    vc8 = (np.asarray(mesh.vertex_colors) * 255 + 0.5).astype(np.uint32)
-    vhex = (vc8[:, 0] << 16) | (vc8[:, 1] << 8) | vc8[:, 2]
+    vc   = (np.asarray(mesh.vertex_colors) * 255 + 0.5).astype(np.uint32)
+    vhex = (vc[:, 0] << 16) | (vc[:, 1] << 8) | vc[:, 2]
 
     meta = {
         s["scan"]: s
@@ -71,247 +65,220 @@ def load_scene(scan_dir: Path):
 
     v_oid = np.array([color2oid.get(int(h), 0) for h in vhex], dtype=np.int32)
     tris  = np.asarray(mesh.triangles, dtype=np.int32)
-    tri2obj = np.array(
-        [np.bincount(v_oid[t]).argmax() for t in tris], dtype=np.int32
-    )
+    tri2obj = np.array([np.bincount(v_oid[t]).argmax() for t in tris],
+                       dtype=np.int32)
 
     obj2faces = {}
     for fid, oid in enumerate(tri2obj):
-        if oid == 0:
-            continue
-        obj2faces.setdefault(int(oid), []).append(fid)
+        if oid != 0:
+            obj2faces.setdefault(int(oid), []).append(fid)
     obj2faces = {k: np.asarray(v, dtype=np.int32) for k, v in obj2faces.items()}
+    return mesh, tri2obj, obj2faces
 
-    return mesh, tris, tri2obj, obj2faces
 
+# ════════════════════════════════════════════════════════════════════════════
+#  Cosine-similarity Top-K matcher                                            ═
+# ════════════════════════════════════════════════════════════════════════════
+def topk_matched_objects(qg: SceneGraph, sg: SceneGraph, k: int = 5):
+    qf, _, _ = qg.to_pyg()
+    sf, _, _ = sg.to_pyg()
+    qf = F.normalize(torch.tensor(np.asarray(qf), dtype=torch.float32), dim=1)
+    sf = F.normalize(torch.tensor(np.asarray(sf), dtype=torch.float32), dim=1)
 
-def topk_matched_objects(qg: SceneGraph,
-                         sg: SceneGraph,
-                         k: int = 5):
-    """
-    Returns up to *k* scene object-IDs whose node embeddings have the highest
-    cosine similarity to *any* text-node embedding.
-    """
-    q_feat, _, _ = qg.to_pyg()
-    s_feat, _, _ = sg.to_pyg()
-    q_feat = torch.tensor(np.asarray(q_feat), dtype=torch.float32)
-    s_feat = torch.tensor(np.asarray(s_feat), dtype=torch.float32)
-    q_feat = F.normalize(q_feat, dim=1)
-    s_feat = F.normalize(s_feat, dim=1)
-
-    sim = torch.matmul(q_feat, s_feat.T)          # (|Q|, |S|)
-    flat = torch.flatten(sim)
-    vals, idx = torch.topk(flat, min(k, flat.numel()))
-    s_ids = list(sg.nodes)                        # order matches to_pyg()
-    s_size = s_feat.size(0)
-
-    picked = []
-    for f_idx in idx.tolist():
-        s_idx = f_idx % s_size
-        oid = s_ids[s_idx]
-        if oid not in picked:
-            picked.append(oid)
-        if len(picked) == k:
+    sim = qf @ sf.T                                   # (|Q|, |S|)
+    topv, topi = torch.topk(sim.flatten(), min(k, sim.numel()))
+    sids  = list(sg.nodes)
+    S     = sf.size(0)
+    picks = []
+    for idx in topi.tolist():
+        sid = sids[idx % S]
+        if sid not in picks:
+            picks.append(sid)
+        if len(picks) == k:
             break
-    return picked
+    return picks
 
 
-def sample_camera_positions(verts_xyz: np.ndarray,
-                            grid_step: float,
-                            ring_n: int = 36,
-                            ring_radius_factor: float = 1.05,
-                            z_eye: float = 1.6) -> np.ndarray:
+# ════════════════════════════════════════════════════════════════════════════
+#  Camera grid sampler                                                        ═
+# ════════════════════════════════════════════════════════════════════════════
+def sample_grid(verts: np.ndarray, step: float, z_eye: float = 1.6):
     """
-    verts_xyz : (V,3) array of mesh vertices
-    ...
+    Return (N,3) xyz grid points covering the mesh’s XY AABB, spacing = step.
     """
-    xs, ys, zs = verts_xyz[:, 0], verts_xyz[:, 1], verts_xyz[:, 2]
-    min_x, max_x = xs.min(), xs.max()
-    min_y, max_y = ys.min(), ys.max()
-    z_floor      = zs.min()
-
-    if grid_step > 0:                                   # dense grid
-        gx = np.arange(min_x, max_x + 1e-4, grid_step)
-        gy = np.arange(min_y, max_y + 1e-4, grid_step)
-        xv, yv = np.meshgrid(gx, gy, indexing='xy')
-        n = xv.size
-        cam = np.stack([xv.ravel(), yv.ravel(),
-                        np.full(n, z_floor + z_eye)], axis=1)
-        return cam
-
-    # ring fallback
-    centre = np.array([(min_x + max_x) * 0.5,
-                       (min_y + max_y) * 0.5])
-    radius = ring_radius_factor * np.linalg.norm(
-                 verts_xyz[:, :2] - centre, axis=1).max()
-    angles = np.linspace(0, 2 * math.pi, ring_n, endpoint=False)
-    xr = centre[0] + radius * np.cos(angles)
-    yr = centre[1] + radius * np.sin(angles)
-    zr = np.full_like(xr, z_floor + z_eye)
-    return np.stack([xr, yr, zr], axis=1)
+    xs, ys, zs = verts[:, 0], verts[:, 1], verts[:, 2]
+    gx = np.arange(xs.min(), xs.max() + 1e-4, step)
+    gy = np.arange(ys.min(), ys.max() + 1e-4, step)
+    xv, yv = np.meshgrid(gx, gy, indexing="xy")
+    n = xv.size
+    cams = np.stack([xv.ravel(), yv.ravel(), np.full(n, zs.min() + z_eye)],
+                    axis=1)
+    return cams
 
 
-
-def visible(camera_pos: np.ndarray,
-            obj_centroid: np.ndarray,
-            target_oid: int,
-            rc_scene: o3d.t.geometry.RaycastingScene,
-            tri2obj: np.ndarray) -> bool:
-    """
-    Cast one ray from camera → object centroid.
-    Return True iff the first hit triangle belongs to `target_oid`.
-    """
-    d = obj_centroid - camera_pos
-    norm = np.linalg.norm(d)
-    if norm < 1e-6:
+# ════════════════════════════════════════════════════════════════════════════
+#  Visibility test (single ray)                                               ═
+# ════════════════════════════════════════════════════════════════════════════
+def first_hit_is_object(cam: np.ndarray, centre: np.ndarray, target_oid: int,
+                        rc: o3d.t.geometry.RaycastingScene,
+                        tri2obj: np.ndarray) -> bool:
+    d = centre - cam
+    l = np.linalg.norm(d)
+    if l < 1e-6:
         return False
-    d /= norm
-
-    ray = o3c.Tensor(np.concatenate([camera_pos, d])[None, :],
-                     dtype=o3c.Dtype.Float32)
-    ans = rc_scene.cast_rays(ray)
-    tri_raw = int(ans['primitive_ids'].cpu().numpy()[0])  # -1 or uint32_t max on miss
-    if tri_raw < 0 or tri_raw >= len(tri2obj):
-        return False                                      # miss
-    return int(tri2obj[tri_raw]) == int(target_oid)
+    ray = np.concatenate([cam, d / l])[None, :]
+    ans = rc.cast_rays(o3c.Tensor(ray, dtype=o3c.Dtype.Float32))
+    tri = int(ans["primitive_ids"].cpu().numpy()[0])
+    if tri < 0 or tri >= len(tri2obj):
+        return False
+    return int(tri2obj[tri]) == int(target_oid)
 
 
-# ──────────────────────────────────────────────────────────────────────────────
-# Main                                                                         │
-# ──────────────────────────────────────────────────────────────────────────────
+# ════════════════════════════════════════════════════════════════════════════
+#  Colour helpers for visualising                                             ═
+# ════════════════════════════════════════════════════════════════════════════
+def colour_objects(mesh: o3d.geometry.TriangleMesh,
+                   obj2faces: dict[int, np.ndarray],
+                   focus: list[int]):
+    """Grey base mesh; bright random colour for every object in `focus`."""
+    rng = np.random.default_rng(42)
+    grey = np.full((len(mesh.vertices), 3), 0.55)
+    tris = np.asarray(mesh.triangles)
+    for oid in focus:
+        for fid in obj2faces.get(oid, []):
+            for vid in tris[fid]:
+                grey[int(vid)] = rng.random(3)
+    mesh.vertex_colors = o3d.utility.Vector3dVector(grey)
+    return mesh
+
+
+def colormap(vals: np.ndarray):
+    """Map values in [0,1] → RGB using matplotlib’s 'hot'."""
+    cmap = plt.get_cmap("hot")
+    return cmap(vals)[:, :3]
+
+
+# ════════════════════════════════════════════════════════════════════════════
+#  Main programme                                                             ═
+# ════════════════════════════════════════════════════════════════════════════
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--root",   required=True,
-                    help="parent folder of 3RScan/<scan_id>/")
-    ap.add_argument("--graphs", required=True,
-                    help="folder with processed_data/{3dssg,scanscribe}/")
-    ap.add_argument("--top_k",  type=int, default=5,
-                    help="how many object matches to keep per caption")
-    ap.add_argument("--particles", type=int, default=36,
-                    help="number of candidate positions on the ring")
-    ap.add_argument("--query_limit", type=int, default=None,
-                    help="only show the first N captions (debug)")
-    ap.add_argument("--show_plot", action="store_true",
-                    help="plot heat-map using matplotlib")
-    ap.add_argument("--grid_step", type=float, default=0.2,
-                help="Grid spacing in metres (0 → use ring method)")
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(
+        description="Compute and visualise localisation probability surface "
+                    "for ScanScribe captions.")
+    parser.add_argument("--root", required=True,
+                        help="Parent folder of 3RScan/<scan_id>/")
+    parser.add_argument("--graphs", required=True,
+                        help="processed_data/{3dssg,scanscribe}/")
+    parser.add_argument("--top_k", type=int, default=25,
+                        help="How many object matches to keep per caption")
+    parser.add_argument("--grid_step", type=float, default=0.25,
+                        help="XY grid spacing in metres")
+    parser.add_argument("--query_limit", type=int,
+                        help="Process only the first N captions (debug)")
+    parser.add_argument("--show_heatmap", action="store_true",
+                        help="Show 2-D Matplotlib heat-map")
+    parser.add_argument("--show_3d", action="store_true",
+                        help="Open Open3D viewer with mesh + probability spheres")
+    args = parser.parse_args()
 
-    # 1. Load graphs (same helper paths as in the original visualiser)
-    raw3d = torch.load(Path(args.graphs)/"3dssg"/
-                       "3dssg_graphs_processed_edgelists_relationembed.pt",
-                       map_location="cpu")
-    database = {
-        sid: SceneGraph(sid, graph_type="3dssg", graph=g,
-                        max_dist=1.0, embedding_type="word2vec",
-                        use_attributes=True)
-        for sid, g in raw3d.items()
-    }
+    # ----- quick summary of chosen arguments
+    print("\nConfiguration -------------------------------------------")
+    for k, v in vars(args).items():
+        print(f"  {k:<12}: {v}")
+    print("---------------------------------------------------------\n")
 
-    rawtxt = torch.load(Path(args.graphs)/"scanscribe"/
-                        "scanscribe_text_graphs_from_image_desc_node_edge_features.pt",
-                        map_location="cpu")
-    queries = [
-        SceneGraph(k.split("_")[0], txt_id=None,
-                   graph=g, graph_type="scanscribe",
-                   embedding_type="word2vec", use_attributes=True)
-        for k, g in rawtxt.items()
-    ]
+    # ----- load scene graphs ----------------------------------------------
+    g3d = torch.load(Path(args.graphs) / "3dssg" /
+                     "3dssg_graphs_processed_edgelists_relationembed.pt",
+                     map_location="cpu")
+    scenes = {sid: SceneGraph(sid,
+                              graph_type="3dssg",
+                              graph=g,
+                              max_dist=1.0,        # ← FIX
+                              embedding_type="word2vec",
+                              use_attributes=True)
+              for sid, g in g3d.items()}
+
+    gtxt = torch.load(Path(args.graphs) / "scanscribe" /
+                      "scanscribe_text_graphs_from_image_desc_node_edge_features.pt",
+                      map_location="cpu")
+    queries = [SceneGraph(k.split("_")[0],
+                          txt_id=None,
+                          graph=g,
+                          graph_type="scanscribe",
+                          embedding_type="word2vec",
+                          use_attributes=True)
+               for k, g in gtxt.items()]
     if args.query_limit:
-        queries = queries[:args.query_limit]
+        queries = queries[: args.query_limit]
 
-    # 2. Process each caption
+    # ----- iterate over captions ------------------------------------------
     for qi, qg in enumerate(queries, 1):
-        scene_id = qg.scene_id
-        sg = database[scene_id]
+        sid = qg.scene_id
+        sg  = scenes[sid]
 
-        # 2.1 object matches
         obj_ids = topk_matched_objects(qg, sg, k=args.top_k)
         if not obj_ids:
-            print(f"[{qi}] {scene_id}: no matches – skipped")
+            print(f"[{qi}] {sid} : no cosine matches — skipped")
             continue
 
-        # 2.2 load mesh & build ray-caster
-        scan_dir = Path(args.root) / scene_id
-        mesh_legacy, tris_np, tri2obj_np, obj2faces = load_scene(scan_dir)
-        tmesh = o3d.t.geometry.TriangleMesh.from_legacy(mesh_legacy)
-        rscene = o3d.t.geometry.RaycastingScene()
-        rscene.add_triangles(tmesh)
+        # mesh + ray-caster
+        mesh, tri2obj, obj2faces = load_scene(Path(args.root) / sid)
+        rc = o3d.t.geometry.RaycastingScene()
+        rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
 
-        # 2.3 object centroids
-        tris = tris_np
-        verts = np.asarray(mesh_legacy.vertices)
+        verts = np.asarray(mesh.vertices)
+        cams  = sample_grid(verts, step=args.grid_step)
+        print(f"[{qi}] {sid}: grid {len(cams):,} pts  |  {len(obj_ids)} objs")
+
+        # object centroids
+        tris = np.asarray(mesh.triangles)
         centroids = {}
         for oid in obj_ids:
-            faces = obj2faces.get(oid)
-            if faces is None or len(faces) == 0:
-                continue
-            v_id = tris[faces].reshape(-1)
-            centroids[oid] = verts[np.unique(v_id)].mean(0)
-
-        # 2.4 sample particles
-        verts_xy = verts[:, :2]
-        cam_pos = sample_camera_positions(
-            verts,
-            grid_step=args.grid_step,
-            ring_n=args.particles)
-
-        print(f"    sampled {len(cam_pos):,} candidate viewpoints "
-                f"({'grid' if args.grid_step > 0 else 'ring'})")
-
-        # 2.5 visibility test
-        scores = np.zeros(len(cam_pos), dtype=np.int32)
-        for pi, pos in enumerate(cam_pos):
-            for oid, c in centroids.items():
-                if visible(pos, c, oid, rscene, tri2obj_np):
-                    scores[pi] += 1
+            faces = obj2faces.get(oid)                # <- changed
+            if faces is not None and len(faces):      # <- changed
+                centroids[oid] = verts[np.unique(tris[faces].ravel())].mean(0)
 
 
-
+        # visibility
+        scores = np.zeros(len(cams), dtype=np.int32)
+        for idx, cam in enumerate(cams):
+            for oid, cen in centroids.items():
+                if first_hit_is_object(cam, cen, oid, rc, tri2obj):
+                    scores[idx] += 1
         if scores.sum() == 0:
-            print(f"[{qi}] {scene_id}: none of the {args.top_k} objects visible "
-                  "from ring – skipped")
+            print("    none of the matched objects visible — skipped\n")
             continue
-
         probs = scores / scores.sum()
 
-        # 2.6 report / visualise
-        print(f"\n[{qi}/{len(queries)}] Scene {scene_id}")
-        for i, p in enumerate(probs):
-            # print(f"  particle {i:02d}: score={scores[i]}  prob={p:.3f}")
-
-        if args.show_plot:
+        # --- 2-D heat-map
+        if args.show_heatmap:
             plt.figure(figsize=(6, 6))
-            plt.title(f"p(x | caption) – {scene_id}")
-            sc = plt.scatter(cam_pos[:, 0], cam_pos[:, 1],
-                             c=probs, cmap='hot', s=80)
-            plt.colorbar(sc, label='probability')
-            plt.axis('equal')
+            sc = plt.scatter(cams[:, 0], cams[:, 1], c=probs,
+                             cmap="hot", s=12)
+            plt.colorbar(sc, label="probability")
+            plt.title(f"{sid}  –  grid {args.grid_step} m")
+            plt.axis("equal")
             plt.tight_layout()
             plt.show()
+
+        # --- 3-D viewer
+        if args.show_3d:
+            vis_mesh = colour_objects(mesh, obj2faces, obj_ids)
+            spheres  = []
+            for p, col in zip(cams, colormap(probs)):
+                s = o3d.geometry.TriangleMesh.create_sphere(radius=0.05)
+                s.translate(p);  s.paint_uniform_color(col);  spheres.append(s)
+
+            vis = o3d.visualization.Visualizer()
+            vis.create_window(width=1280, height=800,
+                              window_name=f"{sid} – localisation prob.")
+            vis.add_geometry(vis_mesh)
+            for s in spheres:
+                vis.add_geometry(s)
+            vis.get_render_option().point_size = 3
+            vis.run();  vis.destroy_window()
 
 
 if __name__ == "__main__":
     main()
-
-
-
-"""
-:Visualize-localization-probability:
-
-Algorithm:
-1. We obtain the scene graph and the text graph.
-2. Calculate cosine similarity between all nodes in the scene and text graphs.
-3. Threshold the similarities to obtain top 5 potential matches.
-4. Load the 3D meshes of the scene.
-5. For Loop through the top 5 matches:
-    5.1 For each match, find the object instances from text-graph in the 3D mesh.
-    5.2 intantiate 36 possible particles/positions uniformly (360 FoV camera) in the 3D mesh scene.
-    5.3 At each possible postion, check which particles can see, each object instance (using ray-casting)
-    5.4 Give each possible particle a score based on how many objects it can see.
-    5.5 Create a probability heatmatrix of the particles based on the scores.
-
-    
-Take Reference from visualization_graph-object.py to know how to find match scene and text graph and also find common objects between them.
-"""
-
