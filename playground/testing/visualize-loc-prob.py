@@ -1,5 +1,5 @@
 """
-Take Reference from visualization_graph-object.py to know how to find match scene and text graph and also find common objects between them.
+:Visualize-localization-probability:
 
 Algorithm:
 1. We obtain the scene graph and the text graph.
@@ -13,4 +13,6 @@ Algorithm:
     5.4 Give each possible particle a score based on how many objects it can see.
     5.5 Create a probability heatmatrix of the particles based on the scores.
 
+    
+Take Reference from visualization_graph-object.py to know how to find match scene and text graph and also find common objects between them.
 """
