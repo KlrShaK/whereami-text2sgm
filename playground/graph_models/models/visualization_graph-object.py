@@ -1,5 +1,5 @@
-# # ──────────────────────────────────  visualization.py  ──────────────────────────────────
-# visualization.py
+# # ──────────────────────────────────  visualization_graph-object.py  ──────────────────────────────────
+# visualization_graph-object.py
 """
 For each human‐text caption, find its best‐matched scene, worst‐matched scene,
 and its own (ground‐truth) scene, then show all three side‐by‐side with matched
