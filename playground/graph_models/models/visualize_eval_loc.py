@@ -95,6 +95,48 @@ class SceneMetrics:
     matched_objects: int
 
 
+def build_metrics_table(metrics_list: List[SceneMetrics], hit_radius: float) -> str:
+    headers = [
+        "Scene",
+        "Frame",
+        "GT Prob",
+        "NLL",
+        f"Hit@{hit_radius:.2f}m",
+        "Err (m)",
+        "Matches",
+        "Grid pts",
+    ]
+    rows: List[List[str]] = []
+    for m in metrics_list:
+        rows.append([
+            m.scene_id,
+            m.frame_id,
+            f"{m.gt_prob:.4f}",
+            f"{m.nll:.3f}",
+            f"{m.hit_mass:.3f}",
+            f"{m.distance_error:.3f}",
+            str(m.matched_objects),
+            str(m.grid_points),
+        ])
+
+    if not rows:
+        return ""
+
+    col_widths = [len(h) for h in headers]
+    for row in rows:
+        for idx, cell in enumerate(row):
+            col_widths[idx] = max(col_widths[idx], len(cell))
+
+    def fmt_row(cells: List[str]) -> str:
+        return " | ".join(cell.ljust(col_widths[i]) for i, cell in enumerate(cells))
+
+    separator = "-+-".join("-" * w for w in col_widths)
+    lines = [fmt_row(headers), separator]
+    for row in rows:
+        lines.append(fmt_row(row))
+    return "\n".join(lines)
+
+
 # --------------------------------------------------------------------------- #
 # Caption graph construction utilities                                       #
 # --------------------------------------------------------------------------- #
@@ -263,6 +305,78 @@ def compute_metrics(cams: np.ndarray,
     )
 
 
+def _cluster_weighted_prediction(positions: np.ndarray,
+                                 weights: np.ndarray,
+                                 bandwidth: float,
+                                 max_points: int) -> Tuple[np.ndarray, List[int], np.ndarray]:
+    """Return a weighted-average position that emphasises local clusters."""
+    if len(positions) == 0:
+        raise ValueError("No candidate positions available for prediction.")
+
+    weights = np.clip(np.asarray(weights, dtype=np.float64), 0.0, None)
+    if not np.any(weights > 0):
+        weights = np.ones_like(weights)
+
+    bandwidth = max(float(bandwidth), 1e-6)
+    max_points = max(1, int(max_points))
+
+    idx_sorted = np.argsort(weights)
+    if len(idx_sorted) > max_points:
+        idx_sorted = idx_sorted[-max_points:]
+
+    subset_positions = positions[idx_sorted]
+    subset_weights = weights[idx_sorted]
+    subset_weights /= subset_weights.sum()
+
+    if len(subset_positions) == 1:
+        return subset_positions[0], [int(idx_sorted[0])], np.asarray([1.0], dtype=np.float64)
+
+    diff = subset_positions[:, None, :] - subset_positions[None, :, :]
+    dist2 = np.sum(diff * diff, axis=2)
+    kernel = np.exp(-dist2 / (2.0 * bandwidth * bandwidth))
+    density = kernel @ subset_weights
+    cluster_weights = subset_weights * density
+    total = cluster_weights.sum()
+    if total <= 0:
+        cluster_weights = subset_weights
+        total = cluster_weights.sum()
+    cluster_weights /= total
+    pred = np.sum(cluster_weights[:, None] * subset_positions, axis=0)
+
+    return pred, [int(idx) for idx in idx_sorted], cluster_weights
+
+
+def select_prediction_point(positions: np.ndarray,
+                            weights: np.ndarray,
+                            strategy: str,
+                            rng: np.random.Generator,
+                            bandwidth: float,
+                            max_points: int) -> Tuple[np.ndarray, List[int], np.ndarray]:
+    """Select a predicted camera position according to the requested strategy."""
+    if len(positions) == 0:
+        raise ValueError("No candidate positions available for prediction.")
+
+    weights = np.clip(np.asarray(weights, dtype=np.float64), 0.0, None)
+    if not np.any(weights > 0):
+        weights = np.ones_like(weights)
+    total = weights.sum()
+
+    if strategy == "argmax" or len(positions) == 1:
+        idx = int(np.argmax(weights))
+        return positions[idx], [idx], np.asarray([1.0], dtype=np.float64)
+
+    if strategy == "random":
+        probs = weights / total
+        idx = int(rng.choice(len(positions), p=probs))
+        return positions[idx], [idx], np.asarray([1.0], dtype=np.float64)
+
+    # Default: weighted cluster-aware prediction.
+    return _cluster_weighted_prediction(positions,
+                                        weights,
+                                        bandwidth=bandwidth,
+                                        max_points=max_points)
+
+
 def add_heatmap_markers(gt_cam: np.ndarray,
                         pred_cam: np.ndarray,
                         label_gt: str = "GT",
@@ -365,6 +479,8 @@ def parse_args() -> argparse.Namespace:
                         help="Subset of scene IDs to evaluate. Defaults to intersection of graphs and query_root.")
     parser.add_argument("--max_scenes", type=int,
                         help="Limit number of scenes processed (after filtering).")
+    parser.add_argument("--visualize_scene",
+                        help="Scene ID to focus on for visualisation. Overrides --scene_ids when set.")
 
     parser.add_argument("--frame_policy",
                         choices=["first", "index", "random", "max_visible", "max_pixels"],
@@ -385,6 +501,14 @@ def parse_args() -> argparse.Namespace:
                         help="Numerical epsilon when computing log-probabilities.")
     parser.add_argument("--hit_radius", type=float, default=0.5,
                         help="Radius (metres) used for Hit@r mass around ground-truth.")
+    parser.add_argument("--prediction_strategy",
+                        choices=["argmax", "random", "weighted"],
+                        default="weighted",
+                        help="How to convert candidate positions into a final camera prediction.")
+    parser.add_argument("--cluster_bandwidth", type=float, default=0.75,
+                        help="Bandwidth (metres) for the weighted cluster strategy.")
+    parser.add_argument("--max_cluster_points", type=int, default=512,
+                        help="Maximum candidates used when computing cluster-aware predictions.")
 
     parser.add_argument("--show_heatmap", action="store_true",
                         help="Show 2-D probability scatter heatmap.")
@@ -403,6 +527,8 @@ def parse_args() -> argparse.Namespace:
 
     parser.add_argument("--save_metrics", type=Path,
                         help="Optional path to save per-scene metrics as JSON.")
+    parser.add_argument("--log_file", type=Path, default=Path("eval_loc_summary.log"),
+                        help="Path to write a plain-text summary log.")
     return parser.parse_args()
 
 
@@ -559,26 +685,47 @@ def evaluate_scene(scene_id: str,
                 arrow_dirs.append(mdir)
                 arrow_weights.append(float(count))
 
-    pred_cam = pred_cam_prob
-    pred_dir: Optional[np.ndarray] = None
-    pred_source = "grid_probability"
+    candidate_dirs: Optional[np.ndarray] = None
+    candidate_source = "grid_probability"
     if arrow_weights:
-        w_arr = np.asarray(arrow_weights, dtype=np.float32)
-        max_w = float(w_arr.max())
-        winners = [i for i, w in enumerate(arrow_weights)
-                   if math.isclose(w, max_w, rel_tol=1e-6, abs_tol=1e-6)]
-        winner_pos = np.stack([arrow_positions[i] for i in winners], axis=0)
-        pred_cam = winner_pos.mean(axis=0)
+        candidate_source = "arrow_field"
+        candidate_positions = np.asarray(arrow_positions, dtype=np.float64)
+        candidate_weights = np.asarray(arrow_weights, dtype=np.float64)
+        candidate_dirs = np.asarray(arrow_dirs, dtype=np.float64)
+    else:
+        candidate_positions = cams
+        candidate_weights = probs
 
-        winner_dirs = np.stack([arrow_dirs[i] for i in winners], axis=0)
-        pred_dir = winner_dirs.mean(axis=0)
-        norm_dir = float(np.linalg.norm(pred_dir))
+    pred_dir: Optional[np.ndarray] = None
+    try:
+        pred_cam, selection_idx, selection_weights = select_prediction_point(
+            candidate_positions,
+            candidate_weights,
+            strategy=args.prediction_strategy,
+            rng=rng,
+            bandwidth=args.cluster_bandwidth,
+            max_points=args.max_cluster_points,
+        )
+    except ValueError:
+        pred_cam = pred_cam_prob
+        selection_idx = [int(pred_idx)]
+        selection_weights = np.asarray([1.0], dtype=np.float64)
+
+    if candidate_dirs is not None and selection_idx:
+        dir_vectors = candidate_dirs[selection_idx]
+        weight_vec = selection_weights
+        if weight_vec.shape[0] != len(selection_idx):
+            weight_vec = np.ones(len(selection_idx), dtype=np.float64)
+        weight_vec = np.clip(weight_vec, 0.0, None)
+        if not np.any(weight_vec > 0):
+            weight_vec = np.ones_like(weight_vec)
+        weight_vec /= weight_vec.sum()
+        mean_dir = np.sum(weight_vec[:, None] * dir_vectors, axis=0)
+        norm_dir = float(np.linalg.norm(mean_dir))
         if norm_dir > 1e-6:
-            pred_dir /= norm_dir
-        else:
-            pred_dir = None
-        pred_source = "arrow_field"
+            pred_dir = mean_dir / norm_dir
 
+    pred_source = f"{candidate_source}:{args.prediction_strategy}"
     metrics.distance_error = float(np.linalg.norm(pred_cam - gt_cam))
 
     print(f"    predicted camera ({pred_source}): "
@@ -749,7 +896,14 @@ def main() -> None:
     scenes = load_scene_graphs(args.graphs)
 
     candidate_ids = list(scenes.keys())
-    if args.scene_ids:
+    if args.visualize_scene:
+        if args.scene_ids:
+            print("[WARN] --visualize_scene overrides --scene_ids.")
+        if args.visualize_scene not in scenes:
+            print(f"[ERROR] Requested scene '{args.visualize_scene}' not found in processed graphs.")
+            return
+        candidate_ids = [args.visualize_scene]
+    elif args.scene_ids:
         scene_set = set(args.scene_ids)
         candidate_ids = [sid for sid in candidate_ids if sid in scene_set]
     else:
@@ -782,7 +936,17 @@ def main() -> None:
 
     if not metrics_list:
         print("No scenes produced metrics. Nothing to report.")
+        if args.log_file:
+            args.log_file.parent.mkdir(parents=True, exist_ok=True)
+            args.log_file.write_text("No scenes produced metrics.\n")
+            print(f"Empty summary logged to {args.log_file}")
         return
+
+    table_text = build_metrics_table(metrics_list, args.hit_radius)
+    if table_text:
+        print("Scene-level summary table -------------------------------")
+        print(table_text)
+        print("---------------------------------------------------------\n")
 
     # Aggregate metrics
     def agg(values: List[float]) -> Tuple[float, float]:
@@ -794,12 +958,26 @@ def main() -> None:
     mean_hit, med_hit = agg([m.hit_mass for m in metrics_list])
     mean_err, med_err = agg([m.distance_error for m in metrics_list])
 
-    print("Aggregate metrics ---------------------------------------")
-    print(f"  GT probability     : mean={mean_gt:.4f} | median={med_gt:.4f}")
-    print(f"  NLL (surprisal)    : mean={mean_nll:.3f} | median={med_nll:.3f}")
-    print(f"  Hit@{args.hit_radius:.2f}m       : mean={mean_hit:.3f} | median={med_hit:.3f}")
-    print(f"  Distance error (m) : mean={mean_err:.3f} | median={med_err:.3f}")
-    print("---------------------------------------------------------\n")
+    agg_lines = [
+        "Aggregate metrics ---------------------------------------",
+        f"  GT probability     : mean={mean_gt:.4f} | median={med_gt:.4f}",
+        f"  NLL (surprisal)    : mean={mean_nll:.3f} | median={med_nll:.3f}",
+        f"  Hit@{args.hit_radius:.2f}m       : mean={mean_hit:.3f} | median={med_hit:.3f}",
+        f"  Distance error (m) : mean={mean_err:.3f} | median={med_err:.3f}",
+        "---------------------------------------------------------\n",
+    ]
+    print("\n".join(agg_lines))
+
+    log_sections: List[str] = []
+    if table_text:
+        log_sections.append("Scene-level summary table")
+        log_sections.append(table_text)
+    log_sections.append("\n".join(agg_lines))
+    log_payload = "\n\n".join(log_sections).rstrip() + "\n"
+    if args.log_file:
+        args.log_file.parent.mkdir(parents=True, exist_ok=True)
+        args.log_file.write_text(log_payload)
+        print(f"Metrics summary logged to {args.log_file}")
 
     if args.save_metrics:
         payload = [
