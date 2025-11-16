@@ -17,14 +17,16 @@ SCENE_IDS=()
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
-  --show_heatmap
-  --show_arrows
-  --show_3d
-  --save_metrics "/tmp/eval_metrics.json"
+  # --show_heatmap
+  # --show_arrows
+  # --show_3d
+  --save_metrics "./eval/eval_metrics.json"
   --frame_policy max_visible
   --top_k 8
   --grid_step 0.25
   --hit_radius 0.5
+  --log_file "./eval/eval_loc_summary.log"
+  --prediction_strategy "weighted"
 )
 
 cd "$PROJECT_DIR" || exit 1

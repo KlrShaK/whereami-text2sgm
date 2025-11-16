@@ -505,9 +505,9 @@ def parse_args() -> argparse.Namespace:
                         choices=["argmax", "random", "weighted"],
                         default="weighted",
                         help="How to convert candidate positions into a final camera prediction.")
-    parser.add_argument("--cluster_bandwidth", type=float, default=0.75,
+    parser.add_argument("--cluster_bandwidth", type=float, default=0.75,#0.75 #0.25
                         help="Bandwidth (metres) for the weighted cluster strategy.")
-    parser.add_argument("--max_cluster_points", type=int, default=512,
+    parser.add_argument("--max_cluster_points", type=int, default=512,#512 # 20
                         help="Maximum candidates used when computing cluster-aware predictions.")
 
     parser.add_argument("--show_heatmap", action="store_true",
