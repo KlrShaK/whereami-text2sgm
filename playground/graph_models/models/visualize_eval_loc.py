@@ -230,9 +230,8 @@ def camera_center_from_pose(pose: Iterable[Iterable[float]]) -> np.ndarray:
     mat = np.asarray(pose, dtype=np.float64)
     if mat.shape != (4, 4):
         raise ValueError(f"Expected 4x4 scene_pose, got shape {mat.shape}")
-    R = mat[:3, :3]
     t = mat[:3, 3]
-    return (-R.T @ t).astype(np.float32)
+    return t.astype(np.float32)
 
 
 def compute_metrics(cams: np.ndarray,
@@ -466,11 +465,13 @@ def evaluate_scene(scene_id: str,
         print(f"[WARN] scene_pose missing in {selection.path} — skipped.")
         return None
 
-    gt_cam = camera_center_from_pose(gt_pose)
     pose_mat = np.asarray(gt_pose, dtype=np.float64)
-    rot_world_cam = pose_mat[:3, :3]
-    gt_dir_vec = rot_world_cam.T @ np.array([0.0, 0.0, 1.0], dtype=np.float64)
-    gt_dir = gt_dir_vec / np.linalg.norm(gt_dir_vec) if np.linalg.norm(gt_dir_vec) > 1e-6 else None
+    gt_cam = camera_center_from_pose(pose_mat)
+    rot_cam_world = pose_mat[:3, :3]
+    forward_cv = rot_cam_world @ np.array([0.0, 0.0, 1.0], dtype=np.float64)
+    forward_o3d = forward_cv
+    norm_forward = np.linalg.norm(forward_o3d)
+    gt_dir = forward_o3d / norm_forward if norm_forward > 1e-6 else None
 
     obj_ids = topk_matched_objects(caption_graph, scene_graph, k=args.top_k)
     if not obj_ids:
