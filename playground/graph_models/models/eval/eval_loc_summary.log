@@ -1,3 +1,32 @@
+Parameters used
+---------------
+arrow_len: 0.0
+arrow_stride: 2
+cluster_bandwidth: 0.75
+eye_height: 1.6
+frame_index: 0
+frame_policy: max_visible
+graphs: /home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data
+grid_step: 0.25
+h_fov_deg: 100.0
+hit_radius: 0.5
+log_file: eval/eval_loc_summary.log
+max_cluster_points: 512
+max_scenes: None
+prediction_strategy: weighted
+prob_eps: 1e-06
+query_root: /home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3RScan_processed
+root: /home/klrshak/work/VisionLang/3RScan/data/3RScan
+save_metrics: eval/eval_metrics.json
+scene_ids: None
+seed: 0
+show_3d: False
+show_arrows: False
+show_heatmap: False
+top_k: 8
+v_fov_deg: 60.0
+visualize_scene: None
+
 Scene-level summary table
 
 Scene                                | Frame        | GT Prob | NLL    | Hit@0.50m | Err (m) | Matches | Grid pts

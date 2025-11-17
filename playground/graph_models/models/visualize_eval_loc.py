@@ -137,6 +137,28 @@ def build_metrics_table(metrics_list: List[SceneMetrics], hit_radius: float) -> 
     return "\n".join(lines)
 
 
+def format_args_section(args: argparse.Namespace) -> str:
+    """Return a human-readable list of CLI parameters."""
+
+    def _stringify(value: object) -> str:
+        if isinstance(value, Path):
+            return str(value)
+        if isinstance(value, (list, tuple)):
+            return "[" + ", ".join(_stringify(v) for v in value) + "]"
+        if isinstance(value, dict):
+            items = ", ".join(f"{k}: {_stringify(v)}" for k, v in value.items())
+            return "{" + items + "}"
+        return str(value)
+
+    lines = ["Parameters used", "---------------"]
+    for key in sorted(vars(args)):
+        if key.startswith("_"):
+            continue
+        value = getattr(args, key)
+        lines.append(f"{key}: {_stringify(value)}")
+    return "\n".join(lines)
+
+
 # --------------------------------------------------------------------------- #
 # Caption graph construction utilities                                       #
 # --------------------------------------------------------------------------- #
@@ -891,6 +913,7 @@ def evaluate_scene(scene_id: str,
 
 def main() -> None:
     args = parse_args()
+    params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
 
     scenes = load_scene_graphs(args.graphs)
@@ -938,7 +961,8 @@ def main() -> None:
         print("No scenes produced metrics. Nothing to report.")
         if args.log_file:
             args.log_file.parent.mkdir(parents=True, exist_ok=True)
-            args.log_file.write_text("No scenes produced metrics.\n")
+            payload = "No scenes produced metrics.\n\n" + params_text + "\n"
+            args.log_file.write_text(payload)
             print(f"Empty summary logged to {args.log_file}")
         return
 
@@ -968,7 +992,7 @@ def main() -> None:
     ]
     print("\n".join(agg_lines))
 
-    log_sections: List[str] = []
+    log_sections: List[str] = [params_text]
     if table_text:
         log_sections.append("Scene-level summary table")
         log_sections.append(table_text)
