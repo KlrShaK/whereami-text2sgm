@@ -17,9 +17,9 @@ SCENE_IDS=()
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
-  # --show_heatmap
-  # --show_arrows
-  # --show_3d
+  --show_heatmap
+  --show_arrows
+  --show_3d
   --save_metrics "./eval/eval_metrics.json"
   --frame_policy max_visible
   --top_k 8

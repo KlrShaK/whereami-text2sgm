@@ -1,0 +1,79 @@
+"""
+TODO: Implement visualize_eval_loc.py
+I want you to write code in new file "visualize_eval_loc.py" carry out similar task as visualize-loc-prob.py file, For every 3RScan scene select a frame and then generate caption graph( details provided in visualize_loc_from_query.py):
+
+1.  Load its ground-truth 3D-SSG scene-graph + mesh(3RScan).
+2.  Compute cosine similarity between all nodes → keep Top-K object matches.
+3.  Generate a dense XY grid (spacing = --grid_step) at eye-height.
+4.  For each grid cell (≙ candidate camera) cast one ray to every matched
+    object centroid; count how many objects are the *first* hit.
+5.  Convert counts → posterior probabilities.
+6. Extract Ground-truth camera pose from query-data json file.
+7.  Visualise
+      • probability heat-map (optional, 2-D) 
+      • full 3-D mesh with matched objects bright and camera spheres whose
+        colour encodes probability (optional, Open3D).
+      • In both visualization, Highlight ground-truth camera position(distinct colour/size).
+8. Generate a error score between predicted camera positions (max prob) and ground-truth. Give reasonable metrics and justify your choice.
+      • Suggested metrics: Negative log-probability at the ground truth (NLL / surprisal), Hit@r (mass near GT) 
+
+
+
+
+Adds a second 2-D plot: a quiver of *weighted arrows* whose:
+  • direction = average of casted ray directions (unit vectors) that fit in a
+    camera FOV window (H×V) which *maximizes* the number of visible objects.
+  • size     = that maximal count (scaled).
+
+You can import functions and features from the mentioned files to "visualize_eval_loc.py" to sucessfully carry out the task. 
+
+
+----------------------------------------------data format--------------------------------------------------
+
+query-data path: /datasets/3RScan_processed/<scene-id>/output/descriptions/all_description.json
+
+/*
+This JSON file contains a list of scene-level annotations used for multimodal reasoning,
+scene understanding, or spatial relation modeling. Each entry represents one frame
+of a scene and includes both textual and geometric information.
+
+[
+  {
+    "scene_index": string,          // Unique UUID for the scene or environment
+    "image_index": string,          // Frame or image identifier within the scene
+    "scene_pose": [ [float x 4], ... ],  // 4x4 transformation matrix [R|t] from world to camera coordinates
+
+    "description": string,          // Natural language summary of visible objects and their spatial layout
+
+    "visible_objects": {            // Dictionary of all objects visible in this frame
+      "<object_id>": {
+        "label": string,            // Semantic class (e.g. "floor", "wall", "armchair")
+        "pixel_count": int,         // Number of visible pixels of this object in the image
+        "pixel_percent": float,     // Visible area percentage relative to total image pixels
+        "centroid_world": [x,y,z],  // 3D centroid in world coordinates
+        "bbox_world": [ [x_min,y_min,z_min], [x_max,y_max,z_max] ], // 3D bounding box corners in world space
+        "centroid_cam": [x,y,z],    // 3D centroid in camera coordinates
+        "distance_from_camera": float, // Euclidean distance from camera to centroid
+        "visible_faces": int,       // Number of visible mesh faces
+        "visible_pixels": int       // Same as pixel_count (redundant for convenience)
+      },
+      ...
+    },
+
+    "spatial_relations": [          // List of pairwise object relations
+      {
+        "subject": string,          // Object label or ID acting as subject
+        "object": string,           // Object label or ID acting as object
+        "relation": string          // Spatial predicate (e.g. "left_of", "right_of", "behind", "above", "below")
+      },
+      ...
+    ],
+
+    "timestamp": string             // ISO 8601 timestamp of when this frame was generated or recorded
+  },
+  ...
+]
+*/
+
+
+"""

@@ -399,6 +399,50 @@ def select_prediction_point(positions: np.ndarray,
                                         max_points=max_points)
 
 
+def top_n_fov_poses(positions: np.ndarray,
+                    weights: np.ndarray,
+                    n: int,
+                    rng: np.random.Generator,
+                    directions: Optional[np.ndarray] = None) -> List[Dict[str, object]]:
+    """Return up to n pose/direction pairs prioritising highest FOV-weighted probability."""
+    if n <= 0:
+        return []
+    if len(positions) == 0 or len(weights) == 0:
+        return []
+    if len(positions) != len(weights):
+        raise ValueError("Positions and weights must have the same length.")
+    if directions is not None and len(directions) != len(positions):
+        raise ValueError("Directions must align with positions.")
+
+    weights = np.clip(np.asarray(weights, dtype=np.float64), 0.0, None)
+    if not np.any(weights > 0):
+        weights = np.ones_like(weights)
+
+    max_w = float(weights.max())
+    top_idx = np.where(weights == max_w)[0]
+
+    if len(top_idx) > n:
+        chosen = rng.choice(top_idx, size=n, replace=False)
+    else:
+        sorted_idx = np.argsort(-weights)
+        chosen = sorted_idx[: min(n, len(sorted_idx))]
+
+    results: List[Dict[str, object]] = []
+    for i in chosen:
+        pose_xy = [float(positions[i][0]), float(positions[i][1])]
+        if directions is not None:
+            dir_vec = np.asarray(directions[i], dtype=np.float64)
+            norm = float(np.linalg.norm(dir_vec))
+            dir_out = (dir_vec / norm).tolist() if norm > 1e-6 else None
+        else:
+            dir_out = None
+        results.append({
+            "pose": pose_xy,
+            "direction": dir_out,
+        })
+    return results
+
+
 def add_heatmap_markers(gt_cam: np.ndarray,
                         pred_cam: np.ndarray,
                         label_gt: str = "GT",
@@ -551,6 +595,8 @@ def parse_args() -> argparse.Namespace:
                         help="Optional path to save per-scene metrics as JSON.")
     parser.add_argument("--log_file", type=Path, default=Path("eval_loc_summary.log"),
                         help="Path to write a plain-text summary log.")
+    parser.add_argument("--top_pose_count", type=int, default=5,
+                        help="Number of top FOV-weighted poses to list.")
     return parser.parse_args()
 
 
@@ -714,6 +760,13 @@ def evaluate_scene(scene_id: str,
         candidate_positions = np.asarray(arrow_positions, dtype=np.float64)
         candidate_weights = np.asarray(arrow_weights, dtype=np.float64)
         candidate_dirs = np.asarray(arrow_dirs, dtype=np.float64)
+        top_fov_poses = top_n_fov_poses(candidate_positions,
+                                        candidate_weights,
+                                        n=args.top_pose_count,
+                                        rng=rng,
+                                        directions=candidate_dirs)
+        print(f"    top-{args.top_pose_count} FOV-weighted poses (pose x,y + dir): "
+              f"{top_fov_poses}")
     else:
         candidate_positions = cams
         candidate_weights = probs
