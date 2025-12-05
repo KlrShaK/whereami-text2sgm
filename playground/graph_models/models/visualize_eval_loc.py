@@ -5,17 +5,25 @@ visualize_eval_loc.py
 Evaluate localisation quality for ScanScribe style captions that come with
 ground-truth camera poses. For every 3RScan scene this script:
 
-1.  Loads the 3D-SSG scene graph and coloured instance mesh.
-2.  Builds a caption SceneGraph from frame-level JSON metadata.
-3.  Matches caption nodes to 3D objects via cosine similarity (Top-K).
-4.  Samples a dense XY grid at eye height and casts visibility rays to the
-    centroids of the matched objects.
-5.  Converts first-hit counts into posterior probabilities.
-6.  Extracts the ground-truth camera pose from the frame JSON.
-7.  Visualises the probability heat-map, optional arrow field, and an Open3D
-    scene with matched objects highlighted plus predicted/ground-truth cameras.
-8.  Reports evaluation metrics such as NLL at the ground-truth, Hit@r mass, and
-    Euclidean error between the MAP prediction and ground-truth camera.
+1.  Loads processed 3D-SSG graphs, per-scene meshes, and selects a frame JSON
+    from `output/descriptions` according to the requested policy.
+2.  Builds a caption SceneGraph from visible_objects + spatial_relations in the
+    frame (word2vec embeddings only).
+3.  Matches caption nodes to 3D objects via cosine similarity and keeps the top
+    K candidates.
+4.  Loads the coloured mesh, samples an XY grid at eye height, and computes
+    centroids for each matched object.
+5.  Casts rays from every grid camera to those centroids, counts first hits, and
+    derives visibility probabilities.
+6.  Extracts the ground-truth camera centre/direction from `scene_pose` and
+    reports probability, NLL, Hit@r, and distance error at the ground-truth.
+7.  Optionally aggregates viewing directions into a FOV-weighted arrow field
+    and prints the strongest pose candidates.
+8.  Chooses a final camera prediction (argmax/random/cluster-weighted) from the
+    grid or arrow candidates, optionally averaging directions.
+9.  Visualises heatmap scatter, arrow quiver, and an Open3D scene with matched
+    objects, probability spheres, and GT/predicted cameras.
+10. Logs a per-scene table, aggregate metrics, and optionally saves a JSON dump.
 
 The script reuses helper functions from visualize_loc_prob.py and constructs
 caption graphs directly from the structured per-frame JSON to avoid any LLM
