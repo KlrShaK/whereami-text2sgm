@@ -32,7 +32,7 @@ EXTRA_ARGS=(
 cd "$PROJECT_DIR" || exit 1
 
 CMD=(
-  python visualize_eval_loc.py
+  python visualize_eval_loc_mk2.py
   --root "$SCENE_ROOT"
   --graphs "$GRAPHS_DIR"
   --query_root "$QUERY_ROOT"
