@@ -5,6 +5,7 @@ PROJECT_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_mo
 
 # 3RScan mesh root (scene folders with meshes + instance labels)
 SCENE_ROOT="/home/klrshak/work/VisionLang/3RScan/data/3RScan"
+# SCENE_ROOT="/media/klrshak/Backup/Datasets/3RScan"
 
 # Caption JSON root (frame-*.json files with ground-truth poses & visible objects)
 QUERY_ROOT="/home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3RScan_processed"
@@ -37,6 +38,13 @@ CMD=(
   --graphs "$GRAPHS_DIR"
   --query_root "$QUERY_ROOT"
 )
+
+# CMD=(
+#   python visualize_eval_loc_mk2-iou.py
+#   --root "$SCENE_ROOT"
+#   --graphs "$GRAPHS_DIR"
+#   --query_root "$QUERY_ROOT"
+# )
 
 if [ ${#SCENE_IDS[@]} -gt 0 ]; then
   CMD+=(--scene_ids "${SCENE_IDS[@]}")

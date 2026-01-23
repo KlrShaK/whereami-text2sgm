@@ -609,6 +609,34 @@ def _arrow_field_from_visibility(cams: np.ndarray,
     return arrow_positions, arrow_dirs, arrow_weights
 
 
+def _arrow_weights_generic(cams: np.ndarray,
+                           visible_dirs: List[List[np.ndarray]],
+                           hfov: float,
+                           vfov: float) -> Tuple[np.ndarray, List[Optional[np.ndarray]]]:
+    """Compute arrow weights/directions for an arbitrary list of cameras."""
+    weights = np.zeros(len(cams), dtype=np.float64)
+    dirs: List[Optional[np.ndarray]] = [None] * len(cams)
+    for idx, dirs_list in enumerate(visible_dirs):
+        if not dirs_list:
+            continue
+        dirs_arr = np.asarray(dirs_list, dtype=np.float32)
+        yaws = np.empty(len(dirs_arr), dtype=np.float32)
+        pits = np.empty(len(dirs_arr), dtype=np.float32)
+        for i, vec in enumerate(dirs_arr):
+            yaw, pit = dir_to_yaw_pitch(vec)  # type: ignore[arg-type]
+            yaws[i] = yaw
+            pits[i] = pit
+        sel, count = best_fov_window(yaws, pits, hfov, vfov)  # type: ignore[arg-type]
+        if count == 0:
+            continue
+        mdir = average_direction(dirs_arr, sel)  # type: ignore[arg-type]
+        if mdir is None:
+            continue
+        weights[idx] = float(count)
+        dirs[idx] = mdir
+    return weights, dirs
+
+
 def coarse_to_fine_arrow_search(verts: np.ndarray,
                                 centroids: Dict[int, np.ndarray],
                                 rc: o3d.t.geometry.RaycastingScene,
@@ -623,76 +651,144 @@ def coarse_to_fine_arrow_search(verts: np.ndarray,
                                 top_k: int) -> Tuple[List[np.ndarray],
                                                      List[np.ndarray],
                                                      List[float],
-                                                     float]:
+                                                     float,
+                                                     np.ndarray,
+                                                     np.ndarray,
+                                                     np.ndarray,
+                                                     np.ndarray]:
     """
-    Iteratively refine FOV-weighted candidates by shrinking a window around
-    the strongest arrows and halving the grid spacing each level.
-    Returns positions, directions, weights from the final level and the
-    last grid spacing used.
+    Iteratively refine around the highest FOV-weighted arrows.
+
+    Level 0: coarse grid covering the mesh with spacing = base_step.
+    At each level: keep only the maxima, spawn a local grid around each
+    maximum with smaller spacing (base_step / 2^level), deduplicate points,
+    and stop after `levels` iterations or when no new points appear.
+    Returns final-level positions/directions/weights, the spacing used at the
+    final level, and all refined (non-base) grid points for visualisation.
     """
     xs, ys, zs = verts[:, 0], verts[:, 1], verts[:, 2]
-    mesh_bounds = (float(xs.min()), float(xs.max()),
-                   float(ys.min()), float(ys.max()))
+    bounds = (float(xs.min()), float(xs.max()), float(ys.min()), float(ys.max()))
     z_base = float(zs.min())
 
-    positions: List[np.ndarray] = []
-    directions: List[np.ndarray] = []
-    weights: List[float] = []
-
-    window = mesh_bounds
-    step = max(float(base_step), 1e-3)
+    base_step = max(float(base_step), 1e-3)
     levels = max(1, int(levels))
-    refine_factor = max(1.0, float(refine_factor))
-    keep_ratio = float(keep_ratio)
-    top_k = max(0, int(top_k))
+
+    # Seed with coarse grid over full bounds.
+    current_step = base_step
+    current_points, _, _ = _grid_from_bounds(bounds, current_step, z_base=z_base, z_eye=z_eye)
+    visited: set[Tuple[float, float]] = set()
+    for pt in current_points:
+        visited.add((round(float(pt[0]), 4), round(float(pt[1]), 4)))
+
+    refined_points: List[np.ndarray] = []
+    refined_weights_list: List[float] = []
+    final_positions: List[np.ndarray] = []
+    final_dirs: List[np.ndarray] = []
+    final_weights: List[float] = []
+
+    all_points: List[np.ndarray] = []
+    all_weights: List[float] = []
+    all_dirs: List[Optional[np.ndarray]] = []
+    base_count = len(current_points)
 
     for lvl in range(levels):
-        cams, gx, gy = _grid_from_bounds(window, step, z_base=z_base, z_eye=z_eye)
-        if len(cams) == 0:
+        if len(current_points) == 0:
             break
 
-        Nx, Ny = len(gx), len(gy)
-        visible_dirs = _compute_visible_dirs(cams, centroids, rc, tri2obj)
-        positions, directions, weights = _arrow_field_from_visibility(
-            cams, visible_dirs, Nx, Ny, hfov, vfov, stride=1)
+        visible_dirs = _compute_visible_dirs(current_points, centroids, rc, tri2obj)
+        weights_np, dirs_list = _arrow_weights_generic(current_points,
+                                                       visible_dirs,
+                                                       hfov=hfov,
+                                                       vfov=vfov)
 
-        if not weights:
-            break
+        # Track all points for visualisation
+        for i, pt in enumerate(current_points):
+            all_points.append(pt)
+            all_weights.append(float(weights_np[i]) if i < len(weights_np) else 0.0)
+            all_dirs.append(dirs_list[i] if i < len(dirs_list) else None)
+
+        valid_idx = [i for i, w in enumerate(weights_np) if w > 0 and dirs_list[i] is not None]
+        final_positions = [current_points[i] for i in valid_idx]
+        final_dirs = [dirs_list[i] for i in valid_idx if dirs_list[i] is not None]  # type: ignore[arg-type]
+        final_weights = [float(weights_np[i]) for i in valid_idx]
 
         if lvl == levels - 1:
             break
 
-        w_np = np.asarray(weights, dtype=np.float64)
-        max_w = float(w_np.max())
-        if max_w <= 0:
+        if not len(weights_np):
             break
-        keep_mask = w_np >= (keep_ratio * max_w)
-        keep_idx = np.where(keep_mask)[0]
-        if top_k > 0:
-            top_idx = np.argsort(-w_np)[: min(top_k, len(w_np))]
-            keep_idx = np.unique(np.concatenate([keep_idx, top_idx]))
-        if keep_idx.size == 0:
+        max_w = float(weights_np.max()) if weights_np.size else 0.0
+        if max_w <= 0.0:
             break
 
-        sel_positions = np.asarray(positions, dtype=np.float64)[keep_idx]
-        x_min = float(sel_positions[:, 0].min())
-        x_max = float(sel_positions[:, 0].max())
-        y_min = float(sel_positions[:, 1].min())
-        y_max = float(sel_positions[:, 1].max())
-        margin = step
-        x_min = max(mesh_bounds[0], x_min - margin)
-        x_max = min(mesh_bounds[1], x_max + margin)
-        y_min = max(mesh_bounds[2], y_min - margin)
-        y_max = min(mesh_bounds[3], y_max + margin)
-        if x_max - x_min < 1e-3:
-            x_max = min(mesh_bounds[1], x_min + step)
-        if y_max - y_min < 1e-3:
-            y_max = min(mesh_bounds[3], y_min + step)
-        window = (x_min, x_max, y_min, y_max)
-        if refine_factor > 1.0:
-            step /= refine_factor
+        order = np.argsort(-weights_np)
+        peak_idx: List[int] = []
+        suppress_radius = current_step * 0.6
+        for idx in order:
+            if weights_np[idx] < keep_ratio * max_w:
+                break
+            if top_k > 0 and len(peak_idx) >= top_k:
+                break
+            keep = True
+            for p in peak_idx:
+                if np.linalg.norm(current_points[idx][:2] - current_points[p][:2]) < suppress_radius:
+                    keep = False
+                    break
+            if keep:
+                peak_idx.append(int(idx))
 
-    return positions, directions, weights, step
+        if not peak_idx:
+            break
+
+        next_step = current_step / refine_factor if refine_factor != 0 else current_step
+        if next_step <= 0:
+            break
+
+        next_points: List[np.ndarray] = []
+        for idx in peak_idx:
+            centre = current_points[idx]
+            cx, cy = float(centre[0]), float(centre[1])
+            next_points.append(np.array([cx, cy, z_base + z_eye], dtype=np.float64))
+            refined_points.append(np.array([cx, cy, z_base + z_eye], dtype=np.float64))
+            refined_weights_list.append(float(weights_np[idx]))
+            offsets = (-next_step, 0.0, next_step)
+            for dx in offsets:
+                for dy in offsets:
+                    nx, ny = cx + dx, cy + dy
+                    if nx < bounds[0] - 1e-6 or nx > bounds[1] + 1e-6:
+                        continue
+                    if ny < bounds[2] - 1e-6 or ny > bounds[3] + 1e-6:
+                        continue
+                    key = (round(nx, 4), round(ny, 4))
+                    if key in visited:
+                        continue
+                    visited.add(key)
+                    pt = np.array([nx, ny, z_base + z_eye], dtype=np.float64)
+                    next_points.append(pt)
+                    refined_points.append(pt)
+                    refined_weights_list.append(float(weights_np[idx]))
+
+        current_points = np.asarray(next_points, dtype=np.float64)
+        current_step = next_step
+
+    all_points_np = np.asarray(all_points, dtype=np.float64) if all_points else np.empty((0, 3), dtype=np.float64)
+    all_weights_np = np.asarray(all_weights, dtype=np.float64) if all_weights else np.empty((0,), dtype=np.float64)
+    all_dirs_np = np.zeros((len(all_dirs), 3), dtype=np.float64)
+    for i, d in enumerate(all_dirs):
+        if d is not None:
+            all_dirs_np[i] = d
+    refined_points_np = np.asarray(refined_points, dtype=np.float64) if refined_points else np.empty((0, 3), dtype=np.float64)
+    refined_weights_np = np.asarray(refined_weights_list, dtype=np.float64) if refined_weights_list else np.empty((0,), dtype=np.float64)
+
+    return (final_positions,
+            final_dirs,
+            final_weights,
+            current_step,
+            refined_points_np,
+            refined_weights_np,
+            all_points_np,
+            all_weights_np,
+            all_dirs_np)
 
 
 # --------------------------------------------------------------------------- #
@@ -904,6 +1000,11 @@ def evaluate_scene(scene_id: str,
     arrow_positions: List[np.ndarray] = []
     arrow_dirs: List[np.ndarray] = []
     arrow_weights: List[float] = []
+    refined_points = np.empty((0, 3), dtype=np.float64)
+    refined_weights = np.empty((0,), dtype=np.float64)
+    arrow_all_points = np.empty((0, 3), dtype=np.float64)
+    arrow_all_weights = np.empty((0,), dtype=np.float64)
+    arrow_all_dirs = np.empty((0, 3), dtype=np.float64)
     arrow_step_used = args.grid_step
     arrow_source = "arrow_field"
 
@@ -912,7 +1013,9 @@ def evaluate_scene(scene_id: str,
         hfov = math.radians(args.h_fov_deg)
         vfov = math.radians(args.v_fov_deg)
         try:
-            arrow_positions, arrow_dirs, arrow_weights, arrow_step_used = coarse_to_fine_arrow_search(
+            (arrow_positions, arrow_dirs, arrow_weights,
+             arrow_step_used, refined_points, refined_weights,
+             arrow_all_points, arrow_all_weights, arrow_all_dirs) = coarse_to_fine_arrow_search(
                 verts=verts,
                 centroids=centroids,
                 rc=rc,
@@ -933,14 +1036,26 @@ def evaluate_scene(scene_id: str,
             arrow_positions, arrow_dirs, arrow_weights = _arrow_field_from_visibility(
                 cams, visible_dirs, Nx, Ny, hfov, vfov, stride=max(1, int(args.arrow_stride)))
             arrow_step_used = args.grid_step
+            refined_points = np.empty((0, 3), dtype=np.float64)
+            refined_weights = np.empty((0,), dtype=np.float64)
+            arrow_all_points = cams
+            arrow_all_weights = np.asarray(arrow_weights, dtype=np.float64)
+            arrow_all_dirs = np.asarray(arrow_dirs, dtype=np.float64) if arrow_dirs else np.empty((0, 3), dtype=np.float64)
 
     candidate_dirs: Optional[np.ndarray] = None
     candidate_source = "grid_probability"
 
     arrow_positions_np = np.asarray(arrow_positions, dtype=np.float64)
+    refined_points_np = np.asarray(refined_points, dtype=np.float64)
+    refined_weights_np = np.asarray(refined_weights, dtype=np.float64)
     arrow_weights_np = np.asarray(arrow_weights, dtype=np.float64)
     arrow_dirs_np = (np.asarray(arrow_dirs, dtype=np.float64)
                      if len(arrow_dirs) else np.empty((0, 3), dtype=np.float64))
+    arrow_all_points_np = np.asarray(arrow_all_points, dtype=np.float64)
+    arrow_all_weights_np = np.asarray(arrow_all_weights, dtype=np.float64)
+    arrow_all_dirs_np = np.asarray(arrow_all_dirs, dtype=np.float64)
+    show_refined_grid = bool(refined_points_np.size)
+    max_arrow_weight = float(arrow_all_weights_np.max()) if arrow_all_weights_np.size else 0.0
 
     if arrow_weights_np.size:
         candidate_source = arrow_source
@@ -1002,6 +1117,18 @@ def evaluate_scene(scene_id: str,
         sc = plt.scatter(cams[:, 0], cams[:, 1], c=probs,
                          cmap="viridis", s=14)
         plt.colorbar(sc, label="Probability")
+        if args.show_arrows and show_refined_grid:
+            if refined_weights_np.size and max_arrow_weight > 0:
+                ref_colors = colormap(np.clip(refined_weights_np / max_arrow_weight, 0.0, 1.0))
+            else:
+                ref_colors = None
+            plt.scatter(refined_points_np[:, 0],
+                        refined_points_np[:, 1],
+                        c=ref_colors if ref_colors is not None else "none",
+                        edgecolors="black",
+                        linewidths=0.6,
+                        s=32,
+                        label=f"Refined grid ({arrow_step_used:.2f} m)")
         plt.axis("equal")
         plt.xlabel("X (m)")
         plt.ylabel("Y (m)")
@@ -1012,15 +1139,14 @@ def evaluate_scene(scene_id: str,
         plt.show()
 
     if args.show_arrows:
-        if arrow_weights_np.size:
+        if arrow_all_points_np.size and arrow_all_weights_np.size:
             hfov = math.radians(args.h_fov_deg)
             vfov = math.radians(args.v_fov_deg)
-            plot_stride = max(1, int(args.arrow_stride))
-            pos_plot = arrow_positions_np[::plot_stride]
-            dirs_plot = (arrow_dirs_np[::plot_stride]
-                         if arrow_dirs_np.size else np.empty((0, 3), dtype=np.float64))
-            weights_plot = arrow_weights_np[::plot_stride]
-            if pos_plot.size == 0 or weights_plot.size == 0 or dirs_plot.size == 0:
+            mask = (arrow_all_weights_np > 0) & (np.linalg.norm(arrow_all_dirs_np, axis=1) > 1e-8)
+            points_plot = arrow_all_points_np[mask]
+            weights_plot = arrow_all_weights_np[mask]
+            dirs_plot = arrow_all_dirs_np[mask]
+            if points_plot.size == 0:
                 print("    [info] Arrow plot skipped (no valid FOV windows).")
             else:
                 max_len = (0.9 * arrow_step_used) if args.arrow_len <= 0 else args.arrow_len
@@ -1032,8 +1158,8 @@ def evaluate_scene(scene_id: str,
                 dirs_xy /= norms
                 U_np = dirs_xy[:, 0] * max_len * scale
                 V_np = dirs_xy[:, 1] * max_len * scale
-                Qx = [float(p[0]) for p in pos_plot]
-                Qy = [float(p[1]) for p in pos_plot]
+                Qx = [float(p[0]) for p in points_plot]
+                Qy = [float(p[1]) for p in points_plot]
 
                 plt.figure(figsize=(7, 6.5))
                 plt.quiver(Qx, Qy, U_np, V_np, W_np,
@@ -1045,6 +1171,11 @@ def evaluate_scene(scene_id: str,
                 plt.ylabel("Y (m)")
                 plt.title(f"{scene_id} · {metrics.frame_id} · FOV arrows "
                           f"(H={math.degrees(hfov):.0f}°, V={math.degrees(vfov):.0f}°)")
+                if show_refined_grid:
+                    plt.scatter(refined_points_np[:, 0], refined_points_np[:, 1],
+                                facecolors="none", edgecolors="black",
+                                linewidths=0.6, s=28, label="Refined grid")
+                    plt.legend(loc="best")
                 add_arrow_markers(gt_cam, pred_cam)
                 plt.tight_layout()
                 plt.show()
@@ -1114,6 +1245,23 @@ def evaluate_scene(scene_id: str,
             if not s.has_vertex_normals():
                 s.compute_vertex_normals()
             vis.add_geometry(f"prob_{idx_point}", s, prob_material)
+
+        if args.show_arrows and show_refined_grid:
+            ref_material = rendering.MaterialRecord()
+            ref_material.shader = "defaultLit"
+            # Colour refined points by their relative arrow weight.
+            if refined_weights_np.size and max_arrow_weight > 0:
+                ref_colours = colormap(np.clip(refined_weights_np / max_arrow_weight, 0.0, 1.0))
+            else:
+                ref_colours = np.tile(np.array([[0.3, 0.85, 1.0]], dtype=np.float64), (len(refined_points_np), 1))
+            for idx_point, point in enumerate(refined_points_np):
+                s = o3d.geometry.TriangleMesh.create_sphere(radius=0.03)
+                s.translate(point)
+                colour = ref_colours[idx_point] if idx_point < len(ref_colours) else np.array([0.3, 0.85, 1.0])
+                s.paint_uniform_color(colour[:3])
+                if not s.has_vertex_normals():
+                    s.compute_vertex_normals()
+                vis.add_geometry(f"ref_grid_{idx_point}", s, ref_material)
 
         gt_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.1)
         gt_sphere.translate(gt_cam)
