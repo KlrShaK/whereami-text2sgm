@@ -738,6 +738,8 @@ def parse_args() -> argparse.Namespace:
                         help="Plot every Nth grid camera in the arrow field.")
     parser.add_argument("--arrow_len", type=float, default=0.0,
                         help="Maximum arrow length (metres). 0 → 0.9 * grid_step.")
+    parser.add_argument("--score_tau", type=float, default=1.0,
+                        help="Temperature for softmax sharpening over visibility counts.")
 
     parser.add_argument("--save_metrics", type=Path,
                         help="Optional path to save per-scene metrics as JSON.")
@@ -866,7 +868,13 @@ def evaluate_scene(scene_id: str,
     if total == 0:
         print(f"[WARN] {scene_id}: matched objects invisible from grid — skipped.")
         return None
-    probs = counts / total
+    #CHANGED
+    # Softmax over scores to sharpen peaks (set tau=1.0; smaller -> sharper)
+    tau = float(args.score_tau)
+    scores_f = counts.astype(np.float32) / max(tau, 1e-6)
+    scores_f -= scores_f.max()  # numerical stability
+    exp_scores = np.exp(scores_f)
+    probs = exp_scores / exp_scores.sum()
 
     pred_idx, metrics = compute_metrics(cams, probs, gt_cam,
                                         eps=args.prob_eps,
