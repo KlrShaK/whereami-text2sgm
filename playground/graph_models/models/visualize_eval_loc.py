@@ -28,6 +28,9 @@ ground-truth camera poses. For every 3RScan scene this script:
 The script reuses helper functions from visualize_loc_prob.py and constructs
 caption graphs directly from the structured per-frame JSON to avoid any LLM
 dependency during evaluation.
+
+
+### WITH IOU CALCULATION AND VISUALISATION
 """
 
 from __future__ import annotations
@@ -101,6 +104,7 @@ class SceneMetrics:
     distance_error: float
     grid_points: int
     matched_objects: int
+    iou_error: Optional[float] = None
 
 
 def build_metrics_table(metrics_list: List[SceneMetrics], hit_radius: float) -> str:
@@ -111,6 +115,7 @@ def build_metrics_table(metrics_list: List[SceneMetrics], hit_radius: float) -> 
         "NLL",
         f"Hit@{hit_radius:.2f}m",
         "Err (m)",
+        "IoU err",
         "Matches",
         "Grid pts",
     ]
@@ -123,6 +128,7 @@ def build_metrics_table(metrics_list: List[SceneMetrics], hit_radius: float) -> 
             f"{m.nll:.3f}",
             f"{m.hit_mass:.3f}",
             f"{m.distance_error:.3f}",
+            "-" if m.iou_error is None else f"{m.iou_error:.3f}",
             str(m.matched_objects),
             str(m.grid_points),
         ])
@@ -333,6 +339,140 @@ def compute_metrics(cams: np.ndarray,
         grid_points=len(cams),
         matched_objects=0,
     )
+
+
+def _camera_axes_from_forward(forward: np.ndarray) -> Optional[Tuple[np.ndarray, np.ndarray, np.ndarray]]:
+    """Return orthonormal (fwd, right, up) axes derived from a forward vector."""
+    fwd = np.asarray(forward, dtype=np.float64)
+    norm = float(np.linalg.norm(fwd))
+    if norm < 1e-6:
+        return None
+    fwd /= norm
+
+    up = np.array([0.0, 0.0, 1.0], dtype=np.float64)
+    if abs(float(np.dot(fwd, up))) > 0.95:
+        up = np.array([0.0, 1.0, 0.0], dtype=np.float64)
+
+    right = np.cross(fwd, up)
+    r_norm = float(np.linalg.norm(right))
+    if r_norm < 1e-6:
+        return None
+    right /= r_norm
+    up = np.cross(right, fwd)
+    u_norm = float(np.linalg.norm(up))
+    if u_norm < 1e-6:
+        return None
+    up /= u_norm
+    return fwd, right, up
+
+
+def _visible_triangles_from_view(cam: np.ndarray,
+                                 forward: Optional[np.ndarray],
+                                 hfov: float,
+                                 vfov: float,
+                                 rc: o3d.t.geometry.RaycastingScene,
+                                 geom_id: int,
+                                 tri_pts: np.ndarray,
+                                 tri_centroids: np.ndarray,
+                                 near: float = 0.05,
+                                 far: Optional[float] = None) -> set[int]:
+    """
+    Return triangle indices visible from a camera: inside frustum (all verts),
+    and first-hit occlusion check via centroid rays.
+    """
+    if forward is None:
+        return set()
+    axes = _camera_axes_from_forward(forward)
+    if axes is None:
+        return set()
+    fwd_axis, right_axis, up_axis = axes
+
+    cam = np.asarray(cam, dtype=np.float64)
+    rel = tri_pts - cam[None, None, :]        # [T,3,3]
+
+    fwd = rel @ fwd_axis
+    right = rel @ right_axis
+    up = rel @ up_axis
+
+    near = max(float(near), 1e-4)
+    in_front = np.all(fwd > near, axis=1)
+    if far is not None:
+        in_front &= np.all(fwd < float(far), axis=1)
+
+    tan_h = math.tan(hfov * 0.5)
+    tan_v = math.tan(vfov * 0.5)
+
+    inside_h = np.all(np.abs(right) <= fwd * tan_h, axis=1)
+    inside_v = np.all(np.abs(up) <= fwd * tan_v, axis=1)
+
+    frustum_mask = in_front & inside_h & inside_v
+    if not np.any(frustum_mask):
+        return set()
+
+    sel_idx = np.nonzero(frustum_mask)[0]
+
+    # Occlusion test: cast a ray to the centroid
+    vecs = tri_centroids[sel_idx] - cam[None, :]
+    dist = np.linalg.norm(vecs, axis=1)
+    valid = dist > 1e-6
+    if not np.any(valid):
+        return set()
+
+    sel_idx = sel_idx[valid]
+    dirs = vecs[valid] / dist[valid][:, None]
+
+    rays = np.concatenate(
+        [np.repeat(cam[None, :], len(sel_idx), axis=0), dirs],
+        axis=1,
+    ).astype(np.float32)
+
+    res = rc.cast_rays(o3d.core.Tensor(rays))
+    prim_ids = np.asarray(res["primitive_ids"].numpy())
+    geom_ids = np.asarray(res["geometry_ids"].numpy())
+
+    hit_mask = (prim_ids == sel_idx) & (geom_ids == geom_id)
+    return {int(i) for i in sel_idx[hit_mask]}
+
+
+def compute_view_iou_error(gt_cam: np.ndarray,
+                           gt_dir: Optional[np.ndarray],
+                           pred_cam: np.ndarray,
+                           pred_dir: Optional[np.ndarray],
+                           hfov: float,
+                           vfov: float,
+                           rc: o3d.t.geometry.RaycastingScene,
+                           geom_id: int,
+                           tri_pts: np.ndarray,
+                           tri_centroids: np.ndarray,
+                           tri_areas: np.ndarray,
+                           near: float = 0.05,
+                           far: Optional[float] = None) -> Tuple[Optional[float], Optional[float], set[int], set[int]]:
+    """
+    Return (IoU, IoU error, gt_set, pred_set) between GT and predicted views.
+    IoU error = 1 - IoU. Returns (None, None, sets) if insufficient data.
+    """
+    if gt_dir is None or pred_dir is None:
+        return None, None, set(), set()
+    gt_vis = _visible_triangles_from_view(gt_cam, gt_dir, hfov, vfov,
+                                          rc, geom_id, tri_pts, tri_centroids,
+                                          near=near, far=far)
+    pred_vis = _visible_triangles_from_view(pred_cam, pred_dir, hfov, vfov,
+                                            rc, geom_id, tri_pts, tri_centroids,
+                                            near=near, far=far)
+    if not gt_vis and not pred_vis:
+        return None, None, gt_vis, pred_vis
+
+    inter = gt_vis & pred_vis
+    union = gt_vis | pred_vis
+    if not union:
+        return None, None, gt_vis, pred_vis
+
+    inter_area = float(tri_areas[list(inter)].sum()) if inter else 0.0
+    union_area = float(tri_areas[list(union)].sum())
+    if union_area <= 1e-9:
+        return None, None, gt_vis, pred_vis
+    iou = inter_area / union_area
+    return iou, 1.0 - iou, gt_vis, pred_vis
 
 
 def _cluster_weighted_prediction(positions: np.ndarray,
@@ -682,9 +822,18 @@ def evaluate_scene(scene_id: str,
 
     mesh, tri2obj, obj2faces = load_scene(scene_dir)
     rc = o3d.t.geometry.RaycastingScene()
-    rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
+    mesh_id = rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
+    if not mesh.has_vertex_normals():
+        mesh.compute_vertex_normals()
 
     verts = np.asarray(mesh.vertices)
+    tris = np.asarray(mesh.triangles)
+    tri_pts = verts[tris]
+    tri_vecs = tri_pts[:, 1] - tri_pts[:, 0]
+    tri_vecs_b = tri_pts[:, 2] - tri_pts[:, 0]
+    tri_cross = np.cross(tri_vecs, tri_vecs_b)
+    tri_areas = 0.5 * np.linalg.norm(tri_cross, axis=1)
+    tri_centroids = tri_pts.mean(axis=1)
     cams = sample_grid(verts, step=args.grid_step, z_eye=args.eye_height)
 
     xs, ys = verts[:, 0], verts[:, 1]
@@ -692,7 +841,6 @@ def evaluate_scene(scene_id: str,
     gy = np.arange(ys.min(), ys.max() + 1e-4, args.grid_step)
     Nx, Ny = len(gx), len(gy)
 
-    tris = np.asarray(mesh.triangles)
     centroids: Dict[int, np.ndarray] = {}
     for oid in obj_ids:
         faces = obj2faces.get(int(oid))
@@ -729,6 +877,9 @@ def evaluate_scene(scene_id: str,
 
     pred_cam_prob = cams[pred_idx]
 
+    hfov_rad = math.radians(args.h_fov_deg)
+    vfov_rad = math.radians(args.v_fov_deg)
+
     # ---- Arrow-based aggregation (computed regardless of plotting)
     arrow_positions: List[np.ndarray] = []
     arrow_dirs: List[np.ndarray] = []
@@ -736,8 +887,6 @@ def evaluate_scene(scene_id: str,
 
     have_arrow_helpers = bool(dir_to_yaw_pitch and best_fov_window and average_direction)
     if have_arrow_helpers:
-        hfov = math.radians(args.h_fov_deg)
-        vfov = math.radians(args.v_fov_deg)
         stride = max(1, int(args.arrow_stride))
         for gy_i in range(0, Ny, stride):
             for gx_i in range(0, Nx, stride):
@@ -751,7 +900,7 @@ def evaluate_scene(scene_id: str,
                     yaw, pit = dir_to_yaw_pitch(vec)  # type: ignore[arg-type]
                     yaws[i] = yaw
                     pits[i] = pit
-                sel, count = best_fov_window(yaws, pits, hfov, vfov)  # type: ignore[arg-type]
+                sel, count = best_fov_window(yaws, pits, hfov_rad, vfov_rad)  # type: ignore[arg-type]
                 if count == 0:
                     continue
                 mdir = average_direction(dirs, sel)  # type: ignore[arg-type]
@@ -814,9 +963,28 @@ def evaluate_scene(scene_id: str,
     print(f"    predicted camera ({pred_source}): "
           f"{pred_cam.tolist()}")
     if pred_dir is not None:
-        print(f"    approx. viewing direction: {pred_dir.tolist()} \n")
+        print(f"    approx. viewing direction: {pred_dir.tolist()}")
     else:
-        print()
+        print("    approx. viewing direction: n/a (no directional vote)")
+
+    iou_val, iou_err, gt_vis_set, pred_vis_set = compute_view_iou_error(
+        gt_cam, gt_dir,
+        pred_cam, pred_dir,
+        hfov=hfov_rad,
+        vfov=vfov_rad,
+        rc=rc,
+        geom_id=int(mesh_id),
+        tri_pts=tri_pts,
+        tri_centroids=tri_centroids,
+        tri_areas=tri_areas,
+        near=0.05,
+        far=None,
+    )
+    metrics.iou_error = iou_err
+    if iou_val is not None and iou_err is not None:
+        print(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
+    else:
+        print("    view IoU: n/a (missing direction or empty visibility)\n")
 
     if args.show_heatmap:
         plt.figure(figsize=(6.5, 6.2))
@@ -834,8 +1002,6 @@ def evaluate_scene(scene_id: str,
 
     if args.show_arrows:
         if arrow_weights:
-            hfov = math.radians(args.h_fov_deg)
-            vfov = math.radians(args.v_fov_deg)
             max_len = (0.9 * args.grid_step) if args.arrow_len <= 0 else args.arrow_len
             W_np = np.asarray(arrow_weights, dtype=np.float32)
             scale = np.where(W_np > 0, W_np / W_np.max(), 0.0)
@@ -857,7 +1023,7 @@ def evaluate_scene(scene_id: str,
             plt.xlabel("X (m)")
             plt.ylabel("Y (m)")
             plt.title(f"{scene_id} · {metrics.frame_id} · FOV arrows "
-                      f"(H={math.degrees(hfov):.0f}°, V={math.degrees(vfov):.0f}°)")
+                      f"(H={math.degrees(hfov_rad):.0f}°, V={math.degrees(vfov_rad):.0f}°)")
             add_arrow_markers(gt_cam, pred_cam)
             plt.tight_layout()
             plt.show()
@@ -938,35 +1104,97 @@ def evaluate_scene(scene_id: str,
 
         pred_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.085)
         pred_sphere.translate(pred_cam)
-        pred_sphere.paint_uniform_color([1.0, 0.55, 0.0])
+        pred_sphere.paint_uniform_color([1.0, 0.9, 0.0])
         if not pred_sphere.has_vertex_normals():
             pred_sphere.compute_vertex_normals()
         vis.add_geometry("pred_cam", pred_sphere, material)
         vis.add_3d_label(pred_cam, f"Pred ({pred_source})")
 
+        frustum_mat = None
+        frustum_mat_pred = None
         frustum_gt = create_camera_frustum(gt_cam, gt_dir,
                                            colour=(1.0, 0.0, 0.0),
-                                           h_fov=math.radians(args.h_fov_deg),
-                                           v_fov=math.radians(args.v_fov_deg),
+                                           h_fov=hfov_rad,
+                                           v_fov=vfov_rad,
                                            scale=frustum_scale)
         frustum_pred = create_camera_frustum(pred_cam, pred_dir,
-                                             colour=(1.0, 0.6, 0.0),
-                                             h_fov=math.radians(args.h_fov_deg),
-                                             v_fov=math.radians(args.v_fov_deg),
+                                             colour=(1.0, 0.9, 0.0),
+                                             h_fov=hfov_rad,
+                                             v_fov=vfov_rad,
                                              scale=frustum_scale)
         if frustum_gt is not None:
             frustum_mat = rendering.MaterialRecord()
             frustum_mat.shader = "unlitLine"
             frustum_mat.line_width = 2.0
+            frustum_mat.base_color = [1.0, 0.0, 0.0, 1.0]
             vis.add_geometry("frustum_gt", frustum_gt, frustum_mat)
         if frustum_pred is not None:
             frustum_mat_pred = rendering.MaterialRecord()
             frustum_mat_pred.shader = "unlitLine"
             frustum_mat_pred.line_width = 2.0
+            frustum_mat_pred.base_color = [1.0, 0.9, 0.0, 1.0]
             vis.add_geometry("frustum_pred", frustum_pred, frustum_mat_pred)
 
         vis.reset_camera_to_default()
         gui.Application.instance.add_window(vis)
+
+        # Second window: IoU-only overlays (GT-only, Pred-only, intersection)
+        vis_iou = o3d.visualization.O3DVisualizer(f"{scene_id} – IoU overlap", 1280, 800)
+        vis_iou.show_settings = False
+        base_mat = rendering.MaterialRecord()
+        base_mat.shader = "defaultLitTransparency"
+        base_mat.base_color = [0.8, 0.8, 0.8, 0.18]
+        vis_iou.add_geometry("mesh_base", mesh, base_mat)
+
+        def _subset_mesh(base: o3d.geometry.TriangleMesh,
+                         tris_idx: set[int],
+                         colour: Tuple[float, float, float],
+                         alpha: float) -> Optional[o3d.geometry.TriangleMesh]:
+            """Create a coloured submesh from a set of triangle indices; None if empty."""
+            if not tris_idx:
+                return None
+
+            idx_arr = np.asarray(sorted(tris_idx), dtype=np.int64)
+            verts = np.asarray(base.vertices)
+            tris_arr = np.asarray(base.triangles)[idx_arr]
+
+            uniq, inv = np.unique(tris_arr.reshape(-1), return_inverse=True)
+            new_verts = verts[uniq]
+            new_tris = inv.reshape(-1, 3)
+
+            sub = o3d.geometry.TriangleMesh()
+            sub.vertices = o3d.utility.Vector3dVector(new_verts)
+            sub.triangles = o3d.utility.Vector3iVector(new_tris)
+            sub.paint_uniform_color(colour)
+            if not sub.has_vertex_normals():
+                sub.compute_vertex_normals()
+            return sub
+
+        gt_only = gt_vis_set - pred_vis_set
+        pred_only = pred_vis_set - gt_vis_set
+        both = gt_vis_set & pred_vis_set
+        overlays = [
+            ("iou_gt_only", gt_only, (1.0, 0.0, 0.0), 0.65),         # GT-only red
+            ("iou_pred_only", pred_only, (1.0, 0.85, 0.0), 0.65),    # Pred-only yellow
+            ("iou_both", both, (1.0, 0.4, 0.0), 0.85),               # Intersection orange
+        ]
+        for name, tri_set, colour, alpha in overlays:
+            mesh_subset = _subset_mesh(mesh, tri_set, colour, alpha)
+            if mesh_subset is None:
+                continue
+            mat = rendering.MaterialRecord()
+            mat.shader = "defaultLitTransparency"
+            mat.base_color = [*colour, alpha]
+            vis_iou.add_geometry(name, mesh_subset, mat)
+
+        vis_iou.add_geometry("gt_cam_iou", gt_sphere, material)
+        vis_iou.add_geometry("pred_cam_iou", pred_sphere, material)
+        if frustum_gt is not None:
+            vis_iou.add_geometry("frustum_gt_iou", frustum_gt, frustum_mat)
+        if frustum_pred is not None:
+            vis_iou.add_geometry("frustum_pred_iou", frustum_pred, frustum_mat_pred)
+        vis_iou.reset_camera_to_default()
+        gui.Application.instance.add_window(vis_iou)
         gui.Application.instance.run()
 
     return metrics
@@ -1017,6 +1245,8 @@ def main() -> None:
         print(f"    gt_prob: {scene_metrics.gt_prob:.4f} | nll: {scene_metrics.nll:.3f}")
         print(f"    hit@{args.hit_radius:.2f}m: {scene_metrics.hit_mass:.3f} | "
               f"dist_err: {scene_metrics.distance_error:.3f} m\n")
+        if scene_metrics.iou_error is not None:
+            print(f"    view IoU error: {scene_metrics.iou_error:.3f}")
 
     if not metrics_list:
         print("No scenes produced metrics. Nothing to report.")
@@ -1042,6 +1272,11 @@ def main() -> None:
     mean_nll, med_nll = agg([m.nll for m in metrics_list])
     mean_hit, med_hit = agg([m.hit_mass for m in metrics_list])
     mean_err, med_err = agg([m.distance_error for m in metrics_list])
+    iou_err_values = [m.iou_error for m in metrics_list if m.iou_error is not None]
+    mean_iou_err: Optional[float] = None
+    med_iou_err: Optional[float] = None
+    if iou_err_values:
+        mean_iou_err, med_iou_err = agg([float(v) for v in iou_err_values])
 
     agg_lines = [
         "Aggregate metrics ---------------------------------------",
@@ -1051,6 +1286,9 @@ def main() -> None:
         f"  Distance error (m) : mean={mean_err:.3f} | median={med_err:.3f}",
         "---------------------------------------------------------\n",
     ]
+    if mean_iou_err is not None and med_iou_err is not None:
+        agg_lines.insert(-1,
+                         f"  View IoU error     : mean={mean_iou_err:.3f} | median={med_iou_err:.3f}")
     print("\n".join(agg_lines))
 
     log_sections: List[str] = [params_text]
@@ -1073,6 +1311,7 @@ def main() -> None:
                 "nll": m.nll,
                 "hit_mass": m.hit_mass,
                 "distance_error": m.distance_error,
+                "iou_error": m.iou_error,
                 "grid_points": m.grid_points,
                 "matched_objects": m.matched_objects,
             }
@@ -1085,6 +1324,7 @@ def main() -> None:
                 "nll": {"mean": mean_nll, "median": med_nll},
                 "hit_mass": {"mean": mean_hit, "median": med_hit},
                 "distance_error": {"mean": mean_err, "median": med_err},
+                "iou_error": None if mean_iou_err is None else {"mean": mean_iou_err, "median": med_iou_err},
                 "hit_radius": args.hit_radius,
                 "top_k": args.top_k,
                 "grid_step": args.grid_step,
