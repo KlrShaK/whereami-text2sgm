@@ -16,7 +16,8 @@ ground-truth camera poses. For every 3RScan scene this script:
 5.  Casts rays from every grid camera to those centroids, counts first hits, and
     derives visibility probabilities.
 6.  Extracts the ground-truth camera centre/direction from `scene_pose` and
-    reports probability, NLL, Hit@r, and distance error at the ground-truth.
+    reports Hit@r curve, mass-radius, Top-K min distance, angular error, and
+    distance error at the ground-truth.
 7.  Optionally aggregates viewing directions into a FOV-weighted arrow field
     and prints the strongest pose candidates.
 8.  Chooses a final camera prediction (argmax/random/cluster-weighted) from the
@@ -98,36 +99,47 @@ class FrameSelection:
 class SceneMetrics:
     scene_id: str
     frame_id: str
-    gt_prob: float
-    nll: float
-    hit_mass: float
+    hit_masses: Dict[float, float]
+    mass_radii: Dict[float, float]
+    topk_min_dist: float
     distance_error: float
+    angular_error_deg: Optional[float]
     grid_points: int
     matched_objects: int
     iou_error: Optional[float] = None
 
 
-def build_metrics_table(metrics_list: List[SceneMetrics], hit_radius: float) -> str:
+def build_metrics_table(metrics_list: List[SceneMetrics],
+                        hit_radii: List[float],
+                        mass_percentiles: List[float],
+                        topk_k: int) -> str:
+    hit_radii = sorted(set(float(r) for r in hit_radii))
+    mass_percentiles = sorted(set(float(p) for p in mass_percentiles))
     headers = [
         "Scene",
         "Frame",
-        "GT Prob",
-        "NLL",
-        f"Hit@{hit_radius:.2f}m",
+        *[f"Hit@{r:.2f}m" for r in hit_radii],
+        *[f"R{p:.0f}%" for p in mass_percentiles],
+        f"TopK{topk_k} (m)",
         "Err (m)",
+        "Ang err (deg)",
         "IoU err",
         "Matches",
         "Grid pts",
     ]
     rows: List[List[str]] = []
     for m in metrics_list:
+        hit_vals = [m.hit_masses.get(r, 0.0) for r in hit_radii]
+        rad_vals = [m.mass_radii.get(p, float("nan")) for p in mass_percentiles]
+        ang_err = "-" if m.angular_error_deg is None else f"{m.angular_error_deg:.2f}"
         rows.append([
             m.scene_id,
             m.frame_id,
-            f"{m.gt_prob:.4f}",
-            f"{m.nll:.3f}",
-            f"{m.hit_mass:.3f}",
+            *[f"{v:.3f}" for v in hit_vals],
+            *[f"{v:.3f}" if np.isfinite(v) else "-" for v in rad_vals],
+            f"{m.topk_min_dist:.3f}",
             f"{m.distance_error:.3f}",
+            ang_err,
             "-" if m.iou_error is None else f"{m.iou_error:.3f}",
             str(m.matched_objects),
             str(m.grid_points),
@@ -315,27 +327,42 @@ def camera_center_from_pose(pose: Iterable[Iterable[float]]) -> np.ndarray:
 def compute_metrics(cams: np.ndarray,
                     probs: np.ndarray,
                     gt_cam: np.ndarray,
-                    eps: float,
-                    hit_radius: float) -> Tuple[int, SceneMetrics]:
+                    hit_radii: List[float],
+                    mass_percentiles: List[float],
+                    topk_k: int) -> Tuple[int, SceneMetrics]:
     pred_idx = int(np.argmax(probs))
-    pred_cam = cams[pred_idx]
-
     distances = np.linalg.norm(cams - gt_cam[None, :], axis=1)
-    gt_idx = int(np.argmin(distances))
-    gt_prob = float(probs[gt_idx])
-    gt_prob_clamped = max(gt_prob, eps)
-    nll = float(-math.log(gt_prob_clamped))
 
-    hit_mass = float(probs[distances <= hit_radius].sum())
-    dist_err = float(np.linalg.norm(pred_cam - gt_cam))
+    hit_masses: Dict[float, float] = {}
+    for r in sorted(set(float(r) for r in hit_radii)):
+        hit_masses[r] = float(probs[distances <= r].sum())
+
+    mass_radii: Dict[float, float] = {}
+    order = np.argsort(distances)
+    cum = np.cumsum(probs[order])
+    for p in sorted(set(float(p) for p in mass_percentiles)):
+        target = max(0.0, min(p / 100.0, 1.0))
+        idx = int(np.searchsorted(cum, target, side="left"))
+        if idx >= len(order):
+            mass_radii[p] = float(distances[order[-1]])
+        else:
+            mass_radii[p] = float(distances[order[idx]])
+
+    topk_k = max(1, int(topk_k))
+    k = min(topk_k, len(probs))
+    top_idx = np.argpartition(probs, -k)[-k:]
+    topk_min_dist = float(distances[top_idx].min()) if len(top_idx) else float("nan")
+
+    dist_err = float(np.linalg.norm(cams[pred_idx] - gt_cam))
 
     return pred_idx, SceneMetrics(
         scene_id="",
         frame_id="",
-        gt_prob=gt_prob,
-        nll=nll,
-        hit_mass=hit_mass,
+        hit_masses=hit_masses,
+        mass_radii=mass_radii,
+        topk_min_dist=topk_min_dist,
         distance_error=dist_err,
+        angular_error_deg=None,
         grid_points=len(cams),
         matched_objects=0,
     )
@@ -712,9 +739,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--eye_height", type=float, default=1.6,
                         help="Eye-height offset used by the grid sampler.")
     parser.add_argument("--prob_eps", type=float, default=1e-6,
-                        help="Numerical epsilon when computing log-probabilities.")
-    parser.add_argument("--hit_radius", type=float, default=0.5,
-                        help="Radius (metres) used for Hit@r mass around ground-truth.")
+                        help="Numerical epsilon when computing log-probabilities (unused).")
+    parser.add_argument("--hit_radii", nargs="+", type=float,
+                        default=[0.75, 1.0, 1.5, 2.0, 2.5],
+                        help="Radii (metres) for Hit@r mass curve.")
+    parser.add_argument("--mass_percentiles", nargs="+", type=float,
+                        default=[90.0, 95.0],
+                        help="Percentiles for mass-radius metric (e.g., 90 95).")
+    parser.add_argument("--top_k_min_dist", type=int, default=10,
+                        help="K for Top-K min distance metric. Minimum distance among top-K probs.")
     parser.add_argument("--prediction_strategy",
                         choices=["argmax", "random", "weighted"],
                         default="weighted",
@@ -877,8 +910,9 @@ def evaluate_scene(scene_id: str,
     probs = exp_scores / exp_scores.sum()
 
     pred_idx, metrics = compute_metrics(cams, probs, gt_cam,
-                                        eps=args.prob_eps,
-                                        hit_radius=args.hit_radius)
+                                        hit_radii=args.hit_radii,
+                                        mass_percentiles=args.mass_percentiles,
+                                        topk_k=args.top_k_min_dist)
     metrics.scene_id = scene_id
     metrics.frame_id = str(frame.get("image_index", selection.path.name))
     metrics.matched_objects = len(obj_ids)
@@ -967,6 +1001,11 @@ def evaluate_scene(scene_id: str,
 
     pred_source = f"{candidate_source}:{args.prediction_strategy}"
     metrics.distance_error = float(np.linalg.norm(pred_cam - gt_cam))
+    if gt_dir is not None and pred_dir is not None:
+        dot = float(np.clip(np.dot(gt_dir, pred_dir), -1.0, 1.0))
+        metrics.angular_error_deg = float(math.degrees(math.acos(dot)))
+    else:
+        metrics.angular_error_deg = None
 
     print(f"    predicted camera ({pred_source}): "
           f"{pred_cam.tolist()}")
@@ -1210,6 +1249,8 @@ def evaluate_scene(scene_id: str,
 
 def main() -> None:
     args = parse_args()
+    args.hit_radii = [float(r) for r in args.hit_radii]
+    args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
 
@@ -1250,9 +1291,21 @@ def main() -> None:
         metrics_list.append(scene_metrics)
         print(f"    frame: {scene_metrics.frame_id}")
         print(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
-        print(f"    gt_prob: {scene_metrics.gt_prob:.4f} | nll: {scene_metrics.nll:.3f}")
-        print(f"    hit@{args.hit_radius:.2f}m: {scene_metrics.hit_mass:.3f} | "
-              f"dist_err: {scene_metrics.distance_error:.3f} m\n")
+        hit_line = " | ".join(
+            f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
+            for r in sorted(scene_metrics.hit_masses)
+        )
+        print(f"    {hit_line}")
+        mass_line = " | ".join(
+            f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
+            for p in sorted(scene_metrics.mass_radii)
+        )
+        if mass_line:
+            print(f"    mass-radius: {mass_line}")
+        ang_err = ("n/a" if scene_metrics.angular_error_deg is None
+                   else f"{scene_metrics.angular_error_deg:.2f}°")
+        print(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
+              f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
         if scene_metrics.iou_error is not None:
             print(f"    view IoU error: {scene_metrics.iou_error:.3f}")
 
@@ -1265,7 +1318,10 @@ def main() -> None:
             print(f"Empty summary logged to {args.log_file}")
         return
 
-    table_text = build_metrics_table(metrics_list, args.hit_radius)
+    table_text = build_metrics_table(metrics_list,
+                                     args.hit_radii,
+                                     args.mass_percentiles,
+                                     args.top_k_min_dist)
     if table_text:
         print("Scene-level summary table -------------------------------")
         print(table_text)
@@ -1276,10 +1332,25 @@ def main() -> None:
         arr = np.asarray(values, dtype=np.float64)
         return float(arr.mean()), float(np.median(arr))
 
-    mean_gt, med_gt = agg([m.gt_prob for m in metrics_list])
-    mean_nll, med_nll = agg([m.nll for m in metrics_list])
-    mean_hit, med_hit = agg([m.hit_mass for m in metrics_list])
+    hit_stats: Dict[float, Tuple[float, float]] = {}
+    for r in sorted(set(args.hit_radii)):
+        vals = [m.hit_masses.get(r, 0.0) for m in metrics_list]
+        hit_stats[r] = agg(vals)
+
+    mass_radius_stats: Dict[float, Tuple[float, float]] = {}
+    for p in sorted(set(args.mass_percentiles)):
+        vals = [m.mass_radii.get(p, float("nan")) for m in metrics_list]
+        vals = [v for v in vals if np.isfinite(v)]
+        if vals:
+            mass_radius_stats[p] = agg(vals)
+
+    mean_topk, med_topk = agg([m.topk_min_dist for m in metrics_list])
     mean_err, med_err = agg([m.distance_error for m in metrics_list])
+    ang_values = [m.angular_error_deg for m in metrics_list if m.angular_error_deg is not None]
+    mean_ang: Optional[float] = None
+    med_ang: Optional[float] = None
+    if ang_values:
+        mean_ang, med_ang = agg([float(v) for v in ang_values])
     iou_err_values = [m.iou_error for m in metrics_list if m.iou_error is not None]
     mean_iou_err: Optional[float] = None
     med_iou_err: Optional[float] = None
@@ -1288,12 +1359,21 @@ def main() -> None:
 
     agg_lines = [
         "Aggregate metrics ---------------------------------------",
-        f"  GT probability     : mean={mean_gt:.4f} | median={med_gt:.4f}",
-        f"  NLL (surprisal)    : mean={mean_nll:.3f} | median={med_nll:.3f}",
-        f"  Hit@{args.hit_radius:.2f}m       : mean={mean_hit:.3f} | median={med_hit:.3f}",
-        f"  Distance error (m) : mean={mean_err:.3f} | median={med_err:.3f}",
+        f"  TopK{args.top_k_min_dist} min dist (m): mean={mean_topk:.3f} | median={med_topk:.3f}",
+        f"  Distance error (m)      : mean={mean_err:.3f} | median={med_err:.3f}",
         "---------------------------------------------------------\n",
     ]
+    for r in sorted(hit_stats):
+        mean_hit, med_hit = hit_stats[r]
+        agg_lines.insert(-1,
+                         f"  Hit@{r:.2f}m              : mean={mean_hit:.3f} | median={med_hit:.3f}")
+    for p in sorted(mass_radius_stats):
+        mean_r, med_r = mass_radius_stats[p]
+        agg_lines.insert(-1,
+                         f"  Mass-radius R{p:.0f}% (m): mean={mean_r:.3f} | median={med_r:.3f}")
+    if mean_ang is not None and med_ang is not None:
+        agg_lines.insert(-1,
+                         f"  Angular error (deg)   : mean={mean_ang:.2f} | median={med_ang:.2f}")
     if mean_iou_err is not None and med_iou_err is not None:
         agg_lines.insert(-1,
                          f"  View IoU error     : mean={mean_iou_err:.3f} | median={med_iou_err:.3f}")
@@ -1315,25 +1395,38 @@ def main() -> None:
             {
                 "scene_id": m.scene_id,
                 "frame_id": m.frame_id,
-                "gt_prob": m.gt_prob,
-                "nll": m.nll,
-                "hit_mass": m.hit_mass,
+                "hit_masses": {str(k): v for k, v in m.hit_masses.items()},
+                "mass_radii": {str(k): v for k, v in m.mass_radii.items()},
+                "topk_min_dist": m.topk_min_dist,
                 "distance_error": m.distance_error,
+                "angular_error_deg": m.angular_error_deg,
                 "iou_error": m.iou_error,
                 "grid_points": m.grid_points,
                 "matched_objects": m.matched_objects,
             }
             for m in metrics_list
         ]
+        hit_mass_summary = {
+            str(r): {"mean": mean_hit, "median": med_hit}
+            for r, (mean_hit, med_hit) in hit_stats.items()
+        }
+        mass_radius_summary = {
+            str(p): {"mean": mean_r, "median": med_r}
+            for p, (mean_r, med_r) in mass_radius_stats.items()
+        }
         args.save_metrics.write_text(json.dumps({
             "metrics": payload,
             "aggregate": {
-                "gt_prob": {"mean": mean_gt, "median": med_gt},
-                "nll": {"mean": mean_nll, "median": med_nll},
-                "hit_mass": {"mean": mean_hit, "median": med_hit},
+                "hit_masses": hit_mass_summary,
+                "mass_radii": mass_radius_summary,
+                "topk_min_dist": {"mean": mean_topk, "median": med_topk},
                 "distance_error": {"mean": mean_err, "median": med_err},
+                "angular_error_deg": (None if mean_ang is None
+                                      else {"mean": mean_ang, "median": med_ang}),
                 "iou_error": None if mean_iou_err is None else {"mean": mean_iou_err, "median": med_iou_err},
-                "hit_radius": args.hit_radius,
+                "hit_radii": args.hit_radii,
+                "mass_percentiles": args.mass_percentiles,
+                "top_k_min_dist": args.top_k_min_dist,
                 "top_k": args.top_k,
                 "grid_step": args.grid_step,
             },
