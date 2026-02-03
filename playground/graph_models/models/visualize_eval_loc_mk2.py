@@ -648,7 +648,8 @@ def coarse_to_fine_arrow_search(verts: np.ndarray,
                                 levels: int,
                                 refine_factor: float,
                                 keep_ratio: float,
-                                top_k: int) -> Tuple[List[np.ndarray],
+                                top_k: int,
+                                apply_nms: bool = True) -> Tuple[List[np.ndarray],
                                                      List[np.ndarray],
                                                      List[float],
                                                      float,
@@ -662,6 +663,7 @@ def coarse_to_fine_arrow_search(verts: np.ndarray,
     Level 0: coarse grid covering the mesh with spacing = base_step.
     At each level: keep only the maxima, spawn a local grid around each
     maximum with smaller spacing (base_step / 2^level), deduplicate points,
+    optionally apply NMS to avoid nearby peaks,
     and stop after `levels` iterations or when no new points appear.
     Returns final-level positions/directions/weights, the spacing used at the
     final level, and all refined (non-base) grid points for visualisation.
@@ -723,18 +725,26 @@ def coarse_to_fine_arrow_search(verts: np.ndarray,
 
         order = np.argsort(-weights_np)
         peak_idx: List[int] = []
-        suppress_radius = current_step * 0.6
-        for idx in order:
-            if weights_np[idx] < keep_ratio * max_w:
-                break
-            if top_k > 0 and len(peak_idx) >= top_k:
-                break
-            keep = True
-            for p in peak_idx:
-                if np.linalg.norm(current_points[idx][:2] - current_points[p][:2]) < suppress_radius:
-                    keep = False
+        if apply_nms:
+            suppress_radius = current_step * 0.6
+            for idx in order:
+                if weights_np[idx] < keep_ratio * max_w:
                     break
-            if keep:
+                if top_k > 0 and len(peak_idx) >= top_k:
+                    break
+                keep = True
+                for p in peak_idx:
+                    if np.linalg.norm(current_points[idx][:2] - current_points[p][:2]) < suppress_radius:
+                        keep = False
+                        break
+                if keep:
+                    peak_idx.append(int(idx))
+        else:
+            for idx in order:
+                if weights_np[idx] < keep_ratio * max_w:
+                    break
+                if top_k > 0 and len(peak_idx) >= top_k:
+                    break
                 peak_idx.append(int(idx))
 
         if not peak_idx:
@@ -822,7 +832,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=0,
                         help="RNG seed for random frame selection.")
 
-    parser.add_argument("--top_k", type=int, default=25,
+    parser.add_argument("--top_k", type=int, default=15,
                         help="How many object matches to keep per caption.")
     parser.add_argument("--grid_step", type=float, default=0.25,
                         help="XY grid spacing in metres.")
@@ -855,7 +865,7 @@ def parse_args() -> argparse.Namespace:
                         help="Plot every Nth grid camera in the arrow field.")
     parser.add_argument("--arrow_len", type=float, default=0.0,
                         help="Maximum arrow length (metres). 0 → 0.9 * grid_step.")
-    parser.add_argument("--coarse_grid_step", type=float, default=1.5,
+    parser.add_argument("--coarse_grid_step", type=float, default=2.0,
                         help="Base XY spacing (metres) for the coarse search grid.")
     parser.add_argument("--coarse_refine_levels", type=int, default=3,
                         help="How many refinement levels to run (>=1).")
@@ -863,8 +873,10 @@ def parse_args() -> argparse.Namespace:
                         help="Factor to shrink spacing each level (2 → halves spacing).")
     parser.add_argument("--coarse_keep_ratio", type=float, default=0.7,
                         help="Keep arrows within ratio*max for next-level window.")
-    parser.add_argument("--coarse_top_k", type=int, default=8,
+    parser.add_argument("--coarse_top_k", type=int, default=16,
                         help="Also keep this many best arrows per level for refinement.")
+    parser.add_argument("--coarse_disable_nms", action="store_true",
+                        help="Disable NMS (non-max suppression) when selecting refinement seeds.")
 
     parser.add_argument("--save_metrics", type=Path,
                         help="Optional path to save per-scene metrics as JSON.")
@@ -1028,6 +1040,7 @@ def evaluate_scene(scene_id: str,
                 refine_factor=args.coarse_refine_factor,
                 keep_ratio=args.coarse_keep_ratio,
                 top_k=args.coarse_top_k,
+                apply_nms=not args.coarse_disable_nms,
             )
             arrow_source = "arrow_field_coarse"
         except Exception as exc:  # noqa: BLE001

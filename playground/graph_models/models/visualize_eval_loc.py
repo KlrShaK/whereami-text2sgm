@@ -744,7 +744,7 @@ def parse_args() -> argparse.Namespace:
                         default=[0.75, 1.0, 1.5, 2.0, 2.5],
                         help="Radii (metres) for Hit@r mass curve.")
     parser.add_argument("--mass_percentiles", nargs="+", type=float,
-                        default=[90.0, 95.0],
+                        default=[50.0, 90.0],
                         help="Percentiles for mass-radius metric (e.g., 90 95).")
     parser.add_argument("--top_k_min_dist", type=int, default=10,
                         help="K for Top-K min distance metric. Minimum distance among top-K probs.")
@@ -771,7 +771,7 @@ def parse_args() -> argparse.Namespace:
                         help="Plot every Nth grid camera in the arrow field.")
     parser.add_argument("--arrow_len", type=float, default=0.0,
                         help="Maximum arrow length (metres). 0 → 0.9 * grid_step.")
-    parser.add_argument("--score_tau", type=float, default=1.0,
+    parser.add_argument("--score_tau", type=float, default= 0.5, #1.5, # 0.5, # works quite well
                         help="Temperature for softmax sharpening over visibility counts.")
 
     parser.add_argument("--save_metrics", type=Path,
