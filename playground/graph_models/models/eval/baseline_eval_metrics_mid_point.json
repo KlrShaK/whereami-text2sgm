@@ -1,0 +1,4580 @@
+[
+  {
+    "scene_id": "02b33dfb-be2b-2d54-92d2-cd012b2b3c40",
+    "frame_id": "frame-000094",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7759245524202079,
+      "90.0": 0.7759245524202079
+    },
+    "topk_min_dist": 0.7759245524202079,
+    "distance_error": 0.7759245524202079,
+    "angular_error_deg": 43.77981520324095,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "02b33e01-be2b-2d54-93fb-4145a709cec5",
+    "frame_id": "frame-000044",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5504958578352878,
+      "90.0": 0.5504958578352878
+    },
+    "topk_min_dist": 0.5504958578352878,
+    "distance_error": 0.5504958578352878,
+    "angular_error_deg": 29.62008497920019,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9151832422235144
+  },
+  {
+    "scene_id": "095821f7-e2c2-2de1-9568-b9ce59920e29",
+    "frame_id": "frame-000022",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.3207181267524475,
+      "90.0": 1.3207181267524475
+    },
+    "topk_min_dist": 1.3207181267524475,
+    "distance_error": 1.3207181267524475,
+    "angular_error_deg": 112.29488867636064,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0958220d-e2c2-2de1-9710-c37018da1883",
+    "frame_id": "frame-000054",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.843166312546825,
+      "90.0": 0.843166312546825
+    },
+    "topk_min_dist": 0.843166312546825,
+    "distance_error": 0.843166312546825,
+    "angular_error_deg": 130.22637160641318,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "09582212-e2c2-2de1-9700-fa44b14fbded",
+    "frame_id": "frame-000113",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8301810234773558,
+      "90.0": 0.8301810234773558
+    },
+    "topk_min_dist": 0.8301810234773558,
+    "distance_error": 0.8301810234773558,
+    "angular_error_deg": 82.73040752880185,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "09582225-e2c2-2de1-9564-f6681ef5e511",
+    "frame_id": "frame-000084",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8472013540536218,
+      "90.0": 0.8472013540536218
+    },
+    "topk_min_dist": 0.8472013540536218,
+    "distance_error": 0.8472013540536218,
+    "angular_error_deg": 38.84862189846109,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "09582244-e2c2-2de1-956c-357092d949d1",
+    "frame_id": "frame-000080",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8391296170755318,
+      "90.0": 0.8391296170755318
+    },
+    "topk_min_dist": 0.8391296170755318,
+    "distance_error": 0.8391296170755318,
+    "angular_error_deg": 37.459556243763146,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.859109588842973
+  },
+  {
+    "scene_id": "0958224e-e2c2-2de1-943b-38e36345e2e7",
+    "frame_id": "frame-000068",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.48795317894884543,
+      "90.0": 0.48795317894884543
+    },
+    "topk_min_dist": 0.48795317894884543,
+    "distance_error": 0.48795317894884543,
+    "angular_error_deg": 54.57323325954405,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0988ea72-eb32-2e61-8344-99e2283c2728",
+    "frame_id": "frame-000321",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5301736534019237,
+      "90.0": 0.5301736534019237
+    },
+    "topk_min_dist": 0.5301736534019237,
+    "distance_error": 0.5301736534019237,
+    "angular_error_deg": 57.4462748042701,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0ad2d382-79e2-2212-98b3-641bf9d552c1",
+    "frame_id": "frame-000315",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8228034902038587,
+      "90.0": 0.8228034902038587
+    },
+    "topk_min_dist": 0.8228034902038587,
+    "distance_error": 0.8228034902038587,
+    "angular_error_deg": 66.42949877305456,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0ad2d386-79e2-2212-9b40-43d081db442a",
+    "frame_id": "frame-000021",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.665120551403266,
+      "90.0": 1.665120551403266
+    },
+    "topk_min_dist": 1.665120551403266,
+    "distance_error": 1.665120551403266,
+    "angular_error_deg": 102.97339887456921,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9769144152092271
+  },
+  {
+    "scene_id": "0ad2d38f-79e2-2212-98d2-9b5060e5e9b5",
+    "frame_id": "frame-000226",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0698785337840364,
+      "90.0": 1.0698785337840364
+    },
+    "topk_min_dist": 1.0698785337840364,
+    "distance_error": 1.0698785337840364,
+    "angular_error_deg": 53.679508456386024,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9980883051890291
+  },
+  {
+    "scene_id": "0ad2d399-79e2-2212-99cf-7a3512734bd7",
+    "frame_id": "frame-000269",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8726336241930837,
+      "90.0": 1.8726336241930837
+    },
+    "topk_min_dist": 1.8726336241930837,
+    "distance_error": 1.8726336241930837,
+    "angular_error_deg": 87.65692332955452,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0ad2d39b-79e2-2212-99ae-830c292cd079",
+    "frame_id": "frame-000131",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8728760571402077,
+      "90.0": 1.8728760571402077
+    },
+    "topk_min_dist": 1.8728760571402077,
+    "distance_error": 1.8728760571402077,
+    "angular_error_deg": 80.91728929848462,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0ad2d3a3-79e2-2212-9a51-9094be707ec2",
+    "frame_id": "frame-000006",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7574073535135648,
+      "90.0": 0.7574073535135648
+    },
+    "topk_min_dist": 0.7574073535135648,
+    "distance_error": 0.7574073535135648,
+    "angular_error_deg": 59.78339607922375,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9989418320837791
+  },
+  {
+    "scene_id": "0cac7536-8d6f-2d13-8dc2-2f9d7aa62dc4",
+    "frame_id": "frame-000164",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.771679138581481,
+      "90.0": 1.771679138581481
+    },
+    "topk_min_dist": 1.771679138581481,
+    "distance_error": 1.771679138581481,
+    "angular_error_deg": 39.03682661994997,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8730873466263283
+  },
+  {
+    "scene_id": "0cac7540-8d6f-2d13-8eee-36ba2a428e3f",
+    "frame_id": "frame-000155",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.0308142758647083,
+      "90.0": 2.0308142758647083
+    },
+    "topk_min_dist": 2.0308142758647083,
+    "distance_error": 2.0308142758647083,
+    "angular_error_deg": 89.41688686178918,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7549-8d6f-2d13-8d56-b895956f571a",
+    "frame_id": "frame-000092",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0030757627928197,
+      "90.0": 1.0030757627928197
+    },
+    "topk_min_dist": 1.0030757627928197,
+    "distance_error": 1.0030757627928197,
+    "angular_error_deg": 94.37500656057706,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7558-8d6f-2d13-8fe1-c8af0362735d",
+    "frame_id": "frame-000153",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.5667785474038336,
+      "90.0": 2.5667785474038336
+    },
+    "topk_min_dist": 2.5667785474038336,
+    "distance_error": 2.5667785474038336,
+    "angular_error_deg": 83.21349566479839,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac755a-8d6f-2d13-8fed-b1be02f4ef77",
+    "frame_id": "frame-000479",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 5.28931865145232,
+      "90.0": 5.28931865145232
+    },
+    "topk_min_dist": 5.28931865145232,
+    "distance_error": 5.28931865145232,
+    "angular_error_deg": 107.06854562471639,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac755e-8d6f-2d13-8c6a-c0979ca34a4f",
+    "frame_id": "frame-000185",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.6389892636446173,
+      "90.0": 2.6389892636446173
+    },
+    "topk_min_dist": 2.6389892636446173,
+    "distance_error": 2.6389892636446173,
+    "angular_error_deg": 47.344235654601725,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7564-8d6f-2d13-8cb2-8b01c0a1b3d5",
+    "frame_id": "frame-000250",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.6452828168096623,
+      "90.0": 1.6452828168096623
+    },
+    "topk_min_dist": 1.6452828168096623,
+    "distance_error": 1.6452828168096623,
+    "angular_error_deg": 119.65463985108069,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7574-8d6f-2d13-8db6-4304f437e6d5",
+    "frame_id": "frame-000140",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.278364002834097,
+      "90.0": 2.278364002834097
+    },
+    "topk_min_dist": 2.278364002834097,
+    "distance_error": 2.278364002834097,
+    "angular_error_deg": 179.17796194246333,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7578-8d6f-2d13-8c2d-bfa7a04f8af3",
+    "frame_id": "frame-000044",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4740469496393056,
+      "90.0": 1.4740469496393056
+    },
+    "topk_min_dist": 1.4740469496393056,
+    "distance_error": 1.4740469496393056,
+    "angular_error_deg": 143.31939575546954,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7580-8d6f-2d13-8c9d-d45247b5244b",
+    "frame_id": "frame-000211",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.7798390718850876,
+      "90.0": 1.7798390718850876
+    },
+    "topk_min_dist": 1.7798390718850876,
+    "distance_error": 1.7798390718850876,
+    "angular_error_deg": 64.66630478952537,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7584-8d6f-2d13-8df8-c05e4307b418",
+    "frame_id": "frame-000184",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7216313877482563,
+      "90.0": 0.7216313877482563
+    },
+    "topk_min_dist": 0.7216313877482563,
+    "distance_error": 0.7216313877482563,
+    "angular_error_deg": 153.5105778435252,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7597-8d6f-2d13-8c9c-6f8542021d5c",
+    "frame_id": "frame-000119",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1370740966401411,
+      "90.0": 1.1370740966401411
+    },
+    "topk_min_dist": 1.1370740966401411,
+    "distance_error": 1.1370740966401411,
+    "angular_error_deg": 101.57361944791995,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac759b-8d6f-2d13-8e3b-2e3bc1ee1158",
+    "frame_id": "frame-000131",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.558229173927432,
+      "90.0": 1.558229173927432
+    },
+    "topk_min_dist": 1.558229173927432,
+    "distance_error": 1.558229173927432,
+    "angular_error_deg": 80.10793276793495,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9775987652545755
+  },
+  {
+    "scene_id": "0cac75a7-8d6f-2d13-8fdc-083ff44d10fb",
+    "frame_id": "frame-000038",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.188297541808841,
+      "90.0": 2.188297541808841
+    },
+    "topk_min_dist": 2.188297541808841,
+    "distance_error": 2.188297541808841,
+    "angular_error_deg": 70.23118958466067,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75ad-8d6f-2d13-8c74-5de4dfc4affc",
+    "frame_id": "frame-000006",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4951210158408503,
+      "90.0": 1.4951210158408503
+    },
+    "topk_min_dist": 1.4951210158408503,
+    "distance_error": 1.4951210158408503,
+    "angular_error_deg": 93.67962393605215,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75b1-8d6f-2d13-8c17-9099db8915bc",
+    "frame_id": "frame-000540",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 3.8363732439294282,
+      "90.0": 3.8363732439294282
+    },
+    "topk_min_dist": 3.8363732439294282,
+    "distance_error": 3.8363732439294282,
+    "angular_error_deg": 86.39564260814988,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8644651540937602
+  },
+  {
+    "scene_id": "0cac75c4-8d6f-2d13-8c37-fcfaf141ae5a",
+    "frame_id": "frame-000000",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.0771365294626745,
+      "90.0": 2.0771365294626745
+    },
+    "topk_min_dist": 2.0771365294626745,
+    "distance_error": 2.0771365294626745,
+    "angular_error_deg": 120.89179767837625,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75c8-8d6f-2d13-8c08-b3c40c58e0f7",
+    "frame_id": "frame-000060",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.948726303480026,
+      "90.0": 1.948726303480026
+    },
+    "topk_min_dist": 1.948726303480026,
+    "distance_error": 1.948726303480026,
+    "angular_error_deg": 93.74983090084179,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75d0-8d6f-2d13-8c26-d771a31c3f50",
+    "frame_id": "frame-000135",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.97064979417072,
+      "90.0": 1.97064979417072
+    },
+    "topk_min_dist": 1.97064979417072,
+    "distance_error": 1.97064979417072,
+    "angular_error_deg": 83.40325800281515,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75dc-8d6f-2d13-8d08-9c497bd6acdc",
+    "frame_id": "frame-000113",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.274955881641644,
+      "90.0": 2.274955881641644
+    },
+    "topk_min_dist": 2.274955881641644,
+    "distance_error": 2.274955881641644,
+    "angular_error_deg": 53.67770679645689,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.742358859132713
+  },
+  {
+    "scene_id": "0cac75f0-8d6f-2d13-8d86-371deca33bb4",
+    "frame_id": "frame-000043",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.173072226479287,
+      "90.0": 1.173072226479287
+    },
+    "topk_min_dist": 1.173072226479287,
+    "distance_error": 1.173072226479287,
+    "angular_error_deg": 170.0163620057632,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75f4-8d6f-2d13-8c10-ce688f7ac0af",
+    "frame_id": "frame-000181",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8912675020844356,
+      "90.0": 1.8912675020844356
+    },
+    "topk_min_dist": 1.8912675020844356,
+    "distance_error": 1.8912675020844356,
+    "angular_error_deg": 67.0571301015082,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75f6-8d6f-2d13-8d7b-dc01a394149c",
+    "frame_id": "frame-000028",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8920543252880426,
+      "90.0": 0.8920543252880426
+    },
+    "topk_min_dist": 0.8920543252880426,
+    "distance_error": 0.8920543252880426,
+    "angular_error_deg": 151.29422421203674,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac75fc-8d6f-2d13-8c59-13d52e366f38",
+    "frame_id": "frame-000041",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2372149211292003,
+      "90.0": 1.2372149211292003
+    },
+    "topk_min_dist": 1.2372149211292003,
+    "distance_error": 1.2372149211292003,
+    "angular_error_deg": 106.44740752182852,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7602-8d6f-2d13-8ca7-c26866c2e42f",
+    "frame_id": "frame-000111",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.386779718041507,
+      "90.0": 1.386779718041507
+    },
+    "topk_min_dist": 1.386779718041507,
+    "distance_error": 1.386779718041507,
+    "angular_error_deg": 125.82506201610724,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac760f-8d6f-2d13-8d9d-2d8df8f8cb6e",
+    "frame_id": "frame-000111",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4110026996340752,
+      "90.0": 1.4110026996340752
+    },
+    "topk_min_dist": 1.4110026996340752,
+    "distance_error": 1.4110026996340752,
+    "angular_error_deg": 46.733753846255595,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7623-8d6f-2d13-8da0-462e7fc0bea2",
+    "frame_id": "frame-000207",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.764513291176148,
+      "90.0": 0.764513291176148
+    },
+    "topk_min_dist": 0.764513291176148,
+    "distance_error": 0.764513291176148,
+    "angular_error_deg": 64.30841630353065,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7627-8d6f-2d13-8eac-41764b5f2c5b",
+    "frame_id": "frame-000009",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2247516790668118,
+      "90.0": 1.2247516790668118
+    },
+    "topk_min_dist": 1.2247516790668118,
+    "distance_error": 1.2247516790668118,
+    "angular_error_deg": 145.56199186494038,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7635-8d6f-2d13-8ea5-25f4dc197d1d",
+    "frame_id": "frame-000064",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.7776989676694328,
+      "90.0": 1.7776989676694328
+    },
+    "topk_min_dist": 1.7776989676694328,
+    "distance_error": 1.7776989676694328,
+    "angular_error_deg": 107.33599426500119,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac763b-8d6f-2d13-8c67-de3d97b48d39",
+    "frame_id": "frame-000122",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5589400768741202,
+      "90.0": 1.5589400768741202
+    },
+    "topk_min_dist": 1.5589400768741202,
+    "distance_error": 1.5589400768741202,
+    "angular_error_deg": 145.0251804303111,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7642-8d6f-2d13-8f9f-eb19016049fa",
+    "frame_id": "frame-000114",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8792370705706244,
+      "90.0": 0.8792370705706244
+    },
+    "topk_min_dist": 0.8792370705706244,
+    "distance_error": 0.8792370705706244,
+    "angular_error_deg": 66.23444978862817,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7648-8d6f-2d13-8e30-76663c19baa4",
+    "frame_id": "frame-000115",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2541527246082096,
+      "90.0": 1.2541527246082096
+    },
+    "topk_min_dist": 1.2541527246082096,
+    "distance_error": 1.2541527246082096,
+    "angular_error_deg": 16.03405088728582,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.6953747443074354
+  },
+  {
+    "scene_id": "0cac764c-8d6f-2d13-8fec-15edfc3e53ad",
+    "frame_id": "frame-000005",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.7114032398776589,
+      "90.0": 1.7114032398776589
+    },
+    "topk_min_dist": 1.7114032398776589,
+    "distance_error": 1.7114032398776589,
+    "angular_error_deg": 86.6921969664012,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7654-8d6f-2d13-8e68-ddd1767454ad",
+    "frame_id": "frame-000133",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.777182878075975,
+      "90.0": 0.777182878075975
+    },
+    "topk_min_dist": 0.777182878075975,
+    "distance_error": 0.777182878075975,
+    "angular_error_deg": 142.58740809666637,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7664-8d6f-2d13-8e1d-b97c9ab20b12",
+    "frame_id": "frame-000033",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.507489723957763,
+      "90.0": 1.507489723957763
+    },
+    "topk_min_dist": 1.507489723957763,
+    "distance_error": 1.507489723957763,
+    "angular_error_deg": 119.83462621070778,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac766c-8d6f-2d13-8cde-44c997b5e8a7",
+    "frame_id": "frame-000108",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.555020874239594,
+      "90.0": 0.555020874239594
+    },
+    "topk_min_dist": 0.555020874239594,
+    "distance_error": 0.555020874239594,
+    "angular_error_deg": 52.1376761746964,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9976360385548433
+  },
+  {
+    "scene_id": "0cac7676-8d6f-2d13-8f3a-d7bf7f03e721",
+    "frame_id": "frame-000096",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.034182189234552,
+      "90.0": 1.034182189234552
+    },
+    "topk_min_dist": 1.034182189234552,
+    "distance_error": 1.034182189234552,
+    "angular_error_deg": 53.411474511903094,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac767c-8d6f-2d13-8e22-50ba98af68e6",
+    "frame_id": "frame-000133",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7362681168046622,
+      "90.0": 0.7362681168046622
+    },
+    "topk_min_dist": 0.7362681168046622,
+    "distance_error": 0.7362681168046622,
+    "angular_error_deg": 97.06018036973666,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac767e-8d6f-2d13-8d1a-d5e9b184df15",
+    "frame_id": "frame-000108",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.932125621830972,
+      "90.0": 1.932125621830972
+    },
+    "topk_min_dist": 1.932125621830972,
+    "distance_error": 1.932125621830972,
+    "angular_error_deg": 123.65104977323693,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac7680-8d6f-2d13-8e05-f6da6172d239",
+    "frame_id": "frame-000129",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7041516975670887,
+      "90.0": 0.7041516975670887
+    },
+    "topk_min_dist": 0.7041516975670887,
+    "distance_error": 0.7041516975670887,
+    "angular_error_deg": 72.81582936974802,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0cac768c-8d6f-2d13-8cc8-7ace156fc3e7",
+    "frame_id": "frame-000000",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5813140617347565,
+      "90.0": 1.5813140617347565
+    },
+    "topk_min_dist": 1.5813140617347565,
+    "distance_error": 1.5813140617347565,
+    "angular_error_deg": 44.67825028349806,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9896444278515907
+  },
+  {
+    "scene_id": "0cf75f4b-564d-23f5-899f-ff97701d3f3b",
+    "frame_id": "frame-000006",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4826147511450354,
+      "90.0": 1.4826147511450354
+    },
+    "topk_min_dist": 1.4826147511450354,
+    "distance_error": 1.4826147511450354,
+    "angular_error_deg": 26.288580370575133,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.7565035522527507
+  },
+  {
+    "scene_id": "0f2f2711-b736-2f71-8c6a-245a9d820a8c",
+    "frame_id": "frame-000150",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5207102084013624,
+      "90.0": 1.5207102084013624
+    },
+    "topk_min_dist": 1.5207102084013624,
+    "distance_error": 1.5207102084013624,
+    "angular_error_deg": 44.481346357953,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "0f2f271b-b736-2f71-8f3a-e9265463abcb",
+    "frame_id": "frame-000190",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.015216760846612,
+      "90.0": 2.015216760846612
+    },
+    "topk_min_dist": 2.015216760846612,
+    "distance_error": 2.015216760846612,
+    "angular_error_deg": 51.600529287754284,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9639113867019283
+  },
+  {
+    "scene_id": "10b17936-3938-2467-88ba-ba5fe2debf14",
+    "frame_id": "frame-000052",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0684391445990777,
+      "90.0": 1.0684391445990777
+    },
+    "topk_min_dist": 1.0684391445990777,
+    "distance_error": 1.0684391445990777,
+    "angular_error_deg": 78.31256795673518,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "10b17940-3938-2467-8a7a-958300ba83d3",
+    "frame_id": "frame-000054",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7752369767662223,
+      "90.0": 0.7752369767662223
+    },
+    "topk_min_dist": 0.7752369767662223,
+    "distance_error": 0.7752369767662223,
+    "angular_error_deg": 135.13319600583168,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "10b1795b-3938-2467-88fe-b10cad8913f8",
+    "frame_id": "frame-000108",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.862648320101039,
+      "90.0": 0.862648320101039
+    },
+    "topk_min_dist": 0.862648320101039,
+    "distance_error": 0.862648320101039,
+    "angular_error_deg": 87.10068574888744,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "10b1795f-3938-2467-8aa6-c985377d32fb",
+    "frame_id": "frame-000035",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.2474057673452545,
+      "90.0": 2.2474057673452545
+    },
+    "topk_min_dist": 2.2474057673452545,
+    "distance_error": 2.2474057673452545,
+    "angular_error_deg": 96.98291226842599,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "10b17971-3938-2467-8a86-2b42613aa7ec",
+    "frame_id": "frame-000257",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.4407623124905795,
+      "90.0": 2.4407623124905795
+    },
+    "topk_min_dist": 2.4407623124905795,
+    "distance_error": 2.4407623124905795,
+    "angular_error_deg": 150.03399758655473,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "13124cad-cec3-27a6-857f-914a832a87c3",
+    "frame_id": "frame-000116",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.0599446423222316,
+      "90.0": 2.0599446423222316
+    },
+    "topk_min_dist": 2.0599446423222316,
+    "distance_error": 2.0599446423222316,
+    "angular_error_deg": 112.0316555876818,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "13124cb2-cec3-27a6-8583-cc0a9d6d1a9a",
+    "frame_id": "frame-000168",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9201271208522169,
+      "90.0": 0.9201271208522169
+    },
+    "topk_min_dist": 0.9201271208522169,
+    "distance_error": 0.9201271208522169,
+    "angular_error_deg": 158.86600508853027,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "13124cbe-cec3-27a6-8745-6e02a03494d2",
+    "frame_id": "frame-000061",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.3849559997715186,
+      "90.0": 1.3849559997715186
+    },
+    "topk_min_dist": 1.3849559997715186,
+    "distance_error": 1.3849559997715186,
+    "angular_error_deg": 68.44648294328029,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "13124cc0-cec3-27a6-84bd-1f56cb6d11a8",
+    "frame_id": "frame-000038",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1115368490724822,
+      "90.0": 1.1115368490724822
+    },
+    "topk_min_dist": 1.1115368490724822,
+    "distance_error": 1.1115368490724822,
+    "angular_error_deg": 115.90451745619572,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "13124cc2-cec3-27a6-86ad-946fe3a73493",
+    "frame_id": "frame-000103",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.96329372579918,
+      "90.0": 0.96329372579918
+    },
+    "topk_min_dist": 0.96329372579918,
+    "distance_error": 0.96329372579918,
+    "angular_error_deg": 142.44226375137575,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "137a8158-1db5-2cc0-8003-31c12610471e",
+    "frame_id": "frame-000750",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5164740986333665,
+      "90.0": 1.5164740986333665
+    },
+    "topk_min_dist": 1.5164740986333665,
+    "distance_error": 1.5164740986333665,
+    "angular_error_deg": 81.91397537463462,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1713f852-5300-2104-8658-73b77b66af61",
+    "frame_id": "frame-000168",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.1583522750524122,
+      "90.0": 2.1583522750524122
+    },
+    "topk_min_dist": 2.1583522750524122,
+    "distance_error": 2.1583522750524122,
+    "angular_error_deg": 85.25695885590761,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1776ad7c-4db7-2333-88b3-edb7a9803f6f",
+    "frame_id": "frame-000096",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.6745433963252927,
+      "90.0": 1.6745433963252927
+    },
+    "topk_min_dist": 1.6745433963252927,
+    "distance_error": 1.6745433963252927,
+    "angular_error_deg": 22.814773449284477,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8980453154231991
+  },
+  {
+    "scene_id": "1776ad7e-4db7-2333-89e1-66854e82170c",
+    "frame_id": "frame-000036",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5695692791033824,
+      "90.0": 1.5695692791033824
+    },
+    "topk_min_dist": 1.5695692791033824,
+    "distance_error": 1.5695692791033824,
+    "angular_error_deg": 101.78716471720898,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "185d7423-3698-223c-8879-80ad9339afce",
+    "frame_id": "frame-000013",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.640410165489988,
+      "90.0": 1.640410165489988
+    },
+    "topk_min_dist": 1.640410165489988,
+    "distance_error": 1.640410165489988,
+    "angular_error_deg": 99.88005378007925,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "18d4d91f-7eb5-280e-8757-1eb6f43ecfd2",
+    "frame_id": "frame-000045",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.47755582303113775,
+      "90.0": 0.47755582303113775
+    },
+    "topk_min_dist": 0.47755582303113775,
+    "distance_error": 0.47755582303113775,
+    "angular_error_deg": 81.690624428907,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "18d4d922-7eb5-280e-87bb-af3229fb1f13",
+    "frame_id": "frame-000135",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7215710446772867,
+      "90.0": 0.7215710446772867
+    },
+    "topk_min_dist": 0.7215710446772867,
+    "distance_error": 0.7215710446772867,
+    "angular_error_deg": 104.28625579472508,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "18d4d926-7eb5-280e-87df-199e66f2babd",
+    "frame_id": "frame-000167",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.3851988781293936,
+      "90.0": 2.3851988781293936
+    },
+    "topk_min_dist": 2.3851988781293936,
+    "distance_error": 2.3851988781293936,
+    "angular_error_deg": 91.97971164861973,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1c211546-f201-2d25-862b-6323518ec6e1",
+    "frame_id": "frame-000201",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.627674276555568,
+      "90.0": 1.627674276555568
+    },
+    "topk_min_dist": 1.627674276555568,
+    "distance_error": 1.627674276555568,
+    "angular_error_deg": 57.96654940498747,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d233fe8-e280-2b1a-8fac-c3646a1cd64a",
+    "frame_id": "frame-000138",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.797083063945293,
+      "90.0": 0.797083063945293
+    },
+    "topk_min_dist": 0.797083063945293,
+    "distance_error": 0.797083063945293,
+    "angular_error_deg": 30.551173999451088,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d233ff6-e280-2b1a-8ed5-3eec62f9bb3f",
+    "frame_id": "frame-000092",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5443832480801502,
+      "90.0": 0.5443832480801502
+    },
+    "topk_min_dist": 0.5443832480801502,
+    "distance_error": 0.5443832480801502,
+    "angular_error_deg": 86.65599337352937,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d233ffe-e280-2b1a-8f1e-7ddb66c98d36",
+    "frame_id": "frame-000002",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.108497349389126,
+      "90.0": 2.108497349389126
+    },
+    "topk_min_dist": 2.108497349389126,
+    "distance_error": 2.108497349389126,
+    "angular_error_deg": 133.44467004300165,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d234002-e280-2b1a-8c8d-6aafb5b35a24",
+    "frame_id": "frame-000028",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.231334247923807,
+      "90.0": 1.231334247923807
+    },
+    "topk_min_dist": 1.231334247923807,
+    "distance_error": 1.231334247923807,
+    "angular_error_deg": 81.25678541749821,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d234004-e280-2b1a-8ec8-560046b9fc96",
+    "frame_id": "frame-000166",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.230451218947775,
+      "90.0": 2.230451218947775
+    },
+    "topk_min_dist": 2.230451218947775,
+    "distance_error": 2.230451218947775,
+    "angular_error_deg": 73.19472416554511,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.7261154788244191
+  },
+  {
+    "scene_id": "1d234006-e280-2b1a-8e34-b2f670259e8d",
+    "frame_id": "frame-000061",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9239657224120139,
+      "90.0": 0.9239657224120139
+    },
+    "topk_min_dist": 0.9239657224120139,
+    "distance_error": 0.9239657224120139,
+    "angular_error_deg": 137.94135103769838,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d234010-e280-2b1a-8da8-205855a16b6b",
+    "frame_id": "frame-000107",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0341117069753094,
+      "90.0": 1.0341117069753094
+    },
+    "topk_min_dist": 1.0341117069753094,
+    "distance_error": 1.0341117069753094,
+    "angular_error_deg": 82.86202890630251,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d234018-e280-2b1a-8f22-da2b997865e8",
+    "frame_id": "frame-000149",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.331798913759623,
+      "90.0": 2.331798913759623
+    },
+    "topk_min_dist": 2.331798913759623,
+    "distance_error": 2.331798913759623,
+    "angular_error_deg": 43.66869170506193,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.99952904130129
+  },
+  {
+    "scene_id": "1d23401e-e280-2b1a-8cef-f28df9df2618",
+    "frame_id": "frame-000111",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7678730255277011,
+      "90.0": 0.7678730255277011
+    },
+    "topk_min_dist": 0.7678730255277011,
+    "distance_error": 0.7678730255277011,
+    "angular_error_deg": 120.716191528148,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d234022-e280-2b1a-8cec-e9787bb0d7b2",
+    "frame_id": "frame-000022",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.546506204944573,
+      "90.0": 0.546506204944573
+    },
+    "topk_min_dist": 0.546506204944573,
+    "distance_error": 0.546506204944573,
+    "angular_error_deg": 87.01753314263968,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d2f8514-d757-207c-8e40-377957df6f67",
+    "frame_id": "frame-000304",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5718098599850787,
+      "90.0": 1.5718098599850787
+    },
+    "topk_min_dist": 1.5718098599850787,
+    "distance_error": 1.5718098599850787,
+    "angular_error_deg": 105.30873823221425,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1d2f8516-d757-207c-8e08-5fef80bf34d8",
+    "frame_id": "frame-000181",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1085315357970869,
+      "90.0": 1.1085315357970869
+    },
+    "topk_min_dist": 1.1085315357970869,
+    "distance_error": 1.1085315357970869,
+    "angular_error_deg": 36.00941246473145,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9820410727344847
+  },
+  {
+    "scene_id": "1dd7209f-2ba0-22d9-8b9e-b5e270b2580f",
+    "frame_id": "frame-000119",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2139309013573445,
+      "90.0": 1.2139309013573445
+    },
+    "topk_min_dist": 1.2139309013573445,
+    "distance_error": 1.2139309013573445,
+    "angular_error_deg": 92.90569942231028,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "1e0ccbe6-9783-2bd7-8d51-ca9e9226bf35",
+    "frame_id": "frame-000366",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5146594633516042,
+      "90.0": 1.5146594633516042
+    },
+    "topk_min_dist": 1.5146594633516042,
+    "distance_error": 1.5146594633516042,
+    "angular_error_deg": 113.5723372691622,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "20c99392-698f-29c5-8439-54bec948ecb1",
+    "frame_id": "frame-000074",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.5310056112314547,
+      "90.0": 2.5310056112314547
+    },
+    "topk_min_dist": 2.5310056112314547,
+    "distance_error": 2.5310056112314547,
+    "angular_error_deg": 62.384148141382894,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "20c993a1-698f-29c5-8716-5a937fdd879a",
+    "frame_id": "frame-000101",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2009813764660657,
+      "90.0": 1.2009813764660657
+    },
+    "topk_min_dist": 1.2009813764660657,
+    "distance_error": 1.2009813764660657,
+    "angular_error_deg": 78.45494623676949,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "20c993af-698f-29c5-84b2-972451f94cfb",
+    "frame_id": "frame-000177",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8077313639657817,
+      "90.0": 1.8077313639657817
+    },
+    "topk_min_dist": 1.8077313639657817,
+    "distance_error": 1.8077313639657817,
+    "angular_error_deg": 46.752595190707105,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8181460276213118
+  },
+  {
+    "scene_id": "20c993b1-698f-29c5-865d-3a86c19acb3b",
+    "frame_id": "frame-000009",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.6555956389273054,
+      "90.0": 1.6555956389273054
+    },
+    "topk_min_dist": 1.6555956389273054,
+    "distance_error": 1.6555956389273054,
+    "angular_error_deg": 134.55672670941098,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "20c993b7-698f-29c5-847d-c8cb8a685f5a",
+    "frame_id": "frame-000006",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9973041870836116,
+      "90.0": 0.9973041870836116
+    },
+    "topk_min_dist": 0.9973041870836116,
+    "distance_error": 0.9973041870836116,
+    "angular_error_deg": 63.49644906961585,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9967868824746298
+  },
+  {
+    "scene_id": "20c993c1-698f-29c5-86b8-50a2a0907e2b",
+    "frame_id": "frame-000178",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5444854794411924,
+      "90.0": 1.5444854794411924
+    },
+    "topk_min_dist": 1.5444854794411924,
+    "distance_error": 1.5444854794411924,
+    "angular_error_deg": 63.66804298221631,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.979487559361974
+  },
+  {
+    "scene_id": "20c993c5-698f-29c5-8604-3248ede4091f",
+    "frame_id": "frame-000000",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.6364365788101867,
+      "90.0": 1.6364365788101867
+    },
+    "topk_min_dist": 1.6364365788101867,
+    "distance_error": 1.6364365788101867,
+    "angular_error_deg": 107.49842409903026,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "20c993c9-698f-29c5-850e-2a93df894437",
+    "frame_id": "frame-000167",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.6069787703085464,
+      "90.0": 0.6069787703085464
+    },
+    "topk_min_dist": 0.6069787703085464,
+    "distance_error": 0.6069787703085464,
+    "angular_error_deg": 119.73982625172047,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "20c993cd-698f-29c5-8575-6a18e0e920cc",
+    "frame_id": "frame-000327",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8481934434095304,
+      "90.0": 1.8481934434095304
+    },
+    "topk_min_dist": 1.8481934434095304,
+    "distance_error": 1.8481934434095304,
+    "angular_error_deg": 122.3809269598227,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9662429579904526
+  },
+  {
+    "scene_id": "210cdba9-9e8d-2832-862b-b37293fcc0e1",
+    "frame_id": "frame-000513",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8799021986374215,
+      "90.0": 0.8799021986374215
+    },
+    "topk_min_dist": 0.8799021986374215,
+    "distance_error": 0.8799021986374215,
+    "angular_error_deg": 120.79951635644849,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "210cdbab-9e8d-2832-85fa-87d12badb00e",
+    "frame_id": "frame-000332",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9650286995550952,
+      "90.0": 0.9650286995550952
+    },
+    "topk_min_dist": 0.9650286995550952,
+    "distance_error": 0.9650286995550952,
+    "angular_error_deg": 84.17331958689327,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "210cdbb2-9e8d-2832-87e5-7e474cf621ea",
+    "frame_id": "frame-000202",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5930138244129567,
+      "90.0": 0.5930138244129567
+    },
+    "topk_min_dist": 0.5930138244129567,
+    "distance_error": 0.5930138244129567,
+    "angular_error_deg": 126.00285089500628,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "22312382-b828-2c09-9267-bad5dd60ac79",
+    "frame_id": "frame-000017",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4660841495437045,
+      "90.0": 1.4660841495437045
+    },
+    "topk_min_dist": 1.4660841495437045,
+    "distance_error": 1.4660841495437045,
+    "angular_error_deg": 53.241632464341976,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "280d8ebb-6cc6-2788-9153-98959a2da801",
+    "frame_id": "frame-000215",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.9882391809555024,
+      "90.0": 1.9882391809555024
+    },
+    "topk_min_dist": 1.9882391809555024,
+    "distance_error": 1.9882391809555024,
+    "angular_error_deg": 177.05823390883072,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "283ccff5-107c-24d5-886c-1d3a1319186a",
+    "frame_id": "frame-000012",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9332143163667352,
+      "90.0": 0.9332143163667352
+    },
+    "topk_min_dist": 0.9332143163667352,
+    "distance_error": 0.9332143163667352,
+    "angular_error_deg": 116.15447927421667,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "2a7f9476-080c-26f9-86e9-c7ce1c76fc07",
+    "frame_id": "frame-000059",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0908998771719474,
+      "90.0": 1.0908998771719474
+    },
+    "topk_min_dist": 1.0908998771719474,
+    "distance_error": 1.0908998771719474,
+    "angular_error_deg": 69.42295309278302,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "2e36952b-e133-204c-911e-7644cb34e8b2",
+    "frame_id": "frame-000057",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2696612095647852,
+      "90.0": 1.2696612095647852
+    },
+    "topk_min_dist": 1.2696612095647852,
+    "distance_error": 1.2696612095647852,
+    "angular_error_deg": 43.302211282044546,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "2e36954b-e133-204c-92ad-1a66c6f63e1a",
+    "frame_id": "frame-000072",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4046198753720955,
+      "90.0": 1.4046198753720955
+    },
+    "topk_min_dist": 1.4046198753720955,
+    "distance_error": 1.4046198753720955,
+    "angular_error_deg": 65.65598704152467,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "2e36955d-e133-204c-90da-122ae14d42a3",
+    "frame_id": "frame-000019",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.7571360646170076,
+      "90.0": 1.7571360646170076
+    },
+    "topk_min_dist": 1.7571360646170076,
+    "distance_error": 1.7571360646170076,
+    "angular_error_deg": 55.734390890379665,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "2e4a3964-d452-21a0-9de5-4f7895499143",
+    "frame_id": "frame-000190",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.6270677261309856,
+      "90.0": 1.6270677261309856
+    },
+    "topk_min_dist": 1.6270677261309856,
+    "distance_error": 1.6270677261309856,
+    "angular_error_deg": 99.1605581392057,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "2ea047d1-aeca-2021-8a44-8ca8d08fe50b",
+    "frame_id": "frame-000063",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2314623026131262,
+      "90.0": 1.2314623026131262
+    },
+    "topk_min_dist": 1.2314623026131262,
+    "distance_error": 1.2314623026131262,
+    "angular_error_deg": 110.56222347436778,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "321c8680-a5a8-2a84-85c2-816a26d59516",
+    "frame_id": "frame-000016",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8768534066620509,
+      "90.0": 0.8768534066620509
+    },
+    "topk_min_dist": 0.8768534066620509,
+    "distance_error": 0.8768534066620509,
+    "angular_error_deg": 39.93259075753948,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.6323324180242518
+  },
+  {
+    "scene_id": "352e9c36-69fb-27a7-889f-69b450a22b74",
+    "frame_id": "frame-000067",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8204784260467778,
+      "90.0": 0.8204784260467778
+    },
+    "topk_min_dist": 0.8204784260467778,
+    "distance_error": 0.8204784260467778,
+    "angular_error_deg": 85.16704105707154,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "352e9c3e-69fb-27a7-8976-a6860f84f876",
+    "frame_id": "frame-000243",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.7908672816498346,
+      "90.0": 2.7908672816498346
+    },
+    "topk_min_dist": 2.7908672816498346,
+    "distance_error": 2.7908672816498346,
+    "angular_error_deg": 102.57447254961258,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8685617570819353
+  },
+  {
+    "scene_id": "352e9c40-69fb-27a7-8a6d-d2ca32644e09",
+    "frame_id": "frame-000180",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8207329519559519,
+      "90.0": 0.8207329519559519
+    },
+    "topk_min_dist": 0.8207329519559519,
+    "distance_error": 0.8207329519559519,
+    "angular_error_deg": 113.53550443947508,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "352e9c46-69fb-27a7-8b1d-bc83c253c676",
+    "frame_id": "frame-000010",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5998934809565265,
+      "90.0": 0.5998934809565265
+    },
+    "topk_min_dist": 0.5998934809565265,
+    "distance_error": 0.5998934809565265,
+    "angular_error_deg": 132.1950298891524,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "352e9c57-69fb-27a7-8bc7-4cf12e417e21",
+    "frame_id": "frame-000072",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.050457434433157,
+      "90.0": 1.050457434433157
+    },
+    "topk_min_dist": 1.050457434433157,
+    "distance_error": 1.050457434433157,
+    "angular_error_deg": 107.57390460920836,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "355465d0-d29b-29f9-94f2-7707ac505bae",
+    "frame_id": "frame-000042",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2622930376871135,
+      "90.0": 1.2622930376871135
+    },
+    "topk_min_dist": 1.2622930376871135,
+    "distance_error": 1.2622930376871135,
+    "angular_error_deg": 82.32619940370006,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "355465d4-d29b-29f9-9550-e366a10d6924",
+    "frame_id": "frame-000019",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 3.988042901243884,
+      "90.0": 3.988042901243884
+    },
+    "topk_min_dist": 3.988042901243884,
+    "distance_error": 3.988042901243884,
+    "angular_error_deg": 85.31806681683761,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "38770c9d-86d7-27b8-869e-4f713b04f290",
+    "frame_id": "frame-000041",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.2843185055402603,
+      "90.0": 0.2843185055402603
+    },
+    "topk_min_dist": 0.2843185055402603,
+    "distance_error": 0.2843185055402603,
+    "angular_error_deg": 54.78763714752619,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "38770ca1-86d7-27b8-8619-ab66f67d9adf",
+    "frame_id": "frame-000714",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.5185330335273277,
+      "90.0": 2.5185330335273277
+    },
+    "topk_min_dist": 2.5185330335273277,
+    "distance_error": 2.5185330335273277,
+    "angular_error_deg": 120.93207934262087,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "3b7b33a9-1b11-283e-9b02-e8f35f6ba24c",
+    "frame_id": "frame-000266",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.9308144379382617,
+      "90.0": 1.9308144379382617
+    },
+    "topk_min_dist": 1.9308144379382617,
+    "distance_error": 1.9308144379382617,
+    "angular_error_deg": 94.24990999218926,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "3b7b33af-1b11-283e-9abd-170c6329c0e6",
+    "frame_id": "frame-000220",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.873899187970515,
+      "90.0": 1.873899187970515
+    },
+    "topk_min_dist": 1.873899187970515,
+    "distance_error": 1.873899187970515,
+    "angular_error_deg": 81.02261893095724,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "41385827-a238-2435-8320-d8d3eb507f5e",
+    "frame_id": "frame-000176",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1266943198257993,
+      "90.0": 1.1266943198257993
+    },
+    "topk_min_dist": 1.1266943198257993,
+    "distance_error": 1.1266943198257993,
+    "angular_error_deg": 60.53584279470156,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9267143434578976
+  },
+  {
+    "scene_id": "4138582f-a238-2435-8332-6902542c2823",
+    "frame_id": "frame-000188",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.510909986391264,
+      "90.0": 0.510909986391264
+    },
+    "topk_min_dist": 0.510909986391264,
+    "distance_error": 0.510909986391264,
+    "angular_error_deg": 155.43595166587704,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "41385847-a238-2435-838b-61864922c518",
+    "frame_id": "frame-000089",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.45265619969429843,
+      "90.0": 0.45265619969429843
+    },
+    "topk_min_dist": 0.45265619969429843,
+    "distance_error": 0.45265619969429843,
+    "angular_error_deg": 78.7758451992939,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4138584b-a238-2435-8128-a939fb07c1c8",
+    "frame_id": "frame-000025",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.070061296357621,
+      "90.0": 1.070061296357621
+    },
+    "topk_min_dist": 1.070061296357621,
+    "distance_error": 1.070061296357621,
+    "angular_error_deg": 35.651641940479806,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "41385851-a238-2435-8056-b7d662a97c93",
+    "frame_id": "frame-000052",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4476549561914993,
+      "90.0": 1.4476549561914993
+    },
+    "topk_min_dist": 1.4476549561914993,
+    "distance_error": 1.4476549561914993,
+    "angular_error_deg": 66.31195409143483,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885af-192d-25fc-8651-420062adb475",
+    "frame_id": "frame-000049",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4141057136758828,
+      "90.0": 1.4141057136758828
+    },
+    "topk_min_dist": 1.4141057136758828,
+    "distance_error": 1.4141057136758828,
+    "angular_error_deg": 34.32174293535252,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9297521715751906
+  },
+  {
+    "scene_id": "422885b3-192d-25fc-84c9-9b80eea1752d",
+    "frame_id": "frame-000014",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.37840715685047427,
+      "90.0": 0.37840715685047427
+    },
+    "topk_min_dist": 0.37840715685047427,
+    "distance_error": 0.37840715685047427,
+    "angular_error_deg": 87.02868813973747,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885bd-192d-25fc-8571-abff2237f383",
+    "frame_id": "frame-000028",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9805358105073264,
+      "90.0": 0.9805358105073264
+    },
+    "topk_min_dist": 0.9805358105073264,
+    "distance_error": 0.9805358105073264,
+    "angular_error_deg": 103.39647581670023,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885bf-192d-25fc-8509-1fd7def9cc19",
+    "frame_id": "frame-000034",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4626606140124514,
+      "90.0": 1.4626606140124514
+    },
+    "topk_min_dist": 1.4626606140124514,
+    "distance_error": 1.4626606140124514,
+    "angular_error_deg": 23.163200694979626,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9249336337617069
+  },
+  {
+    "scene_id": "422885c3-192d-25fc-844a-645180810bfd",
+    "frame_id": "frame-000055",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5569981941910177,
+      "90.0": 0.5569981941910177
+    },
+    "topk_min_dist": 0.5569981941910177,
+    "distance_error": 0.5569981941910177,
+    "angular_error_deg": 57.24018130522987,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885c7-192d-25fc-85f5-67ba0d80ade5",
+    "frame_id": "frame-000071",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.37932742742706194,
+      "90.0": 0.37932742742706194
+    },
+    "topk_min_dist": 0.37932742742706194,
+    "distance_error": 0.37932742742706194,
+    "angular_error_deg": 140.8000536753579,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885ce-192d-25fc-851a-df2d675a6559",
+    "frame_id": "frame-000145",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2743334843631644,
+      "90.0": 1.2743334843631644
+    },
+    "topk_min_dist": 1.2743334843631644,
+    "distance_error": 1.2743334843631644,
+    "angular_error_deg": 110.10625411864248,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885e0-192d-25fc-844a-62e395291839",
+    "frame_id": "frame-000231",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1558673913529591,
+      "90.0": 1.1558673913529591
+    },
+    "topk_min_dist": 1.1558673913529591,
+    "distance_error": 1.1558673913529591,
+    "angular_error_deg": 170.84208153270035,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885e5-192d-25fc-871f-83fa4d7af432",
+    "frame_id": "frame-000141",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.47441270957393994,
+      "90.0": 0.47441270957393994
+    },
+    "topk_min_dist": 0.47441270957393994,
+    "distance_error": 0.47441270957393994,
+    "angular_error_deg": 97.5073744911345,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "422885e9-192d-25fc-87a9-7013fe4114f2",
+    "frame_id": "frame-000715",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9093345255964245,
+      "90.0": 0.9093345255964245
+    },
+    "topk_min_dist": 0.9093345255964245,
+    "distance_error": 0.9093345255964245,
+    "angular_error_deg": 64.41051328208071,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4238490c-60a7-271e-9f38-3c651e3b3912",
+    "frame_id": "frame-000038",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5500104342593181,
+      "90.0": 0.5500104342593181
+    },
+    "topk_min_dist": 0.5500104342593181,
+    "distance_error": 0.5500104342593181,
+    "angular_error_deg": 98.46067594054433,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "43b8cae1-6678-2e38-9865-c19c07c25015",
+    "frame_id": "frame-000149",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.6585735006955409,
+      "90.0": 1.6585735006955409
+    },
+    "topk_min_dist": 1.6585735006955409,
+    "distance_error": 1.6585735006955409,
+    "angular_error_deg": 87.79470817099975,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "43b8cae9-6678-2e38-9bc2-8c31ab832242",
+    "frame_id": "frame-000078",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9909490595337936,
+      "90.0": 0.9909490595337936
+    },
+    "topk_min_dist": 0.9909490595337936,
+    "distance_error": 0.9909490595337936,
+    "angular_error_deg": 122.73738102322642,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "43b8caed-6678-2e38-98f8-a76f51ef79af",
+    "frame_id": "frame-000035",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.807993394985417,
+      "90.0": 0.807993394985417
+    },
+    "topk_min_dist": 0.807993394985417,
+    "distance_error": 0.807993394985417,
+    "angular_error_deg": 112.9395182905377,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "43b8caf3-6678-2e38-99da-2aeb70cf8e95",
+    "frame_id": "frame-000042",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1370721637294716,
+      "90.0": 1.1370721637294716
+    },
+    "topk_min_dist": 1.1370721637294716,
+    "distance_error": 1.1370721637294716,
+    "angular_error_deg": 64.58524444991173,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4731976a-f9f7-2a1a-9737-305b709ca37f",
+    "frame_id": "frame-000191",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0228286687504728,
+      "90.0": 1.0228286687504728
+    },
+    "topk_min_dist": 1.0228286687504728,
+    "distance_error": 1.0228286687504728,
+    "angular_error_deg": 42.26678201292898,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "47319770-f9f7-2a1a-9583-5aa0374a4d35",
+    "frame_id": "frame-000207",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5711936890402742,
+      "90.0": 0.5711936890402742
+    },
+    "topk_min_dist": 0.5711936890402742,
+    "distance_error": 0.5711936890402742,
+    "angular_error_deg": 111.39050560903557,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "47319774-f9f7-2a1a-9412-d4a1c89c8aa3",
+    "frame_id": "frame-000246",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.6845173885312835,
+      "90.0": 0.6845173885312835
+    },
+    "topk_min_dist": 0.6845173885312835,
+    "distance_error": 0.6845173885312835,
+    "angular_error_deg": 148.82096020693487,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4731977c-f9f7-2a1a-976c-34c48a84405c",
+    "frame_id": "frame-000019",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2279040698506338,
+      "90.0": 1.2279040698506338
+    },
+    "topk_min_dist": 1.2279040698506338,
+    "distance_error": 1.2279040698506338,
+    "angular_error_deg": 159.1727652001718,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "48005c65-7d67-29ec-85e0-6a925eb15a27",
+    "frame_id": "frame-000105",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8196240106776538,
+      "90.0": 1.8196240106776538
+    },
+    "topk_min_dist": 1.8196240106776538,
+    "distance_error": 1.8196240106776538,
+    "angular_error_deg": 69.02461660132863,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4a9a43d2-7736-2874-874d-d0fad0570e19",
+    "frame_id": "frame-000883",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.166690862215818,
+      "90.0": 1.166690862215818
+    },
+    "topk_min_dist": 1.166690862215818,
+    "distance_error": 1.166690862215818,
+    "angular_error_deg": 41.9419482016126,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8997858849417267
+  },
+  {
+    "scene_id": "4a9a43d6-7736-2874-84c3-86ec156a3b2d",
+    "frame_id": "frame-000119",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8237720518442286,
+      "90.0": 0.8237720518442286
+    },
+    "topk_min_dist": 0.8237720518442286,
+    "distance_error": 0.8237720518442286,
+    "angular_error_deg": 84.88729741266594,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4a9a43e0-7736-2874-87ac-c589da4d0f00",
+    "frame_id": "frame-000374",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.6456003573330924,
+      "90.0": 0.6456003573330924
+    },
+    "topk_min_dist": 0.6456003573330924,
+    "distance_error": 0.6456003573330924,
+    "angular_error_deg": 111.39555675036357,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4a9a43e4-7736-2874-8479-0e81135ccdb0",
+    "frame_id": "frame-000229",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.7840834225817377,
+      "90.0": 1.7840834225817377
+    },
+    "topk_min_dist": 1.7840834225817377,
+    "distance_error": 1.7840834225817377,
+    "angular_error_deg": 68.54387990276643,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4acaebba-6c10-2a2a-8650-34c2f160db99",
+    "frame_id": "frame-000053",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2867692184315331,
+      "90.0": 1.2867692184315331
+    },
+    "topk_min_dist": 1.2867692184315331,
+    "distance_error": 1.2867692184315331,
+    "angular_error_deg": 156.06751221857076,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4acaebc0-6c10-2a2a-852e-0226d6539299",
+    "frame_id": "frame-000253",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0615384187248607,
+      "90.0": 1.0615384187248607
+    },
+    "topk_min_dist": 1.0615384187248607,
+    "distance_error": 1.0615384187248607,
+    "angular_error_deg": 21.702888001773992,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4acaebcc-6c10-2a2a-858b-29c7e4fb410d",
+    "frame_id": "frame-000156",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.0730310787925355,
+      "90.0": 2.0730310787925355
+    },
+    "topk_min_dist": 2.0730310787925355,
+    "distance_error": 2.0730310787925355,
+    "angular_error_deg": 91.64020808208754,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4d3d829e-8cf4-2e04-8318-b76f02d91c93",
+    "frame_id": "frame-000215",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8449083655258358,
+      "90.0": 1.8449083655258358
+    },
+    "topk_min_dist": 1.8449083655258358,
+    "distance_error": 1.8449083655258358,
+    "angular_error_deg": 53.721741964788215,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.8437052985904541
+  },
+  {
+    "scene_id": "4d3d82a2-8cf4-2e04-810b-7634c83eed98",
+    "frame_id": "frame-000024",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.33690074610127,
+      "90.0": 1.33690074610127
+    },
+    "topk_min_dist": 1.33690074610127,
+    "distance_error": 1.33690074610127,
+    "angular_error_deg": 86.89727926192421,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4d3d82b0-8cf4-2e04-80a8-c955ea964c2f",
+    "frame_id": "frame-000239",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5126627984308683,
+      "90.0": 0.5126627984308683
+    },
+    "topk_min_dist": 0.5126627984308683,
+    "distance_error": 0.5126627984308683,
+    "angular_error_deg": 88.73507349832602,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4d3d82b6-8cf4-2e04-830a-4303fa0e79c7",
+    "frame_id": "frame-000315",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.138280305093361,
+      "90.0": 2.138280305093361
+    },
+    "topk_min_dist": 2.138280305093361,
+    "distance_error": 2.138280305093361,
+    "angular_error_deg": 67.66709728177372,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4d3d82bc-8cf4-2e04-8007-e2f7fe679737",
+    "frame_id": "frame-000306",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.06344287761843,
+      "90.0": 2.06344287761843
+    },
+    "topk_min_dist": 2.06344287761843,
+    "distance_error": 2.06344287761843,
+    "angular_error_deg": 36.7106142754955,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4e858c81-fd93-2cb4-8469-d9226116b5de",
+    "frame_id": "frame-000086",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0605756253205978,
+      "90.0": 1.0605756253205978
+    },
+    "topk_min_dist": 1.0605756253205978,
+    "distance_error": 1.0605756253205978,
+    "angular_error_deg": 76.70629831582629,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4e858c8f-fd93-2cb4-8676-36cea7ef23cc",
+    "frame_id": "frame-000019",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.5371108107134464,
+      "90.0": 0.5371108107134464
+    },
+    "topk_min_dist": 0.5371108107134464,
+    "distance_error": 0.5371108107134464,
+    "angular_error_deg": 73.47001868816965,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4e858c93-fd93-2cb4-86d6-12f652012a40",
+    "frame_id": "frame-000042",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.479820331599078,
+      "90.0": 1.479820331599078
+    },
+    "topk_min_dist": 1.479820331599078,
+    "distance_error": 1.479820331599078,
+    "angular_error_deg": 91.33301934724042,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4e858ca1-fd93-2cb4-84b6-490997979830",
+    "frame_id": "frame-000612",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 4.907819299578046,
+      "90.0": 4.907819299578046
+    },
+    "topk_min_dist": 4.907819299578046,
+    "distance_error": 4.907819299578046,
+    "angular_error_deg": 28.76718620045974,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4fbad314-465b-2a5d-8445-9d021f278c1e",
+    "frame_id": "frame-000146",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 4.990156648119127,
+      "90.0": 4.990156648119127
+    },
+    "topk_min_dist": 4.990156648119127,
+    "distance_error": 4.990156648119127,
+    "angular_error_deg": 61.392322834680094,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4fbad31a-465b-2a5d-8566-f4e4845c1a78",
+    "frame_id": "frame-000049",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2256630849552355,
+      "90.0": 1.2256630849552355
+    },
+    "topk_min_dist": 1.2256630849552355,
+    "distance_error": 1.2256630849552355,
+    "angular_error_deg": 169.71101488297305,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "4fbad31e-465b-2a5d-84b7-c0ddea978db4",
+    "frame_id": "frame-000182",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.405569176025191,
+      "90.0": 1.405569176025191
+    },
+    "topk_min_dist": 1.405569176025191,
+    "distance_error": 1.405569176025191,
+    "angular_error_deg": 49.43406532083095,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.865090552833125
+  },
+  {
+    "scene_id": "4fbad329-465b-2a5d-8401-a3f550ef3de5",
+    "frame_id": "frame-001007",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 3.6525817764082613,
+      "90.0": 3.6525817764082613
+    },
+    "topk_min_dist": 3.6525817764082613,
+    "distance_error": 3.6525817764082613,
+    "angular_error_deg": 44.3321550060832,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9477636195156246
+  },
+  {
+    "scene_id": "4fbad32b-465b-2a5d-8499-85100e88f454",
+    "frame_id": "frame-000226",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.858982670937428,
+      "90.0": 2.858982670937428
+    },
+    "topk_min_dist": 2.858982670937428,
+    "distance_error": 2.858982670937428,
+    "angular_error_deg": 65.28151307909505,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9767275610127283
+  },
+  {
+    "scene_id": "501ebf0b-a3bb-263f-86fd-7ef000a19588",
+    "frame_id": "frame-000049",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1624178508868934,
+      "90.0": 1.1624178508868934
+    },
+    "topk_min_dist": 1.1624178508868934,
+    "distance_error": 1.1624178508868934,
+    "angular_error_deg": 43.53737009671339,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9957441483323504
+  },
+  {
+    "scene_id": "50e7c0ad-0730-2a5f-8635-252404ee82e0",
+    "frame_id": "frame-000001",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0800475966062373,
+      "90.0": 1.0800475966062373
+    },
+    "topk_min_dist": 1.0800475966062373,
+    "distance_error": 1.0800475966062373,
+    "angular_error_deg": 41.45028339292272,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9400788777374263
+  },
+  {
+    "scene_id": "5104a9c7-adc4-2a85-9026-45557dcf9a87",
+    "frame_id": "frame-001028",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.2010654217228613,
+      "90.0": 2.2010654217228613
+    },
+    "topk_min_dist": 2.2010654217228613,
+    "distance_error": 2.2010654217228613,
+    "angular_error_deg": 61.16690465771772,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9788919704149741
+  },
+  {
+    "scene_id": "531cff02-0021-28f6-8deb-a71f6c628346",
+    "frame_id": "frame-000429",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.8103670778332106,
+      "90.0": 1.8103670778332106
+    },
+    "topk_min_dist": 1.8103670778332106,
+    "distance_error": 1.8103670778332106,
+    "angular_error_deg": 62.87411856618622,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "531cff06-0021-28f6-8ce2-e13a4801e5a8",
+    "frame_id": "frame-000551",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.659308471057774,
+      "90.0": 0.659308471057774
+    },
+    "topk_min_dist": 0.659308471057774,
+    "distance_error": 0.659308471057774,
+    "angular_error_deg": 37.24516016776556,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9994319823184544
+  },
+  {
+    "scene_id": "531cff08-0021-28f6-8e08-ba2eeb945e09",
+    "frame_id": "frame-000742",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.8332249291422102,
+      "90.0": 2.8332249291422102
+    },
+    "topk_min_dist": 2.8332249291422102,
+    "distance_error": 2.8332249291422102,
+    "angular_error_deg": 64.21183896306565,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9528218028943187
+  },
+  {
+    "scene_id": "5341b79f-8a66-2cdd-84d5-6dba6525dd75",
+    "frame_id": "frame-000066",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7117296354621871,
+      "90.0": 0.7117296354621871
+    },
+    "topk_min_dist": 0.7117296354621871,
+    "distance_error": 0.7117296354621871,
+    "angular_error_deg": 88.82724222107473,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7bf-8a66-2cdd-8794-026113b7c312",
+    "frame_id": "frame-000026",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.7367943549764855,
+      "90.0": 0.7367943549764855
+    },
+    "topk_min_dist": 0.7367943549764855,
+    "distance_error": 0.7367943549764855,
+    "angular_error_deg": 129.56505610072242,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7c1-8a66-2cdd-853b-598d8f2780ce",
+    "frame_id": "frame-000063",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4420268477126417,
+      "90.0": 1.4420268477126417
+    },
+    "topk_min_dist": 1.4420268477126417,
+    "distance_error": 1.4420268477126417,
+    "angular_error_deg": 124.35087855536666,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7c3-8a66-2cdd-8651-225a7489523a",
+    "frame_id": "frame-000133",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.47662801592399257,
+      "90.0": 0.47662801592399257
+    },
+    "topk_min_dist": 0.47662801592399257,
+    "distance_error": 0.47662801592399257,
+    "angular_error_deg": 155.49011958409193,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7d3-8a66-2cdd-8633-0a3da632befa",
+    "frame_id": "frame-000082",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.8119688850634033,
+      "90.0": 2.8119688850634033
+    },
+    "topk_min_dist": 2.8119688850634033,
+    "distance_error": 2.8119688850634033,
+    "angular_error_deg": 123.32218669660527,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7d9-8a66-2cdd-844b-cfdadb69ed63",
+    "frame_id": "frame-000132",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8376141852475841,
+      "90.0": 0.8376141852475841
+    },
+    "topk_min_dist": 0.8376141852475841,
+    "distance_error": 0.8376141852475841,
+    "angular_error_deg": 27.393156159803393,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9527133572617374
+  },
+  {
+    "scene_id": "5341b7db-8a66-2cdd-85c5-66dbe881bd5f",
+    "frame_id": "frame-000078",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1188544870186685,
+      "90.0": 1.1188544870186685
+    },
+    "topk_min_dist": 1.1188544870186685,
+    "distance_error": 1.1188544870186685,
+    "angular_error_deg": 32.78923103908587,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.6930977390435815
+  },
+  {
+    "scene_id": "5341b7dd-8a66-2cdd-8789-886081e65f53",
+    "frame_id": "frame-000175",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.923431216179253,
+      "90.0": 0.923431216179253
+    },
+    "topk_min_dist": 0.923431216179253,
+    "distance_error": 0.923431216179253,
+    "angular_error_deg": 76.2979974025177,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7e1-8a66-2cdd-87a3-02aad508ff86",
+    "frame_id": "frame-000178",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.4447411007551363,
+      "90.0": 1.4447411007551363
+    },
+    "topk_min_dist": 1.4447411007551363,
+    "distance_error": 1.4447411007551363,
+    "angular_error_deg": 78.87891506478415,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7e3-8a66-2cdd-8709-66a2159f0017",
+    "frame_id": "frame-000001",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.625604383016768,
+      "90.0": 2.625604383016768
+    },
+    "topk_min_dist": 2.625604383016768,
+    "distance_error": 2.625604383016768,
+    "angular_error_deg": 148.83812001136766,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5341b7e9-8a66-2cdd-86a9-62cf7da55c0a",
+    "frame_id": "frame-000177",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.2308774513575242,
+      "90.0": 1.2308774513575242
+    },
+    "topk_min_dist": 1.2308774513575242,
+    "distance_error": 1.2308774513575242,
+    "angular_error_deg": 76.93764245809507,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "54b263a3-0199-2df4-87db-40539528902d",
+    "frame_id": "frame-000048",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8114628079214362,
+      "90.0": 0.8114628079214362
+    },
+    "topk_min_dist": 0.8114628079214362,
+    "distance_error": 0.8114628079214362,
+    "angular_error_deg": 28.809205592709464,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.539215162031492
+  },
+  {
+    "scene_id": "55551077-36f1-29c0-89ec-2e7690991cb2",
+    "frame_id": "frame-000016",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.40473526246007635,
+      "90.0": 0.40473526246007635
+    },
+    "topk_min_dist": 0.40473526246007635,
+    "distance_error": 0.40473526246007635,
+    "angular_error_deg": 33.04487465128618,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9410579623323017
+  },
+  {
+    "scene_id": "5555107f-36f1-29c0-8903-9b66fb2301d0",
+    "frame_id": "frame-000072",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9557362588097715,
+      "90.0": 0.9557362588097715
+    },
+    "topk_min_dist": 0.9557362588097715,
+    "distance_error": 0.9557362588097715,
+    "angular_error_deg": 131.75918243663526,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5555108d-36f1-29c0-8b37-5efa2bef59d4",
+    "frame_id": "frame-000081",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.766318752293419,
+      "90.0": 1.766318752293419
+    },
+    "topk_min_dist": 1.766318752293419,
+    "distance_error": 1.766318752293419,
+    "angular_error_deg": 111.00346200732251,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5630cfc9-12bf-2860-84ed-5bb189f0e94e",
+    "frame_id": "frame-000275",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.0074931113209051,
+      "90.0": 1.0074931113209051
+    },
+    "topk_min_dist": 1.0074931113209051,
+    "distance_error": 1.0074931113209051,
+    "angular_error_deg": 68.43113637512806,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "5630cfcb-12bf-2860-87ee-b4e4a5bf0cb0",
+    "frame_id": "frame-000072",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.1097771312114775,
+      "90.0": 1.1097771312114775
+    },
+    "topk_min_dist": 1.1097771312114775,
+    "distance_error": 1.1097771312114775,
+    "angular_error_deg": 56.36183574050679,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9594629274534463
+  },
+  {
+    "scene_id": "5630cfcf-12bf-2860-8784-83d28a611a83",
+    "frame_id": "frame-000034",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8466183760083439,
+      "90.0": 0.8466183760083439
+    },
+    "topk_min_dist": 0.8466183760083439,
+    "distance_error": 0.8466183760083439,
+    "angular_error_deg": 50.87383059094056,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "6bde6081-9162-246f-8c4e-ffaf709d17b1",
+    "frame_id": "frame-000115",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.273453820553006,
+      "90.0": 1.273453820553006
+    },
+    "topk_min_dist": 1.273453820553006,
+    "distance_error": 1.273453820553006,
+    "angular_error_deg": 121.37645796273087,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "6bde60cb-9162-246f-8cf5-d04f7426e56f",
+    "frame_id": "frame-000092",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.0115263125346297,
+      "90.0": 2.0115263125346297
+    },
+    "topk_min_dist": 2.0115263125346297,
+    "distance_error": 2.0115263125346297,
+    "angular_error_deg": 108.0011990036657,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "742e8f15-be0a-294e-9ebb-6c72dbcb9662",
+    "frame_id": "frame-000107",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.9780670971069587,
+      "90.0": 1.9780670971069587
+    },
+    "topk_min_dist": 1.9780670971069587,
+    "distance_error": 1.9780670971069587,
+    "angular_error_deg": 60.61931283231866,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "75c25975-9ca2-2844-9769-84677f46d4cf",
+    "frame_id": "frame-000012",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.6449878456830456,
+      "90.0": 0.6449878456830456
+    },
+    "topk_min_dist": 0.6449878456830456,
+    "distance_error": 0.6449878456830456,
+    "angular_error_deg": 42.96702164504196,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9999639919891941
+  },
+  {
+    "scene_id": "7747a50c-9431-24e8-877d-e60c3a341cc2",
+    "frame_id": "frame-000597",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.5983335981141227,
+      "90.0": 1.5983335981141227
+    },
+    "topk_min_dist": 1.5983335981141227,
+    "distance_error": 1.5983335981141227,
+    "angular_error_deg": 59.59429030838938,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "8e0f1c28-9e28-2339-8584-ff06ff93c341",
+    "frame_id": "frame-000029",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.9167747443530092,
+      "90.0": 1.9167747443530092
+    },
+    "topk_min_dist": 1.9167747443530092,
+    "distance_error": 1.9167747443530092,
+    "angular_error_deg": 149.61108027161706,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "8eabc45f-5af7-2f32-8528-640861d2a135",
+    "frame_id": "frame-000171",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.216858945654619,
+      "90.0": 2.216858945654619
+    },
+    "topk_min_dist": 2.216858945654619,
+    "distance_error": 2.216858945654619,
+    "angular_error_deg": 66.75148749786615,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "a0905fd9-66f7-2272-9dfb-0483fdcc54c7",
+    "frame_id": "frame-000213",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.061602366628067,
+      "90.0": 1.061602366628067
+    },
+    "topk_min_dist": 1.061602366628067,
+    "distance_error": 1.061602366628067,
+    "angular_error_deg": 162.21906021188798,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "ab835fae-54c6-29a1-995e-b06cfc555786",
+    "frame_id": "frame-000062",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.835740914920696,
+      "90.0": 0.835740914920696
+    },
+    "topk_min_dist": 0.835740914920696,
+    "distance_error": 0.835740914920696,
+    "angular_error_deg": 131.1907336310611,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "b05fdd8a-fca0-2d4f-8ac5-f6ae697787f5",
+    "frame_id": "frame-000064",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9013660965954403,
+      "90.0": 0.9013660965954403
+    },
+    "topk_min_dist": 0.9013660965954403,
+    "distance_error": 0.9013660965954403,
+    "angular_error_deg": 100.92732852007552,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "b05fdd96-fca0-2d4f-88c3-d9dfda85c00e",
+    "frame_id": "frame-000003",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.898524017991907,
+      "90.0": 0.898524017991907
+    },
+    "topk_min_dist": 0.898524017991907,
+    "distance_error": 0.898524017991907,
+    "angular_error_deg": 100.38316464515013,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "b1f23308-d255-2761-94da-981d962c6bf8",
+    "frame_id": "frame-000091",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.6688568850233946,
+      "90.0": 0.6688568850233946
+    },
+    "topk_min_dist": 0.6688568850233946,
+    "distance_error": 0.6688568850233946,
+    "angular_error_deg": 105.17023901219,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "ba6fdaaa-a4c1-2dca-8163-a52b18bf6b64",
+    "frame_id": "frame-000300",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.9151829365146176,
+      "90.0": 2.9151829365146176
+    },
+    "topk_min_dist": 2.9151829365146176,
+    "distance_error": 2.9151829365146176,
+    "angular_error_deg": 143.65296558595193,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "bcb0fe06-4f39-2c70-9c24-a8dd7496c2f8",
+    "frame_id": "frame-000059",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8721292233493432,
+      "90.0": 0.8721292233493432
+    },
+    "topk_min_dist": 0.8721292233493432,
+    "distance_error": 0.8721292233493432,
+    "angular_error_deg": 35.803381064746276,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "bf9a3da2-45a5-2e80-8219-1f0a216399fe",
+    "frame_id": "frame-000155",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.6359502367160238,
+      "90.0": 0.6359502367160238
+    },
+    "topk_min_dist": 0.6359502367160238,
+    "distance_error": 0.6359502367160238,
+    "angular_error_deg": 46.22416223370177,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "bf9a3de9-45a5-2e80-8022-277108d67404",
+    "frame_id": "frame-000088",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.9121123077150652,
+      "90.0": 1.9121123077150652
+    },
+    "topk_min_dist": 1.9121123077150652,
+    "distance_error": 1.9121123077150652,
+    "angular_error_deg": 51.84190177757625,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "c7895f27-339c-2d13-836b-c12dca280261",
+    "frame_id": "frame-000125",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.8288530770810424,
+      "90.0": 0.8288530770810424
+    },
+    "topk_min_dist": 0.8288530770810424,
+    "distance_error": 0.8288530770810424,
+    "angular_error_deg": 73.92825023216508,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "c7895f7c-339c-2d13-819f-3bb0b26c91f6",
+    "frame_id": "frame-000143",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.9363390332495612,
+      "90.0": 0.9363390332495612
+    },
+    "topk_min_dist": 0.9363390332495612,
+    "distance_error": 0.9363390332495612,
+    "angular_error_deg": 24.37366842962946,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9846622639529893
+  },
+  {
+    "scene_id": "c92fb5b5-f771-2064-8570-dbe16cb33764",
+    "frame_id": "frame-000282",
+    "hit_masses": {
+      "0.75": 1.0,
+      "1.0": 1.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 0.4373462208888275,
+      "90.0": 0.4373462208888275
+    },
+    "topk_min_dist": 0.4373462208888275,
+    "distance_error": 0.4373462208888275,
+    "angular_error_deg": 127.17738402965115,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "d7d40d4e-7a5d-2b36-97e7-34324c52ac42",
+    "frame_id": "frame-000038",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.3192987022361493,
+      "90.0": 1.3192987022361493
+    },
+    "topk_min_dist": 1.3192987022361493,
+    "distance_error": 1.3192987022361493,
+    "angular_error_deg": 91.48531476881529,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "ddc73797-765b-241a-9e2c-097c5989baf6",
+    "frame_id": "frame-000147",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 0.0
+    },
+    "mass_radii": {
+      "50.0": 2.590435736595852,
+      "90.0": 2.590435736595852
+    },
+    "topk_min_dist": 2.590435736595852,
+    "distance_error": 2.590435736595852,
+    "angular_error_deg": 127.55479262476365,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "e61b0e04-bada-2f31-82d6-72831a602ba7",
+    "frame_id": "frame-000040",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 0.0,
+      "2.0": 0.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 2.2190059407434024,
+      "90.0": 2.2190059407434024
+    },
+    "topk_min_dist": 2.2190059407434024,
+    "distance_error": 2.2190059407434024,
+    "angular_error_deg": 150.23471123716087,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 1.0
+  },
+  {
+    "scene_id": "fcf66d7b-622d-291c-86b8-7db96aebcee3",
+    "frame_id": "frame-000011",
+    "hit_masses": {
+      "0.75": 0.0,
+      "1.0": 0.0,
+      "1.5": 1.0,
+      "2.0": 1.0,
+      "2.5": 1.0
+    },
+    "mass_radii": {
+      "50.0": 1.3045446070754279,
+      "90.0": 1.3045446070754279
+    },
+    "topk_min_dist": 1.3045446070754279,
+    "distance_error": 1.3045446070754279,
+    "angular_error_deg": 55.636816477275424,
+    "grid_points": 1,
+    "matched_objects": 0,
+    "iou_error": 0.9965308800605377
+  }
+]

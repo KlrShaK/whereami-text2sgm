@@ -60,3 +60,13 @@ Problems:
 - Initialize random points
 - Check how many objects from the Text graph you can see from that random point (give objects based on the point) (give a score based on how many objects are visible)
 - Later on can create a score, with percentage of object visble (how many points of an object are visible compared to all the points)
+
+
+
+<!-- 
+Added subgraph filtering is not helping, Top-K giving too many distractors matching, implement thresholding for cosine matching -->
+relationship based cosine simmilarity? instead of just label based and maybe using clip embeddings instead of word2vec
+
+filtering top 10 worst looking at whats the problem and then iterating like that
+
+VLA baseline 
