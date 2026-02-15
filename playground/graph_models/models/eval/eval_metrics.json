@@ -15,9 +15,9 @@
         "90.0": 1.5167974787438354
       },
       "topk_min_dist": 0.24268618798817873,
-      "distance_error": 0.5366993263859959,
-      "angular_error_deg": 45.61155720376298,
-      "iou_error": 0.8797752848772674,
+      "distance_error": 0.5374013780769545,
+      "angular_error_deg": 47.08231863313851,
+      "iou_error": 0.8890483959667086,
       "grid_points": 198,
       "matched_objects": 6
     },
@@ -36,9 +36,9 @@
         "90.0": 1.344649514634735
       },
       "topk_min_dist": 0.056020656165845416,
-      "distance_error": 0.9127517361423843,
-      "angular_error_deg": 52.220145015926825,
-      "iou_error": 0.9489607762308905,
+      "distance_error": 0.9252967352379421,
+      "angular_error_deg": 52.67959084987701,
+      "iou_error": 0.9545564569187696,
       "grid_points": 204,
       "matched_objects": 10
     },
@@ -57,9 +57,9 @@
         "90.0": 3.315213690754612
       },
       "topk_min_dist": 1.257275004150995,
-      "distance_error": 1.1405476863801816,
-      "angular_error_deg": 72.66065384403558,
-      "iou_error": 0.8438405244100946,
+      "distance_error": 1.157530095280121,
+      "angular_error_deg": 69.09856523363507,
+      "iou_error": 0.824568254840642,
       "grid_points": 624,
       "matched_objects": 4
     },
@@ -78,9 +78,9 @@
         "90.0": 2.8805911570996625
       },
       "topk_min_dist": 0.5084960971762749,
-      "distance_error": 0.8355436714124627,
-      "angular_error_deg": 46.0140668236146,
-      "iou_error": 0.6470047681499251,
+      "distance_error": 1.2699712146657534,
+      "angular_error_deg": 54.70886483676756,
+      "iou_error": 0.9408912894720002,
       "grid_points": 667,
       "matched_objects": 6
     },
@@ -99,9 +99,9 @@
         "90.0": 1.9253574510573672
       },
       "topk_min_dist": 0.3090555220532379,
-      "distance_error": 1.000583820471901,
-      "angular_error_deg": 101.96238332614347,
-      "iou_error": 0.9469811869095623,
+      "distance_error": 1.0241311721765016,
+      "angular_error_deg": 87.93686887016979,
+      "iou_error": 0.884265447697432,
       "grid_points": 399,
       "matched_objects": 10
     },
@@ -120,9 +120,9 @@
         "90.0": 3.368108965606584
       },
       "topk_min_dist": 1.0011665402018555,
-      "distance_error": 1.4278102359155433,
-      "angular_error_deg": 45.08647926998833,
-      "iou_error": 0.6482773258558372,
+      "distance_error": 1.5322093303444069,
+      "angular_error_deg": 47.5673892367661,
+      "iou_error": 0.6506419622036168,
       "grid_points": 240,
       "matched_objects": 6
     },
@@ -141,9 +141,9 @@
         "90.0": 3.27036381676112
       },
       "topk_min_dist": 1.542909535701176,
-      "distance_error": 1.1477165422943498,
-      "angular_error_deg": 55.26557413368036,
-      "iou_error": 0.8921481931038643,
+      "distance_error": 1.1184096109329524,
+      "angular_error_deg": 53.40723573815529,
+      "iou_error": 0.8811542501511014,
       "grid_points": 285,
       "matched_objects": 2
     },
@@ -162,9 +162,9 @@
         "90.0": 1.4772476162327741
       },
       "topk_min_dist": 0.2934613081785888,
-      "distance_error": 0.6941538666136434,
-      "angular_error_deg": 18.5829708361332,
-      "iou_error": 0.69676105157135,
+      "distance_error": 0.6971065716241178,
+      "angular_error_deg": 17.978352336482853,
+      "iou_error": 0.6957382226770632,
       "grid_points": 144,
       "matched_objects": 7
     },
@@ -183,9 +183,9 @@
         "90.0": 2.9217575412504266
       },
       "topk_min_dist": 0.3019015622799423,
-      "distance_error": 1.3610767910771726,
-      "angular_error_deg": 42.37955082624273,
-      "iou_error": 0.545969380931911,
+      "distance_error": 1.4921413847518947,
+      "angular_error_deg": 25.889924975655806,
+      "iou_error": 0.6415219939286474,
       "grid_points": 442,
       "matched_objects": 8
     },
@@ -204,9 +204,9 @@
         "90.0": 2.0035936886608585
       },
       "topk_min_dist": 1.1228743016535658,
-      "distance_error": 0.32072714069387526,
-      "angular_error_deg": 24.10801917811245,
-      "iou_error": 0.7541812354784474,
+      "distance_error": 0.5873249594751141,
+      "angular_error_deg": 28.670514367837484,
+      "iou_error": 0.7372909040662387,
       "grid_points": 255,
       "matched_objects": 7
     },
@@ -225,9 +225,9 @@
         "90.0": 2.4407682416376706
       },
       "topk_min_dist": 0.2678911529609351,
-      "distance_error": 0.8581665808011012,
-      "angular_error_deg": 16.314210547694522,
-      "iou_error": 0.6556901587719495,
+      "distance_error": 0.9103852851958741,
+      "angular_error_deg": 16.30051544252017,
+      "iou_error": 0.6686679412038876,
       "grid_points": 288,
       "matched_objects": 6
     },
@@ -246,9 +246,9 @@
         "90.0": 2.5435455961646034
       },
       "topk_min_dist": 0.5095587365879722,
-      "distance_error": 1.129772656358582,
-      "angular_error_deg": 21.228831757282975,
-      "iou_error": 0.9374868438475125,
+      "distance_error": 1.047841562231637,
+      "angular_error_deg": 22.502693488961743,
+      "iou_error": 0.9358961183176369,
       "grid_points": 250,
       "matched_objects": 5
     },
@@ -267,8 +267,8 @@
         "90.0": 2.9702521560646566
       },
       "topk_min_dist": 1.8886775487222331,
-      "distance_error": 0.9160900029778163,
-      "angular_error_deg": 69.9173383209579,
+      "distance_error": 0.9080956911868038,
+      "angular_error_deg": 70.5730887604068,
       "iou_error": 1.0,
       "grid_points": 198,
       "matched_objects": 5
@@ -288,9 +288,9 @@
         "90.0": 2.656910760824565
       },
       "topk_min_dist": 2.048699438016326,
-      "distance_error": 0.9799379667420532,
-      "angular_error_deg": 15.46167849417783,
-      "iou_error": 0.6561832981323538,
+      "distance_error": 0.9786523883251037,
+      "angular_error_deg": 15.781697279218832,
+      "iou_error": 0.611310933842645,
       "grid_points": 460,
       "matched_objects": 6
     },
@@ -309,9 +309,9 @@
         "90.0": 2.0707609776885594
       },
       "topk_min_dist": 0.9621221519667029,
-      "distance_error": 0.24839379197707212,
-      "angular_error_deg": 10.039361962980673,
-      "iou_error": 0.3596948806343968,
+      "distance_error": 0.3366857784952313,
+      "angular_error_deg": 7.806947905754163,
+      "iou_error": 0.430817495770201,
       "grid_points": 342,
       "matched_objects": 6
     },
@@ -330,9 +330,9 @@
         "90.0": 2.2673580662533763
       },
       "topk_min_dist": 1.1276372636489098,
-      "distance_error": 0.6807304521437767,
-      "angular_error_deg": 43.52025641694942,
-      "iou_error": 0.76247075862061,
+      "distance_error": 0.7431369141004578,
+      "angular_error_deg": 46.80641437997537,
+      "iou_error": 0.7712740349828439,
       "grid_points": 224,
       "matched_objects": 6
     },
@@ -351,9 +351,9 @@
         "90.0": 2.119739721437965
       },
       "topk_min_dist": 1.0198024305723419,
-      "distance_error": 1.2685483655327083,
-      "angular_error_deg": 73.29057098947061,
-      "iou_error": 0.8170847739552243,
+      "distance_error": 1.261878228245429,
+      "angular_error_deg": 72.7965465613271,
+      "iou_error": 0.8143613070731985,
       "grid_points": 252,
       "matched_objects": 6
     },
@@ -372,9 +372,9 @@
         "90.0": 2.4035940041111243
       },
       "topk_min_dist": 0.5056442260549154,
-      "distance_error": 1.2463631584441164,
-      "angular_error_deg": 72.85314343383229,
-      "iou_error": 0.9178776400331256,
+      "distance_error": 1.2686451132569854,
+      "angular_error_deg": 70.25887565195646,
+      "iou_error": 0.936787422053644,
       "grid_points": 280,
       "matched_objects": 5
     },
@@ -393,9 +393,9 @@
         "90.0": 1.6883061986562193
       },
       "topk_min_dist": 0.6380985944074729,
-      "distance_error": 0.8069894789427876,
-      "angular_error_deg": 66.41169715062672,
-      "iou_error": 0.9659275336500852,
+      "distance_error": 0.8046708308295794,
+      "angular_error_deg": 66.18502299863223,
+      "iou_error": 0.9666807873066908,
       "grid_points": 224,
       "matched_objects": 5
     },
@@ -414,9 +414,9 @@
         "90.0": 4.96718375137184
       },
       "topk_min_dist": 4.12181203598891,
-      "distance_error": 2.9890738728821087,
-      "angular_error_deg": 56.95631685527463,
-      "iou_error": 0.9211779425184071,
+      "distance_error": 3.506341927388581,
+      "angular_error_deg": 77.83462638413407,
+      "iou_error": 0.7718840934619654,
       "grid_points": 323,
       "matched_objects": 6
     },
@@ -435,9 +435,9 @@
         "90.0": 4.24219034265036
       },
       "topk_min_dist": 0.4185918349082484,
-      "distance_error": 2.21883204414725,
-      "angular_error_deg": 44.21681711199915,
-      "iou_error": 0.9316052086821098,
+      "distance_error": 2.5601819314988368,
+      "angular_error_deg": 63.6348513119517,
+      "iou_error": 0.8194053030154635,
       "grid_points": 306,
       "matched_objects": 8
     },
@@ -456,9 +456,9 @@
         "90.0": 2.667449001622971
       },
       "topk_min_dist": 2.080554175497633,
-      "distance_error": 0.7371827984571168,
-      "angular_error_deg": 20.044228978782712,
-      "iou_error": 0.4664140394384896,
+      "distance_error": 1.3302434966085972,
+      "angular_error_deg": 27.133905596275724,
+      "iou_error": 0.5917351349660551,
       "grid_points": 460,
       "matched_objects": 7
     },
@@ -477,9 +477,9 @@
         "90.0": 2.823330543524955
       },
       "topk_min_dist": 0.3696356498378241,
-      "distance_error": 1.3695685591024822,
-      "angular_error_deg": 80.1186337254054,
-      "iou_error": 0.8803478804365884,
+      "distance_error": 1.5984832338586947,
+      "angular_error_deg": 85.27551371276984,
+      "iou_error": 0.9299799953259807,
       "grid_points": 420,
       "matched_objects": 10
     },
@@ -498,9 +498,9 @@
         "90.0": 3.4401087373548846
       },
       "topk_min_dist": 3.4376326217837274,
-      "distance_error": 1.7530943418182845,
-      "angular_error_deg": 98.80361373031289,
-      "iou_error": 0.9687135495203985,
+      "distance_error": 1.7937599589425897,
+      "angular_error_deg": 82.54091614876864,
+      "iou_error": 0.9283068354464312,
       "grid_points": 1088,
       "matched_objects": 7
     },
@@ -519,9 +519,9 @@
         "90.0": 3.4270239244916
       },
       "topk_min_dist": 0.25964084561010486,
-      "distance_error": 0.7652077227667681,
-      "angular_error_deg": 33.650434956339176,
-      "iou_error": 0.5445566170996798,
+      "distance_error": 2.098664252964832,
+      "angular_error_deg": 38.945243091329964,
+      "iou_error": 0.5378137316565073,
       "grid_points": 651,
       "matched_objects": 6
     },
@@ -540,9 +540,9 @@
         "90.0": 2.1392233395872724
       },
       "topk_min_dist": 1.6000557494130696,
-      "distance_error": 0.5841397813267705,
-      "angular_error_deg": 19.648537926416832,
-      "iou_error": 0.3547704038599243,
+      "distance_error": 1.2197057900502855,
+      "angular_error_deg": 19.0744701466803,
+      "iou_error": 0.4689575951100954,
       "grid_points": 900,
       "matched_objects": 9
     },
@@ -561,9 +561,9 @@
         "90.0": 3.4883886046162025
       },
       "topk_min_dist": 0.8434495864720599,
-      "distance_error": 1.171986528710897,
-      "angular_error_deg": 61.11249136325198,
-      "iou_error": 0.8958842555126802,
+      "distance_error": 1.3740105615917895,
+      "angular_error_deg": 55.48964920584567,
+      "iou_error": 0.8444451911321675,
       "grid_points": 728,
       "matched_objects": 8
     },
@@ -582,9 +582,9 @@
         "90.0": 4.57065725986964
       },
       "topk_min_dist": 2.7154621203336338,
-      "distance_error": 3.1392834215359935,
-      "angular_error_deg": 94.63562816763947,
-      "iou_error": 0.9075310035146633,
+      "distance_error": 3.661302084693205,
+      "angular_error_deg": 95.59885973774124,
+      "iou_error": 0.8643668078295204,
       "grid_points": 506,
       "matched_objects": 7
     },
@@ -603,9 +603,9 @@
         "90.0": 2.4988088569749265
       },
       "topk_min_dist": 1.235738524362287,
-      "distance_error": 0.43249968635389036,
-      "angular_error_deg": 67.2851489487835,
-      "iou_error": 0.7638807093784757,
+      "distance_error": 0.9209095597668535,
+      "angular_error_deg": 65.99819048035151,
+      "iou_error": 0.7190223498339172,
       "grid_points": 391,
       "matched_objects": 5
     },
@@ -624,9 +624,9 @@
         "90.0": 2.5329044351277292
       },
       "topk_min_dist": 1.338796981068609,
-      "distance_error": 1.3372824829334806,
-      "angular_error_deg": 88.0716739222662,
-      "iou_error": 0.9927246841586391,
+      "distance_error": 1.3762227980879846,
+      "angular_error_deg": 88.7111440811465,
+      "iou_error": 0.9938997584331425,
       "grid_points": 306,
       "matched_objects": 6
     },
@@ -645,9 +645,9 @@
         "90.0": 2.643302775729544
       },
       "topk_min_dist": 2.1336384588426633,
-      "distance_error": 1.5764730518901788,
-      "angular_error_deg": 96.84061789888247,
-      "iou_error": 0.9987952813677923,
+      "distance_error": 1.5724759659653351,
+      "angular_error_deg": 99.10724777429981,
+      "iou_error": 0.998759130863811,
       "grid_points": 340,
       "matched_objects": 7
     },
@@ -666,9 +666,9 @@
         "90.0": 3.583455074576097
       },
       "topk_min_dist": 1.6104875717873244,
-      "distance_error": 1.7555565335097745,
-      "angular_error_deg": 111.57150416301526,
-      "iou_error": 0.9666984604144734,
+      "distance_error": 1.9168335926964633,
+      "angular_error_deg": 139.64535661334108,
+      "iou_error": 0.9952625996169338,
       "grid_points": 870,
       "matched_objects": 6
     },
@@ -687,9 +687,9 @@
         "90.0": 3.2389863619190025
       },
       "topk_min_dist": 1.1944642565614916,
-      "distance_error": 1.4849333186722278,
-      "angular_error_deg": 55.612589064573434,
-      "iou_error": 0.7664903423320487,
+      "distance_error": 1.5249171609229655,
+      "angular_error_deg": 31.870886521577756,
+      "iou_error": 0.6901066361551936,
       "grid_points": 725,
       "matched_objects": 8
     },
@@ -708,9 +708,9 @@
         "90.0": 1.5853487370699801
       },
       "topk_min_dist": 0.9481838563798562,
-      "distance_error": 1.5440666159626657,
-      "angular_error_deg": 110.70683683081337,
-      "iou_error": 0.975291239003886,
+      "distance_error": 1.6513253764942804,
+      "angular_error_deg": 119.14570149453027,
+      "iou_error": 0.9357266535262165,
       "grid_points": 400,
       "matched_objects": 9
     },
@@ -729,9 +729,9 @@
         "90.0": 1.3221878321381397
       },
       "topk_min_dist": 0.3742434680869468,
-      "distance_error": 1.0137559396997229,
-      "angular_error_deg": 55.40565811600392,
-      "iou_error": 1.0,
+      "distance_error": 0.9470927327888156,
+      "angular_error_deg": 63.563569715667356,
+      "iou_error": 0.9228274293378282,
       "grid_points": 306,
       "matched_objects": 7
     },
@@ -750,9 +750,9 @@
         "90.0": 4.095841842619934
       },
       "topk_min_dist": 0.869905379507391,
-      "distance_error": 2.606463788357684,
-      "angular_error_deg": 30.259586025681088,
-      "iou_error": 0.6947071821726442,
+      "distance_error": 3.2223072519054528,
+      "angular_error_deg": 27.63494794938053,
+      "iou_error": 0.7973271086326266,
       "grid_points": 837,
       "matched_objects": 6
     },
@@ -771,9 +771,9 @@
         "90.0": 1.0652520919508814
       },
       "topk_min_dist": 0.20195608051079583,
-      "distance_error": 0.841405222814852,
-      "angular_error_deg": 43.643278358733205,
-      "iou_error": 0.7755431205173342,
+      "distance_error": 0.8423636905954321,
+      "angular_error_deg": 44.76332192082634,
+      "iou_error": 0.7929310070297921,
       "grid_points": 396,
       "matched_objects": 10
     },
@@ -792,9 +792,9 @@
         "90.0": 3.329194752222715
       },
       "topk_min_dist": 0.19643997972534263,
-      "distance_error": 1.1639306884141412,
-      "angular_error_deg": 28.644080304165804,
-      "iou_error": 0.5419810479994505,
+      "distance_error": 1.7406597430658253,
+      "angular_error_deg": 30.47519663497269,
+      "iou_error": 0.6512766878938383,
       "grid_points": 675,
       "matched_objects": 6
     },
@@ -813,9 +813,9 @@
         "90.0": 2.5069509565272776
       },
       "topk_min_dist": 0.6008437424420429,
-      "distance_error": 1.2912042026591863,
-      "angular_error_deg": 35.92273018262882,
-      "iou_error": 0.7887252424023529,
+      "distance_error": 1.5337276092785592,
+      "angular_error_deg": 38.708691227485666,
+      "iou_error": 0.85271348452792,
       "grid_points": 441,
       "matched_objects": 5
     },
@@ -834,9 +834,9 @@
         "90.0": 1.8048450052803298
       },
       "topk_min_dist": 1.1657808479325642,
-      "distance_error": 1.0595661265966105,
-      "angular_error_deg": 24.291843446847462,
-      "iou_error": 0.6191390716768534,
+      "distance_error": 1.0591510225657665,
+      "angular_error_deg": 24.56837916418273,
+      "iou_error": 0.6179257278105964,
       "grid_points": 342,
       "matched_objects": 8
     },
@@ -855,9 +855,9 @@
         "90.0": 2.6825780012771387
       },
       "topk_min_dist": 2.0562307001670614,
-      "distance_error": 1.1825331802213357,
-      "angular_error_deg": 10.37261590241775,
-      "iou_error": 0.6211172107788487,
+      "distance_error": 1.3227056352827748,
+      "angular_error_deg": 7.687574601433648,
+      "iou_error": 0.6565629486687243,
       "grid_points": 440,
       "matched_objects": 7
     },
@@ -876,9 +876,9 @@
         "90.0": 1.7540535431646016
       },
       "topk_min_dist": 0.32578738528848,
-      "distance_error": 0.6787717250105677,
-      "angular_error_deg": 31.201987246299694,
-      "iou_error": 0.49044149935904946,
+      "distance_error": 0.6886840095239258,
+      "angular_error_deg": 31.68771587589247,
+      "iou_error": 0.4971884567404812,
       "grid_points": 154,
       "matched_objects": 6
     },
@@ -897,9 +897,9 @@
         "90.0": 2.8980575614489634
       },
       "topk_min_dist": 0.8517948871905832,
-      "distance_error": 1.8723967880088643,
-      "angular_error_deg": 54.54635649121428,
-      "iou_error": 0.7906517197491032,
+      "distance_error": 1.933607506556034,
+      "angular_error_deg": 61.44341392712096,
+      "iou_error": 0.8197656252337778,
       "grid_points": 621,
       "matched_objects": 8
     },
@@ -918,9 +918,9 @@
         "90.0": 2.9001870167803974
       },
       "topk_min_dist": 1.6754831364257041,
-      "distance_error": 1.7309375814335144,
-      "angular_error_deg": 40.60054032671124,
-      "iou_error": 0.8554169836432479,
+      "distance_error": 1.7468938075872456,
+      "angular_error_deg": 41.374247673842255,
+      "iou_error": 0.8606845396422967,
       "grid_points": 168,
       "matched_objects": 6
     },
@@ -939,9 +939,9 @@
         "90.0": 2.331870126212744
       },
       "topk_min_dist": 0.2920351575471012,
-      "distance_error": 1.6574323722061426,
-      "angular_error_deg": 12.835947212678786,
-      "iou_error": 0.5528480951651282,
+      "distance_error": 1.4551912753074876,
+      "angular_error_deg": 10.406613748683725,
+      "iou_error": 0.4917991298413448,
       "grid_points": 342,
       "matched_objects": 7
     },
@@ -960,9 +960,9 @@
         "90.0": 4.047889224027048
       },
       "topk_min_dist": 2.645298962326335,
-      "distance_error": 1.5062720779438024,
-      "angular_error_deg": 29.988613259628135,
-      "iou_error": 0.5898830684468046,
+      "distance_error": 0.8338404460755272,
+      "angular_error_deg": 26.680202236116962,
+      "iou_error": 0.4606184439779546,
       "grid_points": 483,
       "matched_objects": 10
     },
@@ -981,9 +981,9 @@
         "90.0": 4.035738684423227
       },
       "topk_min_dist": 1.0108546717185058,
-      "distance_error": 2.051974973027908,
-      "angular_error_deg": 46.169251630635436,
-      "iou_error": 0.9992557232474126,
+      "distance_error": 1.908019371064207,
+      "angular_error_deg": 43.52492480915726,
+      "iou_error": 0.7612754945553974,
       "grid_points": 483,
       "matched_objects": 3
     },
@@ -1002,9 +1002,9 @@
         "90.0": 2.58223344963199
       },
       "topk_min_dist": 0.7296740864515285,
-      "distance_error": 1.4645480758262865,
-      "angular_error_deg": 43.131423446567716,
-      "iou_error": 1.0,
+      "distance_error": 1.2059000826211155,
+      "angular_error_deg": 58.099965191550346,
+      "iou_error": 0.9680641786041659,
       "grid_points": 480,
       "matched_objects": 8
     },
@@ -1023,9 +1023,9 @@
         "90.0": 3.2091639604539304
       },
       "topk_min_dist": 0.7747692443420074,
-      "distance_error": 1.4549027953764293,
-      "angular_error_deg": 14.513668448400013,
-      "iou_error": 0.5744128323592059,
+      "distance_error": 0.9267979834652436,
+      "angular_error_deg": 9.631281858751564,
+      "iou_error": 0.3811448451982732,
       "grid_points": 598,
       "matched_objects": 9
     },
@@ -1044,9 +1044,9 @@
         "90.0": 1.826196713579364
       },
       "topk_min_dist": 1.2783307203028929,
-      "distance_error": 0.6549588856084229,
-      "angular_error_deg": 6.822694050510731,
-      "iou_error": 0.46194334360025857,
+      "distance_error": 0.6487514498653405,
+      "angular_error_deg": 7.022141831922448,
+      "iou_error": 0.46443886758318675,
       "grid_points": 323,
       "matched_objects": 3
     },
@@ -1065,9 +1065,9 @@
         "90.0": 4.472664871786499
       },
       "topk_min_dist": 2.469606476131192,
-      "distance_error": 2.3021812220999447,
-      "angular_error_deg": 69.40764720577923,
-      "iou_error": 0.836953134667196,
+      "distance_error": 3.4981533918915955,
+      "angular_error_deg": 101.91475544264104,
+      "iou_error": 0.6772251218133121,
       "grid_points": 525,
       "matched_objects": 6
     },
@@ -1086,9 +1086,9 @@
         "90.0": 4.065497432723902
       },
       "topk_min_dist": 3.4185475543186485,
-      "distance_error": 1.6982405914053542,
-      "angular_error_deg": 47.48161571066693,
-      "iou_error": 0.7535500654829888,
+      "distance_error": 1.6160488683113219,
+      "angular_error_deg": 47.34265648726623,
+      "iou_error": 0.7397169316257373,
       "grid_points": 304,
       "matched_objects": 7
     },
@@ -1107,9 +1107,9 @@
         "90.0": 3.006551865824545
       },
       "topk_min_dist": 0.8773417936977562,
-      "distance_error": 1.8214741675746473,
-      "angular_error_deg": 82.83514798039815,
-      "iou_error": 0.8299538778215433,
+      "distance_error": 2.5097379816784295,
+      "angular_error_deg": 76.34636332704284,
+      "iou_error": 0.8018556909060208,
       "grid_points": 600,
       "matched_objects": 6
     },
@@ -1128,9 +1128,9 @@
         "90.0": 1.9857112595079742
       },
       "topk_min_dist": 0.7516043933218025,
-      "distance_error": 0.9401510057908286,
-      "angular_error_deg": 77.04039305394079,
-      "iou_error": 0.9319504857630752,
+      "distance_error": 1.182770713057219,
+      "angular_error_deg": 75.33334376413211,
+      "iou_error": 0.8933059249831432,
       "grid_points": 650,
       "matched_objects": 6
     },
@@ -1149,9 +1149,9 @@
         "90.0": 3.3024349222129947
       },
       "topk_min_dist": 2.027635241482076,
-      "distance_error": 1.232206781565887,
-      "angular_error_deg": 28.390718344305736,
-      "iou_error": 0.7185797989170482,
+      "distance_error": 1.3277332743320873,
+      "angular_error_deg": 21.261399904020035,
+      "iou_error": 0.6706549738510074,
       "grid_points": 506,
       "matched_objects": 6
     },
@@ -1170,9 +1170,9 @@
         "90.0": 2.262820507294672
       },
       "topk_min_dist": 0.8091051399766759,
-      "distance_error": 0.7928758580105156,
-      "angular_error_deg": 41.63139750192063,
-      "iou_error": 0.6099350747706577,
+      "distance_error": 1.233190135959462,
+      "angular_error_deg": 49.698159669102694,
+      "iou_error": 0.6768465979158671,
       "grid_points": 624,
       "matched_objects": 9
     },
@@ -1191,9 +1191,9 @@
         "90.0": 2.372985341953355
       },
       "topk_min_dist": 0.9670937435768743,
-      "distance_error": 1.4768695241903183,
-      "angular_error_deg": 45.509062429645624,
-      "iou_error": 0.6809838608030296,
+      "distance_error": 1.4778399963014697,
+      "angular_error_deg": 46.10244000077707,
+      "iou_error": 0.6856364907017866,
       "grid_points": 360,
       "matched_objects": 5
     },
@@ -1212,9 +1212,9 @@
         "90.0": 3.305091912459573
       },
       "topk_min_dist": 1.5360091046753377,
-      "distance_error": 1.1541506162368882,
-      "angular_error_deg": 23.28658394771388,
-      "iou_error": 0.38855503199272134,
+      "distance_error": 1.915408105601933,
+      "angular_error_deg": 39.371904966139915,
+      "iou_error": 0.46633219188692776,
       "grid_points": 529,
       "matched_objects": 6
     },
@@ -1233,9 +1233,9 @@
         "90.0": 2.2892386783531533
       },
       "topk_min_dist": 0.9572123225989736,
-      "distance_error": 1.3192399965736343,
-      "angular_error_deg": 37.400196092139325,
-      "iou_error": 0.9814485645225445,
+      "distance_error": 1.390915597213135,
+      "angular_error_deg": 36.16473957918123,
+      "iou_error": 0.9226148551501586,
       "grid_points": 304,
       "matched_objects": 8
     },
@@ -1254,9 +1254,9 @@
         "90.0": 2.6550102511793665
       },
       "topk_min_dist": 0.21216753087204562,
-      "distance_error": 0.9422932268919976,
-      "angular_error_deg": 21.684126559743014,
-      "iou_error": 0.6825161244507723,
+      "distance_error": 1.5301382434182584,
+      "angular_error_deg": 15.764113840161814,
+      "iou_error": 0.6651364419423085,
       "grid_points": 484,
       "matched_objects": 9
     },
@@ -1275,9 +1275,9 @@
         "90.0": 3.1750645360689482
       },
       "topk_min_dist": 1.60844949254111,
-      "distance_error": 1.4294984777290012,
-      "angular_error_deg": 69.37756549784056,
-      "iou_error": 0.9234584378372357,
+      "distance_error": 1.6184419091991706,
+      "angular_error_deg": 80.69640089140206,
+      "iou_error": 0.9211523331273511,
       "grid_points": 420,
       "matched_objects": 4
     },
@@ -1296,9 +1296,9 @@
         "90.0": 4.1931876953270715
       },
       "topk_min_dist": 0.9061452060665557,
-      "distance_error": 2.4935663249469333,
-      "angular_error_deg": 79.94082494287356,
-      "iou_error": 0.9436588191463505,
+      "distance_error": 2.391207173033199,
+      "angular_error_deg": 88.90071676788372,
+      "iou_error": 0.9428144292853988,
       "grid_points": 810,
       "matched_objects": 10
     },
@@ -1317,9 +1317,9 @@
         "90.0": 1.9963266152918646
       },
       "topk_min_dist": 0.4859178254519205,
-      "distance_error": 0.3227708547524432,
-      "angular_error_deg": 36.348002230092334,
-      "iou_error": 0.9655760998400242,
+      "distance_error": 0.3209440755504199,
+      "angular_error_deg": 36.99279510072287,
+      "iou_error": 0.9688629850101445,
       "grid_points": 304,
       "matched_objects": 3
     },
@@ -1338,9 +1338,9 @@
         "90.0": 1.444300258499383
       },
       "topk_min_dist": 0.6687737191440645,
-      "distance_error": 1.3302766574852793,
-      "angular_error_deg": 116.08123747517888,
-      "iou_error": 0.9613434950314917,
+      "distance_error": 1.4738072466207017,
+      "angular_error_deg": 107.64986690328301,
+      "iou_error": 0.9634680624364896,
       "grid_points": 330,
       "matched_objects": 9
     },
@@ -1359,8 +1359,8 @@
         "90.0": 2.181053327891982
       },
       "topk_min_dist": 0.7076973158502619,
-      "distance_error": 0.6274441680631886,
-      "angular_error_deg": 107.41430832389551,
+      "distance_error": 0.6386745056524602,
+      "angular_error_deg": 108.05934222233378,
       "iou_error": 1.0,
       "grid_points": 154,
       "matched_objects": 8
@@ -1380,9 +1380,9 @@
         "90.0": 3.1130852271325473
       },
       "topk_min_dist": 0.4730721575812692,
-      "distance_error": 1.2814406104466634,
-      "angular_error_deg": 26.471389133314705,
-      "iou_error": 0.7373001729693791,
+      "distance_error": 1.681093191345188,
+      "angular_error_deg": 19.791879659782257,
+      "iou_error": 0.7279441469855458,
       "grid_points": 675,
       "matched_objects": 4
     },
@@ -1401,9 +1401,9 @@
         "90.0": 3.162687518742687
       },
       "topk_min_dist": 0.5985493601961092,
-      "distance_error": 1.1959172894755965,
-      "angular_error_deg": 15.564560272348027,
-      "iou_error": 0.6769037700117468,
+      "distance_error": 1.363929317134296,
+      "angular_error_deg": 20.535283035467064,
+      "iou_error": 0.7117624907993841,
       "grid_points": 374,
       "matched_objects": 4
     },
@@ -1422,9 +1422,9 @@
         "90.0": 3.5107725583486222
       },
       "topk_min_dist": 1.367395800232205,
-      "distance_error": 1.891530972572265,
-      "angular_error_deg": 118.14469720301341,
-      "iou_error": 0.931194926685025,
+      "distance_error": 2.166984363524413,
+      "angular_error_deg": 119.59909099830213,
+      "iou_error": 0.9138184601149942,
       "grid_points": 350,
       "matched_objects": 6
     },
@@ -1443,9 +1443,9 @@
         "90.0": 4.425439038631629
       },
       "topk_min_dist": 1.4835468624898562,
-      "distance_error": 2.145560814162431,
-      "angular_error_deg": 36.31035897897168,
-      "iou_error": 0.7182862694645218,
+      "distance_error": 2.5026575374040565,
+      "angular_error_deg": 54.803620795580784,
+      "iou_error": 0.7176430213677609,
       "grid_points": 528,
       "matched_objects": 4
     },
@@ -1464,9 +1464,9 @@
         "90.0": 2.958763638559285
       },
       "topk_min_dist": 2.5649370921849033,
-      "distance_error": 1.0343541592055419,
-      "angular_error_deg": 51.7969767300157,
-      "iou_error": 0.7127100100826524,
+      "distance_error": 1.3573889482864996,
+      "angular_error_deg": 55.58569672354616,
+      "iou_error": 0.5775939054308026,
       "grid_points": 361,
       "matched_objects": 5
     },
@@ -1485,9 +1485,9 @@
         "90.0": 2.838646869687791
       },
       "topk_min_dist": 1.6927340543721228,
-      "distance_error": 0.5315996891388663,
-      "angular_error_deg": 24.460883404727394,
-      "iou_error": 0.6408783706606633,
+      "distance_error": 1.0397760273276342,
+      "angular_error_deg": 31.474173728315503,
+      "iou_error": 0.6488809493318345,
       "grid_points": 638,
       "matched_objects": 6
     },
@@ -1506,9 +1506,9 @@
         "90.0": 3.185150438180897
       },
       "topk_min_dist": 0.9666182720361344,
-      "distance_error": 1.2493858314327877,
-      "angular_error_deg": 74.70593697287943,
-      "iou_error": 0.8668213498797293,
+      "distance_error": 2.171829141074729,
+      "angular_error_deg": 71.45513527493121,
+      "iou_error": 0.9010948419667627,
       "grid_points": 702,
       "matched_objects": 9
     },
@@ -1527,8 +1527,8 @@
         "90.0": 2.342221400069214
       },
       "topk_min_dist": 1.772454256102758,
-      "distance_error": 0.6525446022493576,
-      "angular_error_deg": 86.20675295395684,
+      "distance_error": 0.6451147733503025,
+      "angular_error_deg": 86.6909171504819,
       "iou_error": 1.0,
       "grid_points": 162,
       "matched_objects": 2
@@ -1548,9 +1548,9 @@
         "90.0": 3.309070494233198
       },
       "topk_min_dist": 1.8282971197926294,
-      "distance_error": 1.3396473179501207,
-      "angular_error_deg": 51.96904083859851,
-      "iou_error": 0.7820557796294046,
+      "distance_error": 1.4988496657569776,
+      "angular_error_deg": 43.39232975212606,
+      "iou_error": 0.7632151918131299,
       "grid_points": 440,
       "matched_objects": 6
     },
@@ -1569,9 +1569,9 @@
         "90.0": 6.377484591253022
       },
       "topk_min_dist": 0.24407017808583806,
-      "distance_error": 3.0994052513637644,
-      "angular_error_deg": 21.978308347427088,
-      "iou_error": 0.7327663845616497,
+      "distance_error": 2.0315752770268802,
+      "angular_error_deg": 24.482683185332878,
+      "iou_error": 0.5621730749516942,
       "grid_points": 936,
       "matched_objects": 7
     },
@@ -1590,9 +1590,9 @@
         "90.0": 3.0011768205943463
       },
       "topk_min_dist": 0.44236852049162,
-      "distance_error": 1.594786064812399,
-      "angular_error_deg": 30.820062003220873,
-      "iou_error": 0.6924703250562754,
+      "distance_error": 0.991286382177882,
+      "angular_error_deg": 27.957785281178733,
+      "iou_error": 0.5649682795533619,
       "grid_points": 540,
       "matched_objects": 8
     },
@@ -1611,9 +1611,9 @@
         "90.0": 4.277572666013436
       },
       "topk_min_dist": 1.8751019925589534,
-      "distance_error": 2.4131016003748496,
-      "angular_error_deg": 117.69149218416612,
-      "iou_error": 0.8611554088487192,
+      "distance_error": 2.6148626134807778,
+      "angular_error_deg": 119.62110026443655,
+      "iou_error": 0.8300840472655685,
       "grid_points": 408,
       "matched_objects": 5
     },
@@ -1632,9 +1632,9 @@
         "90.0": 3.1217606841289687
       },
       "topk_min_dist": 1.369368542258059,
-      "distance_error": 0.5240049613094584,
-      "angular_error_deg": 23.689149643085376,
-      "iou_error": 0.5530612190191524,
+      "distance_error": 1.6174421201929854,
+      "angular_error_deg": 16.273978471781874,
+      "iou_error": 0.7402185822627401,
       "grid_points": 816,
       "matched_objects": 6
     },
@@ -1653,9 +1653,9 @@
         "90.0": 2.0599447184034942
       },
       "topk_min_dist": 0.7485316985934946,
-      "distance_error": 0.39715016909197526,
-      "angular_error_deg": 59.337145835097516,
-      "iou_error": 0.7705666709239414,
+      "distance_error": 0.4831953961172761,
+      "angular_error_deg": 60.20032611523811,
+      "iou_error": 0.7371470985712624,
       "grid_points": 340,
       "matched_objects": 10
     },
@@ -1674,9 +1674,9 @@
         "90.0": 2.7358674525077507
       },
       "topk_min_dist": 1.880972036965512,
-      "distance_error": 1.014004165034526,
-      "angular_error_deg": 85.94844769974152,
-      "iou_error": 0.9290232033175386,
+      "distance_error": 1.3042753411836394,
+      "angular_error_deg": 91.27646585425583,
+      "iou_error": 0.9059185139531046,
       "grid_points": 360,
       "matched_objects": 3
     },
@@ -1695,9 +1695,9 @@
         "90.0": 3.162150192960679
       },
       "topk_min_dist": 1.0934677791327292,
-      "distance_error": 1.6299386978719785,
-      "angular_error_deg": 25.549191232029184,
-      "iou_error": 0.7664565026966442,
+      "distance_error": 1.7199294842426698,
+      "angular_error_deg": 25.37469674225458,
+      "iou_error": 0.7715593755874125,
       "grid_points": 270,
       "matched_objects": 3
     },
@@ -1716,9 +1716,9 @@
         "90.0": 2.7192609193216133
       },
       "topk_min_dist": 1.138215697097042,
-      "distance_error": 0.8578666912097048,
-      "angular_error_deg": 59.427197279331516,
-      "iou_error": 0.759645690786906,
+      "distance_error": 0.8406765836320041,
+      "angular_error_deg": 59.26472343526555,
+      "iou_error": 0.760364784877957,
       "grid_points": 288,
       "matched_objects": 3
     },
@@ -1737,9 +1737,9 @@
         "90.0": 1.9182875727195694
       },
       "topk_min_dist": 0.21475374944489972,
-      "distance_error": 0.9923194881311741,
-      "angular_error_deg": 17.396298812806087,
-      "iou_error": 0.5665219123302967,
+      "distance_error": 1.0066477682614292,
+      "angular_error_deg": 18.13984522531235,
+      "iou_error": 0.5802913904588874,
       "grid_points": 70,
       "matched_objects": 5
     },
@@ -1758,9 +1758,9 @@
         "90.0": 1.585480701406227
       },
       "topk_min_dist": 0.38633848413957145,
-      "distance_error": 0.7706187994854713,
-      "angular_error_deg": 42.63163699890673,
-      "iou_error": 0.6540283701785294,
+      "distance_error": 0.7901179605651577,
+      "angular_error_deg": 43.28944536077736,
+      "iou_error": 0.6635859238424422,
       "grid_points": 99,
       "matched_objects": 4
     },
@@ -1779,9 +1779,9 @@
         "90.0": 1.7478561698804447
       },
       "topk_min_dist": 0.19773976872466248,
-      "distance_error": 0.7337745012803877,
-      "angular_error_deg": 33.70274848701125,
-      "iou_error": 0.6268697902251863,
+      "distance_error": 0.7488959099199773,
+      "angular_error_deg": 34.56020700186409,
+      "iou_error": 0.6351100975707986,
       "grid_points": 110,
       "matched_objects": 4
     },
@@ -1800,9 +1800,9 @@
         "90.0": 1.6712922959462775
       },
       "topk_min_dist": 0.2500088573974154,
-      "distance_error": 0.6946852503954479,
-      "angular_error_deg": 28.817661547700766,
-      "iou_error": 0.5975395155561802,
+      "distance_error": 0.7012604462998356,
+      "angular_error_deg": 28.407470726472344,
+      "iou_error": 0.5974700689148522,
       "grid_points": 110,
       "matched_objects": 5
     },
@@ -1821,9 +1821,9 @@
         "90.0": 1.6938602252708008
       },
       "topk_min_dist": 0.5492813133280143,
-      "distance_error": 1.13664954132273,
-      "angular_error_deg": 42.49369018185506,
-      "iou_error": 0.5537206617264552,
+      "distance_error": 1.146775815359486,
+      "angular_error_deg": 42.626730799833645,
+      "iou_error": 0.5607487934661439,
       "grid_points": 120,
       "matched_objects": 6
     },
@@ -1842,9 +1842,9 @@
         "90.0": 1.5975064594533237
       },
       "topk_min_dist": 0.45038204658467706,
-      "distance_error": 0.966068544034988,
-      "angular_error_deg": 23.396618329583895,
-      "iou_error": 0.4708059819556337,
+      "distance_error": 0.982278475194576,
+      "angular_error_deg": 24.03229256806882,
+      "iou_error": 0.4796156614981484,
       "grid_points": 88,
       "matched_objects": 6
     },
@@ -1863,9 +1863,9 @@
         "90.0": 1.569812073024381
       },
       "topk_min_dist": 0.3432736452917722,
-      "distance_error": 1.034122337712222,
-      "angular_error_deg": 6.016508171722005,
-      "iou_error": 0.5204032631753337,
+      "distance_error": 1.0520972508303996,
+      "angular_error_deg": 5.973176895827106,
+      "iou_error": 0.5210795029126745,
       "grid_points": 99,
       "matched_objects": 6
     },
@@ -1884,9 +1884,9 @@
         "90.0": 2.0584436520068485
       },
       "topk_min_dist": 0.8291247066905781,
-      "distance_error": 0.9107128214777085,
-      "angular_error_deg": 48.66865532315379,
-      "iou_error": 0.65160156968192,
+      "distance_error": 0.8895293930493681,
+      "angular_error_deg": 48.24282758034517,
+      "iou_error": 0.6529949168608659,
       "grid_points": 204,
       "matched_objects": 7
     },
@@ -1905,9 +1905,9 @@
         "90.0": 1.9587942848135058
       },
       "topk_min_dist": 0.9100481221331167,
-      "distance_error": 0.30295211093763474,
-      "angular_error_deg": 37.842349378830974,
-      "iou_error": 0.7628090213961174,
+      "distance_error": 0.32034928453100053,
+      "angular_error_deg": 40.55191971062058,
+      "iou_error": 0.7906481441820824,
       "grid_points": 340,
       "matched_objects": 9
     },
@@ -1926,9 +1926,9 @@
         "90.0": 3.2996115301605187
       },
       "topk_min_dist": 0.6633670118670713,
-      "distance_error": 1.4809606140486025,
-      "angular_error_deg": 73.56069060912023,
-      "iou_error": 0.945745024431708,
+      "distance_error": 1.7551448730800443,
+      "angular_error_deg": 75.25317687343325,
+      "iou_error": 0.8441211743286494,
       "grid_points": 323,
       "matched_objects": 9
     },
@@ -1947,8 +1947,8 @@
         "90.0": 2.02871977569402
       },
       "topk_min_dist": 0.568746822006825,
-      "distance_error": 0.2005925622089252,
-      "angular_error_deg": 99.88218289354144,
+      "distance_error": 0.2098516349415432,
+      "angular_error_deg": 100.9638774672757,
       "iou_error": 1.0,
       "grid_points": 323,
       "matched_objects": 3
@@ -1968,9 +1968,9 @@
         "90.0": 1.7522991060523494
       },
       "topk_min_dist": 0.8758880677657319,
-      "distance_error": 0.5295297509304389,
-      "angular_error_deg": 33.56839731406867,
-      "iou_error": 0.6252722076868751,
+      "distance_error": 0.5229899614873287,
+      "angular_error_deg": 32.90067108554878,
+      "iou_error": 0.620190829830956,
       "grid_points": 160,
       "matched_objects": 6
     },
@@ -1989,9 +1989,9 @@
         "90.0": 3.2389380979005167
       },
       "topk_min_dist": 0.8928283814569428,
-      "distance_error": 1.6312585557914105,
-      "angular_error_deg": 68.55819920860114,
-      "iou_error": 0.6484120630745515,
+      "distance_error": 1.638270698304634,
+      "angular_error_deg": 68.67380576201754,
+      "iou_error": 0.6509078931961911,
       "grid_points": 198,
       "matched_objects": 6
     },
@@ -2010,9 +2010,9 @@
         "90.0": 2.9935382933734953
       },
       "topk_min_dist": 1.7841475249342709,
-      "distance_error": 0.918622884642188,
-      "angular_error_deg": 45.722353404228166,
-      "iou_error": 0.710766510676337,
+      "distance_error": 0.7495703349476943,
+      "angular_error_deg": 39.13882527601021,
+      "iou_error": 0.6545628220066044,
       "grid_points": 576,
       "matched_objects": 2
     },
@@ -2031,9 +2031,9 @@
         "90.0": 2.5844118997079484
       },
       "topk_min_dist": 0.4696165952060266,
-      "distance_error": 0.6841523246063929,
-      "angular_error_deg": 89.60269326766516,
-      "iou_error": 0.9966261655826971,
+      "distance_error": 0.5677096736346515,
+      "angular_error_deg": 75.841685727288,
+      "iou_error": 0.9306569614304079,
       "grid_points": 418,
       "matched_objects": 4
     },
@@ -2052,9 +2052,9 @@
         "90.0": 2.396734138781325
       },
       "topk_min_dist": 0.8894352240589464,
-      "distance_error": 0.25457896746761166,
-      "angular_error_deg": 36.655521388731295,
-      "iou_error": 0.5898210973540472,
+      "distance_error": 1.0125168128732438,
+      "angular_error_deg": 41.16704021606317,
+      "iou_error": 0.709554251641991,
       "grid_points": 621,
       "matched_objects": 10
     },
@@ -2073,9 +2073,9 @@
         "90.0": 1.1836967032803796
       },
       "topk_min_dist": 0.5857071723088294,
-      "distance_error": 0.34981294051093725,
-      "angular_error_deg": 28.461966275048205,
-      "iou_error": 0.4601040867706857,
+      "distance_error": 0.36020437680835604,
+      "angular_error_deg": 29.343950193602954,
+      "iou_error": 0.4753003904252735,
       "grid_points": 110,
       "matched_objects": 6
     },
@@ -2094,9 +2094,9 @@
         "90.0": 2.5328647040954704
       },
       "topk_min_dist": 1.210981214540505,
-      "distance_error": 0.568850750912897,
-      "angular_error_deg": 40.070475730391045,
-      "iou_error": 0.5549551165363211,
+      "distance_error": 0.2768947850811938,
+      "angular_error_deg": 31.889401458113895,
+      "iou_error": 0.47854566351445627,
       "grid_points": 720,
       "matched_objects": 9
     },
@@ -2115,9 +2115,9 @@
         "90.0": 2.638822748930344
       },
       "topk_min_dist": 0.2646830447267172,
-      "distance_error": 1.4596208219543787,
-      "angular_error_deg": 54.19498645452894,
-      "iou_error": 0.995993695759392,
+      "distance_error": 1.9916903913574817,
+      "angular_error_deg": 52.78993865823735,
+      "iou_error": 0.9088772405531731,
       "grid_points": 780,
       "matched_objects": 5
     },
@@ -2136,9 +2136,9 @@
         "90.0": 3.819750641427089
       },
       "topk_min_dist": 1.9427934135074854,
-      "distance_error": 1.1993178852131274,
-      "angular_error_deg": 27.990765557342655,
-      "iou_error": 0.5875235240999757,
+      "distance_error": 0.5862113232660706,
+      "angular_error_deg": 31.884733477802,
+      "iou_error": 0.4410504715563578,
       "grid_points": 675,
       "matched_objects": 3
     },
@@ -2157,9 +2157,9 @@
         "90.0": 2.5249468845044194
       },
       "topk_min_dist": 1.5741505059677106,
-      "distance_error": 0.7007628253026925,
-      "angular_error_deg": 63.15739719610127,
-      "iou_error": 0.9625256671231224,
+      "distance_error": 0.6715410474386326,
+      "angular_error_deg": 61.867765296770344,
+      "iou_error": 0.9519984946108332,
       "grid_points": 418,
       "matched_objects": 7
     },
@@ -2178,9 +2178,9 @@
         "90.0": 2.528393723160737
       },
       "topk_min_dist": 1.8981424785689367,
-      "distance_error": 0.9823544221098198,
-      "angular_error_deg": 76.58828715938512,
-      "iou_error": 0.8505357291451026,
+      "distance_error": 1.0276752854583762,
+      "angular_error_deg": 76.89160452827934,
+      "iou_error": 0.8459291360265937,
       "grid_points": 252,
       "matched_objects": 10
     },
@@ -2199,9 +2199,9 @@
         "90.0": 2.75961053224786
       },
       "topk_min_dist": 1.3783434682274776,
-      "distance_error": 1.206871505684779,
-      "angular_error_deg": 53.72049625548204,
-      "iou_error": 0.63745983496426,
+      "distance_error": 1.2432249734936631,
+      "angular_error_deg": 54.99029337965626,
+      "iou_error": 0.6421728500233346,
       "grid_points": 204,
       "matched_objects": 8
     },
@@ -2220,9 +2220,9 @@
         "90.0": 4.32983050166774
       },
       "topk_min_dist": 1.4959169963609589,
-      "distance_error": 2.6857428033462276,
-      "angular_error_deg": 150.73761228484582,
-      "iou_error": 0.9890415576448005,
+      "distance_error": 2.76252362683595,
+      "angular_error_deg": 150.34832586272404,
+      "iou_error": 0.9844791656466195,
       "grid_points": 682,
       "matched_objects": 5
     },
@@ -2241,9 +2241,9 @@
         "90.0": 5.716261347505126
       },
       "topk_min_dist": 4.077239156413651,
-      "distance_error": 3.681069903512682,
-      "angular_error_deg": 95.18339277716393,
-      "iou_error": 0.9996958346653778,
+      "distance_error": 3.7059820591996293,
+      "angular_error_deg": 108.8097254735924,
+      "iou_error": 0.9958477003737203,
       "grid_points": 930,
       "matched_objects": 10
     },
@@ -2262,9 +2262,9 @@
         "90.0": 2.0378729472080903
       },
       "topk_min_dist": 0.6314892519696124,
-      "distance_error": 1.0300654682966177,
-      "angular_error_deg": 133.19289028617405,
-      "iou_error": 1.0,
+      "distance_error": 1.1342479123545923,
+      "angular_error_deg": 124.52994496894833,
+      "iou_error": 0.9999346249908876,
       "grid_points": 500,
       "matched_objects": 10
     },
@@ -2283,9 +2283,9 @@
         "90.0": 2.041680831719506
       },
       "topk_min_dist": 0.5512201015819772,
-      "distance_error": 0.8419035843949069,
-      "angular_error_deg": 37.138257672294756,
-      "iou_error": 0.5727870006357998,
+      "distance_error": 0.8215018703924973,
+      "angular_error_deg": 36.57898837369556,
+      "iou_error": 0.5649884453884564,
       "grid_points": 196,
       "matched_objects": 9
     },
@@ -2304,9 +2304,9 @@
         "90.0": 2.2910842300390875
       },
       "topk_min_dist": 0.6669379043977696,
-      "distance_error": 0.9292967899197333,
-      "angular_error_deg": 11.505447547152153,
-      "iou_error": 0.6044933128444054,
+      "distance_error": 0.8979093775516769,
+      "angular_error_deg": 10.504854985850807,
+      "iou_error": 0.6008255629216244,
       "grid_points": 252,
       "matched_objects": 8
     },
@@ -2325,8 +2325,8 @@
         "90.0": 1.0376720245812745
       },
       "topk_min_dist": 0.18276359936830827,
-      "distance_error": 0.3433177697297114,
-      "angular_error_deg": 82.27478937521893,
+      "distance_error": 0.3575662057939395,
+      "angular_error_deg": 83.14793226217395,
       "iou_error": 1.0,
       "grid_points": 132,
       "matched_objects": 9
@@ -2346,9 +2346,9 @@
         "90.0": 1.2273133313004703
       },
       "topk_min_dist": 0.4417999499944051,
-      "distance_error": 0.4967135113549465,
-      "angular_error_deg": 78.47839243571862,
-      "iou_error": 0.9914998391390129,
+      "distance_error": 0.5562856667813091,
+      "angular_error_deg": 79.49076557788148,
+      "iou_error": 0.990074318024534,
       "grid_points": 187,
       "matched_objects": 7
     },
@@ -2367,9 +2367,9 @@
         "90.0": 2.667886583421759
       },
       "topk_min_dist": 1.566721767873649,
-      "distance_error": 2.084705381133404,
-      "angular_error_deg": 51.46314971678588,
-      "iou_error": 0.6102709088104719,
+      "distance_error": 2.0999313174280667,
+      "angular_error_deg": 52.38304333937625,
+      "iou_error": 0.616536232167129,
       "grid_points": 56,
       "matched_objects": 4
     },
@@ -2388,9 +2388,9 @@
         "90.0": 4.852175041898182
       },
       "topk_min_dist": 2.479323198748124,
-      "distance_error": 2.8169643540384453,
-      "angular_error_deg": 131.2621970108218,
-      "iou_error": 0.9918828514987474,
+      "distance_error": 2.038251128107449,
+      "angular_error_deg": 124.7910447357839,
+      "iou_error": 1.0,
       "grid_points": 640,
       "matched_objects": 4
     },
@@ -2409,9 +2409,9 @@
         "90.0": 4.427495411052179
       },
       "topk_min_dist": 3.2161000650177423,
-      "distance_error": 1.9694705506222348,
-      "angular_error_deg": 49.053526801376826,
-      "iou_error": 0.4817126950189202,
+      "distance_error": 3.063668341164502,
+      "angular_error_deg": 32.849006601818274,
+      "iou_error": 0.5172573311400034,
       "grid_points": 800,
       "matched_objects": 3
     },
@@ -2430,9 +2430,9 @@
         "90.0": 4.748479551978821
       },
       "topk_min_dist": 4.73018816119102,
-      "distance_error": 2.4965351142025938,
-      "angular_error_deg": 56.26886455452286,
-      "iou_error": 0.36244646418202897,
+      "distance_error": 2.662777840391333,
+      "angular_error_deg": 54.534514844252975,
+      "iou_error": 0.3587242267310118,
       "grid_points": 816,
       "matched_objects": 9
     },
@@ -2451,9 +2451,9 @@
         "90.0": 3.6785010551189856
       },
       "topk_min_dist": 1.4286584581764874,
-      "distance_error": 1.9851990494775074,
-      "angular_error_deg": 20.230791034703426,
-      "iou_error": 0.8082409295219751,
+      "distance_error": 2.827572863154854,
+      "angular_error_deg": 35.7236594251755,
+      "iou_error": 0.8704595163173514,
       "grid_points": 728,
       "matched_objects": 9
     },
@@ -2472,9 +2472,9 @@
         "90.0": 2.567818431293829
       },
       "topk_min_dist": 1.6665218446556918,
-      "distance_error": 0.8850106759289477,
-      "angular_error_deg": 14.44772041462658,
-      "iou_error": 0.5063085850237259,
+      "distance_error": 0.8795130942475953,
+      "angular_error_deg": 11.572633239898826,
+      "iou_error": 0.44769010219489336,
       "grid_points": 442,
       "matched_objects": 6
     },
@@ -2493,9 +2493,9 @@
         "90.0": 2.1317716781705776
       },
       "topk_min_dist": 0.6220264223495551,
-      "distance_error": 0.9864150797166984,
-      "angular_error_deg": 81.82678241830192,
-      "iou_error": 0.9999537930968265,
+      "distance_error": 0.7646928423644332,
+      "angular_error_deg": 66.43187915994928,
+      "iou_error": 0.9352306226723897,
       "grid_points": 330,
       "matched_objects": 7
     },
@@ -2514,9 +2514,9 @@
         "90.0": 1.6244887386064784
       },
       "topk_min_dist": 0.35906496118210735,
-      "distance_error": 0.5630415408017477,
-      "angular_error_deg": 86.34904306784631,
-      "iou_error": 0.9803090804473618,
+      "distance_error": 0.5369187404968726,
+      "angular_error_deg": 85.53570442766222,
+      "iou_error": 0.9819113570233478,
       "grid_points": 380,
       "matched_objects": 3
     },
@@ -2535,9 +2535,9 @@
         "90.0": 2.405661516961231
       },
       "topk_min_dist": 1.7008713339212163,
-      "distance_error": 0.881023601127212,
-      "angular_error_deg": 74.84092115415224,
-      "iou_error": 0.8903464422195865,
+      "distance_error": 0.886016095106507,
+      "angular_error_deg": 74.27951220901633,
+      "iou_error": 0.9040805434271906,
       "grid_points": 272,
       "matched_objects": 8
     },
@@ -2556,9 +2556,9 @@
         "90.0": 2.6892403362383344
       },
       "topk_min_dist": 1.6003510907038774,
-      "distance_error": 1.0366591387321713,
-      "angular_error_deg": 40.30610451036154,
-      "iou_error": 0.8132103344168191,
+      "distance_error": 1.220265401895621,
+      "angular_error_deg": 47.14717807722364,
+      "iou_error": 0.8294040665392169,
       "grid_points": 672,
       "matched_objects": 7
     },
@@ -2577,9 +2577,9 @@
         "90.0": 3.2300507855038765
       },
       "topk_min_dist": 1.0848353001623794,
-      "distance_error": 1.119644555340225,
-      "angular_error_deg": 78.02198722875602,
-      "iou_error": 0.9073446830736434,
+      "distance_error": 1.1728637399839978,
+      "angular_error_deg": 88.6942969986982,
+      "iou_error": 0.9234599451446754,
       "grid_points": 783,
       "matched_objects": 10
     },
@@ -2598,9 +2598,9 @@
         "90.0": 2.704291501267214
       },
       "topk_min_dist": 1.851241021366602,
-      "distance_error": 1.461538674398945,
-      "angular_error_deg": 42.8559133977587,
-      "iou_error": 0.9164760625232384,
+      "distance_error": 1.2319268956246585,
+      "angular_error_deg": 32.78576383415158,
+      "iou_error": 0.8275506864666942,
       "grid_points": 414,
       "matched_objects": 10
     },
@@ -2619,9 +2619,9 @@
         "90.0": 3.2205531020127167
       },
       "topk_min_dist": 0.12916888471926752,
-      "distance_error": 0.8587796972215787,
-      "angular_error_deg": 45.02938081232641,
-      "iou_error": 0.6818898498047348,
+      "distance_error": 1.0022979352927173,
+      "angular_error_deg": 38.98992032988044,
+      "iou_error": 0.6129413083587307,
       "grid_points": 522,
       "matched_objects": 6
     },
@@ -2640,9 +2640,9 @@
         "90.0": 3.523273569335307
       },
       "topk_min_dist": 2.796826203155893,
-      "distance_error": 1.2416992140164655,
-      "angular_error_deg": 52.28843142551411,
-      "iou_error": 0.745361430168566,
+      "distance_error": 0.8329467670895785,
+      "angular_error_deg": 29.525093780039153,
+      "iou_error": 0.6914129733876035,
       "grid_points": 483,
       "matched_objects": 4
     },
@@ -2661,9 +2661,9 @@
         "90.0": 1.8196655662605776
       },
       "topk_min_dist": 0.6905782190401125,
-      "distance_error": 0.9624678248688424,
-      "angular_error_deg": 47.91876761357556,
-      "iou_error": 0.6816734805611977,
+      "distance_error": 1.503260024004282,
+      "angular_error_deg": 52.69120818822411,
+      "iou_error": 0.7342010614757799,
       "grid_points": 480,
       "matched_objects": 10
     },
@@ -2682,9 +2682,9 @@
         "90.0": 3.7194206810854236
       },
       "topk_min_dist": 1.4475558460186397,
-      "distance_error": 1.1214232273524276,
-      "angular_error_deg": 109.87967826224205,
-      "iou_error": 1.0,
+      "distance_error": 2.2233929217359134,
+      "angular_error_deg": 102.3839528609176,
+      "iou_error": 0.9676523593768027,
       "grid_points": 650,
       "matched_objects": 10
     },
@@ -2703,9 +2703,9 @@
         "90.0": 2.619881588999315
       },
       "topk_min_dist": 0.5991494747131219,
-      "distance_error": 1.3031317117510288,
-      "angular_error_deg": 95.49926157506451,
-      "iou_error": 0.9519828245178363,
+      "distance_error": 1.111308045474341,
+      "angular_error_deg": 96.40102473202421,
+      "iou_error": 0.9081768633939338,
       "grid_points": 483,
       "matched_objects": 6
     },
@@ -2724,9 +2724,9 @@
         "90.0": 2.188640653526152
       },
       "topk_min_dist": 1.482062466110618,
-      "distance_error": 0.7605228204970302,
-      "angular_error_deg": 23.51478090091144,
-      "iou_error": 0.46611361847725297,
+      "distance_error": 0.8837090227651696,
+      "angular_error_deg": 25.66266747789042,
+      "iou_error": 0.464699644314326,
       "grid_points": 357,
       "matched_objects": 4
     },
@@ -2745,9 +2745,9 @@
         "90.0": 3.8440024226596288
       },
       "topk_min_dist": 0.2423264033572981,
-      "distance_error": 1.5621005912188966,
-      "angular_error_deg": 102.05927997239094,
-      "iou_error": 0.9587822040144321,
+      "distance_error": 2.585687915867347,
+      "angular_error_deg": 117.33591267570222,
+      "iou_error": 0.9467336870417095,
       "grid_points": 690,
       "matched_objects": 6
     },
@@ -2766,9 +2766,9 @@
         "90.0": 2.4054105557767818
       },
       "topk_min_dist": 1.0654640309691747,
-      "distance_error": 1.0703393815692412,
-      "angular_error_deg": 63.18296029874406,
-      "iou_error": 1.0,
+      "distance_error": 1.051645305567348,
+      "angular_error_deg": 71.87740108561383,
+      "iou_error": 0.9963931131855345,
       "grid_points": 399,
       "matched_objects": 10
     },
@@ -2787,9 +2787,9 @@
         "90.0": 3.1590403883667793
       },
       "topk_min_dist": 2.1171480025709437,
-      "distance_error": 1.690948283766433,
-      "angular_error_deg": 72.26087762998722,
-      "iou_error": 0.8511952658989278,
+      "distance_error": 1.7091844135328338,
+      "angular_error_deg": 70.73011780647587,
+      "iou_error": 0.8352127194188248,
       "grid_points": 234,
       "matched_objects": 6
     },
@@ -2808,9 +2808,9 @@
         "90.0": 2.2590452960516028
       },
       "topk_min_dist": 1.3976543374961763,
-      "distance_error": 1.2801098061329934,
-      "angular_error_deg": 68.17348243026962,
-      "iou_error": 0.7867001074772234,
+      "distance_error": 1.2771082095012705,
+      "angular_error_deg": 68.14756350016526,
+      "iou_error": 0.7895249598053418,
       "grid_points": 144,
       "matched_objects": 5
     },
@@ -2829,9 +2829,9 @@
         "90.0": 3.5743907650515365
       },
       "topk_min_dist": 0.13375125935399582,
-      "distance_error": 1.806908022180546,
-      "angular_error_deg": 92.27047883630787,
-      "iou_error": 0.9173407606953082,
+      "distance_error": 1.7095841262941962,
+      "angular_error_deg": 87.90672304064343,
+      "iou_error": 0.9043521659960122,
       "grid_points": 630,
       "matched_objects": 8
     },
@@ -2850,9 +2850,9 @@
         "90.0": 3.3667349966634976
       },
       "topk_min_dist": 2.4514568533341814,
-      "distance_error": 1.967832863555499,
-      "angular_error_deg": 94.80724007759395,
-      "iou_error": 0.9493764633816794,
+      "distance_error": 2.0178304247970376,
+      "angular_error_deg": 101.93742563919436,
+      "iou_error": 0.9665258048818001,
       "grid_points": 224,
       "matched_objects": 9
     },
@@ -2871,9 +2871,9 @@
         "90.0": 2.5806484803227234
       },
       "topk_min_dist": 1.1317853919243324,
-      "distance_error": 0.20315623293084678,
-      "angular_error_deg": 51.63715988432737,
-      "iou_error": 0.876703403266015,
+      "distance_error": 0.26370257775204453,
+      "angular_error_deg": 52.26066772310551,
+      "iou_error": 0.8448254289376665,
       "grid_points": 323,
       "matched_objects": 6
     },
@@ -2892,9 +2892,9 @@
         "90.0": 4.149170514691407
       },
       "topk_min_dist": 0.756224499785943,
-      "distance_error": 2.2915123064296385,
-      "angular_error_deg": 54.08196655924005,
-      "iou_error": 0.8926562202617834,
+      "distance_error": 2.3653774376922283,
+      "angular_error_deg": 59.236146729293566,
+      "iou_error": 0.8211200840694757,
       "grid_points": 567,
       "matched_objects": 6
     },
@@ -2913,9 +2913,9 @@
         "90.0": 2.8540063877790685
       },
       "topk_min_dist": 2.2432636248361764,
-      "distance_error": 1.0689445932656731,
-      "angular_error_deg": 67.73655110797463,
-      "iou_error": 0.9833595413739156,
+      "distance_error": 1.4238100295119038,
+      "angular_error_deg": 70.16232520946329,
+      "iou_error": 0.9403601026538794,
       "grid_points": 552,
       "matched_objects": 6
     },
@@ -2934,9 +2934,9 @@
         "90.0": 2.491402858975501
       },
       "topk_min_dist": 1.2821868887161618,
-      "distance_error": 1.148794191727847,
-      "angular_error_deg": 21.731358833206617,
-      "iou_error": 0.4577384592164765,
+      "distance_error": 1.1691276774875374,
+      "angular_error_deg": 22.840688502918436,
+      "iou_error": 0.4664595461552916,
       "grid_points": 168,
       "matched_objects": 5
     },
@@ -2955,9 +2955,9 @@
         "90.0": 2.5132924192010666
       },
       "topk_min_dist": 1.2621389774612146,
-      "distance_error": 0.9570315521211508,
-      "angular_error_deg": 31.34314395320755,
-      "iou_error": 0.6814997313308789,
+      "distance_error": 0.984602898047678,
+      "angular_error_deg": 28.962872692189826,
+      "iou_error": 0.7072229874890392,
       "grid_points": 220,
       "matched_objects": 9
     },
@@ -2976,9 +2976,9 @@
         "90.0": 0.8928439461983482
       },
       "topk_min_dist": 0.22258320297822842,
-      "distance_error": 0.37106673209713237,
-      "angular_error_deg": 48.09342642741894,
-      "iou_error": 0.7736258219804681,
+      "distance_error": 0.39324407967356206,
+      "angular_error_deg": 49.68203830463866,
+      "iou_error": 0.7798536506935045,
       "grid_points": 210,
       "matched_objects": 8
     },
@@ -2997,9 +2997,9 @@
         "90.0": 0.7913715530919089
       },
       "topk_min_dist": 0.10229435443818993,
-      "distance_error": 0.4542806335514153,
-      "angular_error_deg": 50.42406458360734,
-      "iou_error": 0.7357498772381623,
+      "distance_error": 0.47082919677751817,
+      "angular_error_deg": 51.577756194962724,
+      "iou_error": 0.7433279742718535,
       "grid_points": 49,
       "matched_objects": 5
     },
@@ -3018,9 +3018,9 @@
         "90.0": 0.8728331256579376
       },
       "topk_min_dist": 0.6411295616202317,
-      "distance_error": 0.7431831012588428,
-      "angular_error_deg": 7.318687499679272,
-      "iou_error": 0.6807758397065277,
+      "distance_error": 0.7500897626082063,
+      "angular_error_deg": 6.328645107234047,
+      "iou_error": 0.7900617579272035,
       "grid_points": 81,
       "matched_objects": 8
     },
@@ -3039,9 +3039,9 @@
         "90.0": 2.734903557754652
       },
       "topk_min_dist": 1.9062451237081255,
-      "distance_error": 1.69327883348285,
-      "angular_error_deg": 77.35725717652213,
-      "iou_error": 0.9090983547758724,
+      "distance_error": 1.711560800344171,
+      "angular_error_deg": 79.6538490689062,
+      "iou_error": 0.9183228188082045,
       "grid_points": 483,
       "matched_objects": 7
     },
@@ -3060,9 +3060,9 @@
         "90.0": 2.8865479323896976
       },
       "topk_min_dist": 0.5361650801789031,
-      "distance_error": 1.6092385142519734,
-      "angular_error_deg": 25.455664951799218,
-      "iou_error": 0.6658339687966035,
+      "distance_error": 1.610422623904319,
+      "angular_error_deg": 26.161790060531974,
+      "iou_error": 0.6861702298560818,
       "grid_points": 216,
       "matched_objects": 6
     },
@@ -3081,9 +3081,9 @@
         "90.0": 2.117316374273174
       },
       "topk_min_dist": 0.5163394558979298,
-      "distance_error": 0.8498054869954937,
-      "angular_error_deg": 47.30854504038799,
-      "iou_error": 0.8460642569685964,
+      "distance_error": 0.9619559183740574,
+      "angular_error_deg": 49.365901478046844,
+      "iou_error": 0.8608200671367249,
       "grid_points": 323,
       "matched_objects": 5
     },
@@ -3102,8 +3102,8 @@
         "90.0": 1.4877874595938525
       },
       "topk_min_dist": 0.4662313075263421,
-      "distance_error": 0.7569576046098462,
-      "angular_error_deg": 129.88160090447596,
+      "distance_error": 0.8741497796927716,
+      "angular_error_deg": 131.38730930162072,
       "iou_error": 1.0,
       "grid_points": 650,
       "matched_objects": 8
@@ -3123,9 +3123,9 @@
         "90.0": 2.368122624456229
       },
       "topk_min_dist": 1.469134531333739,
-      "distance_error": 0.319591219423205,
-      "angular_error_deg": 68.34041280693205,
-      "iou_error": 0.8566589976827399,
+      "distance_error": 0.18684880270530133,
+      "angular_error_deg": 74.63067673911817,
+      "iou_error": 0.8482692395285589,
       "grid_points": 462,
       "matched_objects": 6
     },
@@ -3144,9 +3144,9 @@
         "90.0": 3.4757543855527064
       },
       "topk_min_dist": 1.0750830596551026,
-      "distance_error": 1.5486298277958026,
-      "angular_error_deg": 35.25849613303607,
-      "iou_error": 0.7664765865695347,
+      "distance_error": 1.864041719284087,
+      "angular_error_deg": 33.36072833216535,
+      "iou_error": 0.7319759068377412,
       "grid_points": 437,
       "matched_objects": 7
     },
@@ -3165,9 +3165,9 @@
         "90.0": 1.9707925262693724
       },
       "topk_min_dist": 1.484616330344884,
-      "distance_error": 0.7842286209974093,
-      "angular_error_deg": 46.36840982295446,
-      "iou_error": 0.6358719977267455,
+      "distance_error": 0.7890275438627945,
+      "angular_error_deg": 48.11845668668614,
+      "iou_error": 0.6469634854315678,
       "grid_points": 252,
       "matched_objects": 7
     },
@@ -3186,9 +3186,9 @@
         "90.0": 1.3572931919553455
       },
       "topk_min_dist": 0.7742647418544434,
-      "distance_error": 0.5140095180274412,
-      "angular_error_deg": 49.28057903453185,
-      "iou_error": 0.9836548163246617,
+      "distance_error": 0.5078837675937448,
+      "angular_error_deg": 50.63701134934786,
+      "iou_error": 0.9865340141742299,
       "grid_points": 110,
       "matched_objects": 5
     },
@@ -3207,9 +3207,9 @@
         "90.0": 1.8596342789595794
       },
       "topk_min_dist": 0.18614260039079011,
-      "distance_error": 1.0644495995349736,
-      "angular_error_deg": 55.756640808600714,
-      "iou_error": 0.8257826665806661,
+      "distance_error": 1.0838181226233492,
+      "angular_error_deg": 57.17399370906885,
+      "iou_error": 0.8336254127031308,
       "grid_points": 132,
       "matched_objects": 7
     },
@@ -3228,9 +3228,9 @@
         "90.0": 1.4940890797169113
       },
       "topk_min_dist": 0.5092181470533333,
-      "distance_error": 0.24796678913669054,
-      "angular_error_deg": 18.01062974420198,
-      "iou_error": 0.39422642730804935,
+      "distance_error": 0.30819736248470186,
+      "angular_error_deg": 18.93864770080575,
+      "iou_error": 0.43020570048626106,
       "grid_points": 225,
       "matched_objects": 6
     },
@@ -3249,9 +3249,9 @@
         "90.0": 1.4315757221788363
       },
       "topk_min_dist": 0.6569034112897366,
-      "distance_error": 0.4263934989412509,
-      "angular_error_deg": 39.53132608011608,
-      "iou_error": 0.7101814987360316,
+      "distance_error": 0.23369259019983354,
+      "angular_error_deg": 31.908885824643708,
+      "iou_error": 0.6320403023638026,
       "grid_points": 323,
       "matched_objects": 8
     },
@@ -3270,9 +3270,9 @@
         "90.0": 1.8609614992546473
       },
       "topk_min_dist": 0.9807485410946755,
-      "distance_error": 0.5576028308127353,
-      "angular_error_deg": 96.93552339052644,
-      "iou_error": 0.9902165261385482,
+      "distance_error": 0.5736980408266075,
+      "angular_error_deg": 97.73811111227313,
+      "iou_error": 0.991315362325934,
       "grid_points": 240,
       "matched_objects": 8
     },
@@ -3291,9 +3291,9 @@
         "90.0": 2.385997011419313
       },
       "topk_min_dist": 0.6806806528692504,
-      "distance_error": 1.1558948148684993,
-      "angular_error_deg": 71.67393724441747,
-      "iou_error": 0.9943409304166605,
+      "distance_error": 0.7658183248610734,
+      "angular_error_deg": 27.384466650237258,
+      "iou_error": 0.8204178665058519,
       "grid_points": 598,
       "matched_objects": 10
     },
@@ -3312,9 +3312,9 @@
         "90.0": 3.8684980371659066
       },
       "topk_min_dist": 2.455688770276053,
-      "distance_error": 1.6674928019931108,
-      "angular_error_deg": 52.5056578839972,
-      "iou_error": 0.9119454231769575,
+      "distance_error": 1.6707742614350285,
+      "angular_error_deg": 73.32601370645264,
+      "iou_error": 0.9934941307914512,
       "grid_points": 784,
       "matched_objects": 5
     },
@@ -3333,8 +3333,8 @@
         "90.0": 2.6958605982911847
       },
       "topk_min_dist": 0.6624648732092981,
-      "distance_error": 1.3723348256025032,
-      "angular_error_deg": 123.56594544678704,
+      "distance_error": 1.2208139598183303,
+      "angular_error_deg": 120.78863240088108,
       "iou_error": 1.0,
       "grid_points": 666,
       "matched_objects": 6
@@ -3354,9 +3354,9 @@
         "90.0": 2.4021103484585056
       },
       "topk_min_dist": 1.1963589284751597,
-      "distance_error": 2.128836433292914,
-      "angular_error_deg": 79.9284615892753,
-      "iou_error": 0.8029426513474548,
+      "distance_error": 2.412185764136662,
+      "angular_error_deg": 65.25547235611765,
+      "iou_error": 0.8313566598444415,
       "grid_points": 924,
       "matched_objects": 10
     },
@@ -3375,9 +3375,9 @@
         "90.0": 2.2785117280763925
       },
       "topk_min_dist": 0.09114045416365466,
-      "distance_error": 0.08979022449990677,
-      "angular_error_deg": 54.235563535850744,
-      "iou_error": 0.7980397705987908,
+      "distance_error": 0.6085027730130187,
+      "angular_error_deg": 74.8780993809206,
+      "iou_error": 0.846338719265273,
       "grid_points": 520,
       "matched_objects": 9
     },
@@ -3396,9 +3396,9 @@
         "90.0": 3.520994068186183
       },
       "topk_min_dist": 0.642512802635794,
-      "distance_error": 1.5732804615845286,
-      "angular_error_deg": 29.125178677077308,
-      "iou_error": 0.6728395444427088,
+      "distance_error": 2.8514958019709136,
+      "angular_error_deg": 29.726380151658535,
+      "iou_error": 0.766044460443059,
       "grid_points": 682,
       "matched_objects": 8
     },
@@ -3417,9 +3417,9 @@
         "90.0": 2.751216433207246
       },
       "topk_min_dist": 2.2307902884330155,
-      "distance_error": 0.7157805962491395,
-      "angular_error_deg": 29.385531983078874,
-      "iou_error": 0.4281862716706194,
+      "distance_error": 1.1087791027346725,
+      "angular_error_deg": 34.24544612541018,
+      "iou_error": 0.4675994304528749,
       "grid_points": 380,
       "matched_objects": 8
     },
@@ -3438,9 +3438,9 @@
         "90.0": 3.2603279274628743
       },
       "topk_min_dist": 2.3530019570926908,
-      "distance_error": 1.7694478486934322,
-      "angular_error_deg": 90.48260673934925,
-      "iou_error": 0.9234053447239869,
+      "distance_error": 1.6425196174303032,
+      "angular_error_deg": 61.79472979942629,
+      "iou_error": 0.8629071624034229,
       "grid_points": 600,
       "matched_objects": 6
     },
@@ -3459,9 +3459,9 @@
         "90.0": 1.1207515136911168
       },
       "topk_min_dist": 0.14383290446872535,
-      "distance_error": 0.5788041208130402,
-      "angular_error_deg": 78.51736382356178,
-      "iou_error": 0.9963561158538163,
+      "distance_error": 0.5601384979465213,
+      "angular_error_deg": 78.30061493978688,
+      "iou_error": 0.996138913647122,
       "grid_points": 156,
       "matched_objects": 6
     },
@@ -3480,9 +3480,9 @@
         "90.0": 2.5136216944211895
       },
       "topk_min_dist": 0.9231646819408078,
-      "distance_error": 0.7427901490789309,
-      "angular_error_deg": 29.451772910954126,
-      "iou_error": 0.6448308410362928,
+      "distance_error": 1.0147280030757777,
+      "angular_error_deg": 33.97811276214908,
+      "iou_error": 0.6639094184646435,
       "grid_points": 506,
       "matched_objects": 4
     },
@@ -3501,9 +3501,9 @@
         "90.0": 3.210504110872401
       },
       "topk_min_dist": 0.3024743001301726,
-      "distance_error": 1.3778136749273064,
-      "angular_error_deg": 46.04074523135941,
-      "iou_error": 0.8296975247598615,
+      "distance_error": 1.4459427132773348,
+      "angular_error_deg": 55.71914607939192,
+      "iou_error": 0.8102576077153167,
       "grid_points": 552,
       "matched_objects": 5
     },
@@ -3522,9 +3522,9 @@
         "90.0": 2.2798634768366566
       },
       "topk_min_dist": 1.8364251792508808,
-      "distance_error": 0.9390163088537693,
-      "angular_error_deg": 123.23139055780045,
-      "iou_error": 1.0,
+      "distance_error": 0.4852589077982977,
+      "angular_error_deg": 72.7974792825305,
+      "iou_error": 0.9475176761876121,
       "grid_points": 621,
       "matched_objects": 8
     },
@@ -3543,9 +3543,9 @@
         "90.0": 2.5456097746150106
       },
       "topk_min_dist": 0.38250054412105566,
-      "distance_error": 0.8916816766293192,
-      "angular_error_deg": 48.15216268802315,
-      "iou_error": 0.7653924540904855,
+      "distance_error": 1.5125638513519934,
+      "angular_error_deg": 76.56418079813282,
+      "iou_error": 0.9702151542916424,
       "grid_points": 918,
       "matched_objects": 10
     },
@@ -3564,9 +3564,9 @@
         "90.0": 5.900480691084332
       },
       "topk_min_dist": 3.244619704718912,
-      "distance_error": 3.3558080073822145,
-      "angular_error_deg": 63.328111743343264,
-      "iou_error": 0.9844234196874996,
+      "distance_error": 3.748163310749362,
+      "angular_error_deg": 108.57558185296264,
+      "iou_error": 0.9994606701890538,
       "grid_points": 840,
       "matched_objects": 10
     },
@@ -3585,9 +3585,9 @@
         "90.0": 3.2505297209392525
       },
       "topk_min_dist": 1.722647783336856,
-      "distance_error": 2.4776275796993645,
-      "angular_error_deg": 146.33583772248934,
-      "iou_error": 0.9786634665360727,
+      "distance_error": 2.438772146602708,
+      "angular_error_deg": 140.91430372205286,
+      "iou_error": 0.9831361957516109,
       "grid_points": 736,
       "matched_objects": 8
     },
@@ -3606,8 +3606,8 @@
         "90.0": 2.894933993813503
       },
       "topk_min_dist": 0.8855768183769566,
-      "distance_error": 1.089703571234689,
-      "angular_error_deg": 139.75934365416794,
+      "distance_error": 1.63945940170843,
+      "angular_error_deg": 148.0553143294518,
       "iou_error": 1.0,
       "grid_points": 676,
       "matched_objects": 6
@@ -3627,9 +3627,9 @@
         "90.0": 3.4369976675568807
       },
       "topk_min_dist": 1.9121330442362996,
-      "distance_error": 2.0303051400601335,
-      "angular_error_deg": 19.67384481399121,
-      "iou_error": 0.7410397906004952,
+      "distance_error": 2.2779834336254763,
+      "angular_error_deg": 11.510564840315414,
+      "iou_error": 0.7603924905841275,
       "grid_points": 759,
       "matched_objects": 5
     },
@@ -3648,8 +3648,8 @@
         "90.0": 2.4808113418579087
       },
       "topk_min_dist": 1.800524507395286,
-      "distance_error": 0.7468197538962977,
-      "angular_error_deg": 106.93343264793477,
+      "distance_error": 0.4475302391642772,
+      "angular_error_deg": 123.15910060941827,
       "iou_error": 1.0,
       "grid_points": 550,
       "matched_objects": 9
@@ -3669,9 +3669,9 @@
         "90.0": 3.021663720058056
       },
       "topk_min_dist": 0.251730756851594,
-      "distance_error": 0.650259848166525,
-      "angular_error_deg": 54.47545208489815,
-      "iou_error": 0.873686486378487,
+      "distance_error": 1.1223623253233619,
+      "angular_error_deg": 57.48879169762545,
+      "iou_error": 0.7860154317696642,
       "grid_points": 1190,
       "matched_objects": 6
     },
@@ -3690,9 +3690,9 @@
         "90.0": 2.806055697223593
       },
       "topk_min_dist": 0.3562070717059554,
-      "distance_error": 1.1238240714751204,
-      "angular_error_deg": 31.70883135123302,
-      "iou_error": 0.640389667859627,
+      "distance_error": 0.3932238351484874,
+      "angular_error_deg": 30.662439854511167,
+      "iou_error": 0.5615836567263669,
       "grid_points": 598,
       "matched_objects": 10
     },
@@ -3711,9 +3711,9 @@
         "90.0": 2.83492947642094
       },
       "topk_min_dist": 1.9844954393582062,
-      "distance_error": 1.0728307975256202,
-      "angular_error_deg": 6.411233101635558,
-      "iou_error": 0.5516059031798559,
+      "distance_error": 0.9221859288423601,
+      "angular_error_deg": 9.494930364151992,
+      "iou_error": 0.5377430285018225,
       "grid_points": 240,
       "matched_objects": 8
     },
@@ -3732,9 +3732,9 @@
         "90.0": 2.9075589654812677
       },
       "topk_min_dist": 1.3825012545091429,
-      "distance_error": 0.5790735599613356,
-      "angular_error_deg": 25.650772345150582,
-      "iou_error": 0.8695616196177629,
+      "distance_error": 1.1364460184472445,
+      "angular_error_deg": 36.6189939881577,
+      "iou_error": 0.9290255998328494,
       "grid_points": 483,
       "matched_objects": 3
     },
@@ -3753,9 +3753,9 @@
         "90.0": 2.310764283001309
       },
       "topk_min_dist": 0.32824094553393807,
-      "distance_error": 1.047582493564764,
-      "angular_error_deg": 41.09949110224759,
-      "iou_error": 0.7376242235712187,
+      "distance_error": 0.938349962496486,
+      "angular_error_deg": 38.53379812272038,
+      "iou_error": 0.7318861483542637,
       "grid_points": 288,
       "matched_objects": 9
     },
@@ -3774,9 +3774,9 @@
         "90.0": 1.495137096610316
       },
       "topk_min_dist": 0.6133661503373898,
-      "distance_error": 1.0678771183292683,
-      "angular_error_deg": 44.46839400465983,
-      "iou_error": 0.6617591026324245,
+      "distance_error": 1.0953547446165657,
+      "angular_error_deg": 46.76344918263007,
+      "iou_error": 0.6551837567985208,
       "grid_points": 165,
       "matched_objects": 8
     },
@@ -3795,9 +3795,9 @@
         "90.0": 2.588876926716927
       },
       "topk_min_dist": 0.8067076422379266,
-      "distance_error": 0.9932424883322905,
-      "angular_error_deg": 34.458711609236616,
-      "iou_error": 0.7688434237301973,
+      "distance_error": 1.0272515632477466,
+      "angular_error_deg": 37.2095323650793,
+      "iou_error": 0.7868328665581352,
       "grid_points": 252,
       "matched_objects": 8
     },
@@ -3816,9 +3816,9 @@
         "90.0": 2.8947627503781628
       },
       "topk_min_dist": 2.6646550179450204,
-      "distance_error": 2.2037153763321324,
-      "angular_error_deg": 59.19575638741198,
-      "iou_error": 0.9321512298316361,
+      "distance_error": 2.209647989975013,
+      "angular_error_deg": 59.63248866680911,
+      "iou_error": 0.919610236269668,
       "grid_points": 336,
       "matched_objects": 6
     },
@@ -3837,9 +3837,9 @@
         "90.0": 2.1405710502793536
       },
       "topk_min_dist": 0.35158213874026295,
-      "distance_error": 1.1302349403970495,
-      "angular_error_deg": 35.37257182038023,
-      "iou_error": 0.6467161257033269,
+      "distance_error": 1.1347934425789816,
+      "angular_error_deg": 35.41024534698479,
+      "iou_error": 0.6449154143342297,
       "grid_points": 165,
       "matched_objects": 9
     },
@@ -3858,9 +3858,9 @@
         "90.0": 2.2508567535066484
       },
       "topk_min_dist": 0.4210503829863021,
-      "distance_error": 0.5769144223660596,
-      "angular_error_deg": 12.780556671911489,
-      "iou_error": 0.2576513142971033,
+      "distance_error": 0.9259566846068029,
+      "angular_error_deg": 9.187977956942646,
+      "iou_error": 0.3256649474782318,
       "grid_points": 380,
       "matched_objects": 5
     },
@@ -3879,9 +3879,9 @@
         "90.0": 1.2502974553233177
       },
       "topk_min_dist": 0.41889721413091563,
-      "distance_error": 0.6250727283769646,
-      "angular_error_deg": 70.2742423668743,
-      "iou_error": 0.8608700757552188,
+      "distance_error": 0.6266387843388768,
+      "angular_error_deg": 71.01521621004805,
+      "iou_error": 0.8628690013358736,
       "grid_points": 121,
       "matched_objects": 10
     },
@@ -3900,9 +3900,9 @@
         "90.0": 3.690471041552318
       },
       "topk_min_dist": 0.3492026987708132,
-      "distance_error": 1.3032111670191349,
-      "angular_error_deg": 33.304283366438945,
-      "iou_error": 0.8232691652250195,
+      "distance_error": 1.2941697567499642,
+      "angular_error_deg": 35.755481601070514,
+      "iou_error": 0.8462477784493114,
       "grid_points": 598,
       "matched_objects": 3
     },
@@ -3921,9 +3921,9 @@
         "90.0": 2.2808744487652906
       },
       "topk_min_dist": 1.5944366563316992,
-      "distance_error": 1.0504075986393,
-      "angular_error_deg": 88.52716645872455,
-      "iou_error": 0.9752796978054572,
+      "distance_error": 1.2017611329039253,
+      "angular_error_deg": 77.16698794329112,
+      "iou_error": 0.9376121386376052,
       "grid_points": 480,
       "matched_objects": 10
     },
@@ -3942,9 +3942,9 @@
         "90.0": 3.4129085914286303
       },
       "topk_min_dist": 1.1131284635463656,
-      "distance_error": 1.1866336274213067,
-      "angular_error_deg": 62.13263603210001,
-      "iou_error": 0.7889495993999991,
+      "distance_error": 0.9308034980798255,
+      "angular_error_deg": 54.84815256614644,
+      "iou_error": 0.7661840400239621,
       "grid_points": 506,
       "matched_objects": 3
     },
@@ -3963,8 +3963,8 @@
         "90.0": 2.739748938583216
       },
       "topk_min_dist": 0.6547316531525619,
-      "distance_error": 0.7538847400795883,
-      "angular_error_deg": 59.4178815394535,
+      "distance_error": 0.7510196113803099,
+      "angular_error_deg": 64.38366641723123,
       "iou_error": 1.0,
       "grid_points": 475,
       "matched_objects": 3
@@ -3984,8 +3984,8 @@
         "90.0": 1.0160083881871362
       },
       "topk_min_dist": 0.23352203216199,
-      "distance_error": 0.9914879254068198,
-      "angular_error_deg": 85.64055376287118,
+      "distance_error": 0.9911102940016921,
+      "angular_error_deg": 87.04519731285794,
       "iou_error": 1.0,
       "grid_points": 266,
       "matched_objects": 9
@@ -4005,9 +4005,9 @@
         "90.0": 1.6763114589443366
       },
       "topk_min_dist": 1.0792062427020008,
-      "distance_error": 0.253721811794646,
-      "angular_error_deg": 40.94689788232529,
-      "iou_error": 0.7534518743626739,
+      "distance_error": 0.26598656647467905,
+      "angular_error_deg": 41.21776196417119,
+      "iou_error": 0.7593270912056987,
       "grid_points": 196,
       "matched_objects": 9
     },
@@ -4026,9 +4026,9 @@
         "90.0": 1.5180887379448447
       },
       "topk_min_dist": 0.20361819479641724,
-      "distance_error": 1.01128547498403,
-      "angular_error_deg": 36.36940409114985,
-      "iou_error": 0.5950273846314389,
+      "distance_error": 1.061003262385777,
+      "angular_error_deg": 37.54222577794089,
+      "iou_error": 0.590886396707832,
       "grid_points": 126,
       "matched_objects": 7
     },
@@ -4047,9 +4047,9 @@
         "90.0": 3.542133789342558
       },
       "topk_min_dist": 0.9426299451526471,
-      "distance_error": 1.364612437901298,
-      "angular_error_deg": 93.2251009928921,
-      "iou_error": 0.987482380842327,
+      "distance_error": 1.575330421294807,
+      "angular_error_deg": 91.47154152175827,
+      "iou_error": 0.9945247714642104,
       "grid_points": 1118,
       "matched_objects": 5
     },
@@ -4068,8 +4068,8 @@
         "90.0": 3.178330022802201
       },
       "topk_min_dist": 0.648340784591044,
-      "distance_error": 1.0772000134860829,
-      "angular_error_deg": 100.88185593610946,
+      "distance_error": 0.741832116676764,
+      "angular_error_deg": 103.49899796971538,
       "iou_error": 1.0,
       "grid_points": 396,
       "matched_objects": 10
@@ -4089,9 +4089,9 @@
         "90.0": 3.365167937473217
       },
       "topk_min_dist": 1.5341109537146094,
-      "distance_error": 1.0008858643257625,
-      "angular_error_deg": 25.23824249207715,
-      "iou_error": 0.5357457628202551,
+      "distance_error": 1.03587913483439,
+      "angular_error_deg": 30.65307089420205,
+      "iou_error": 0.5230450808266023,
       "grid_points": 506,
       "matched_objects": 2
     },
@@ -4110,9 +4110,9 @@
         "90.0": 3.4295720929039213
       },
       "topk_min_dist": 0.3472039410538394,
-      "distance_error": 1.0945136291719326,
-      "angular_error_deg": 19.582273132672384,
-      "iou_error": 0.8572822138100373,
+      "distance_error": 0.8179526728239221,
+      "angular_error_deg": 34.458581802264526,
+      "iou_error": 0.7360431883980985,
       "grid_points": 504,
       "matched_objects": 3
     },
@@ -4131,9 +4131,9 @@
         "90.0": 2.1241512824022433
       },
       "topk_min_dist": 1.0067316956177812,
-      "distance_error": 2.1110095857612823,
-      "angular_error_deg": 36.564539991244416,
-      "iou_error": 0.91769714199352,
+      "distance_error": 1.7901941522772722,
+      "angular_error_deg": 37.82862654179536,
+      "iou_error": 0.9767278538005836,
       "grid_points": 672,
       "matched_objects": 8
     },
@@ -4152,9 +4152,9 @@
         "90.0": 2.579597506702905
       },
       "topk_min_dist": 0.431252192857,
-      "distance_error": 0.4822040715698551,
-      "angular_error_deg": 34.92775241540445,
-      "iou_error": 0.7939790768601747,
+      "distance_error": 0.14473239659825501,
+      "angular_error_deg": 19.91806073033555,
+      "iou_error": 0.48590885999335065,
       "grid_points": 440,
       "matched_objects": 7
     },
@@ -4173,9 +4173,9 @@
         "90.0": 2.1599051846081525
       },
       "topk_min_dist": 0.7855682093856828,
-      "distance_error": 1.6647504488344411,
-      "angular_error_deg": 128.86344123312597,
-      "iou_error": 0.9958559021386382,
+      "distance_error": 2.2074167576974024,
+      "angular_error_deg": 133.09408723854605,
+      "iou_error": 0.9803691930751098,
       "grid_points": 728,
       "matched_objects": 10
     },
@@ -4194,9 +4194,9 @@
         "90.0": 2.4605535584208966
       },
       "topk_min_dist": 0.24429430796505164,
-      "distance_error": 0.609175994581494,
-      "angular_error_deg": 21.795038119684843,
-      "iou_error": 0.6487281402941627,
+      "distance_error": 0.630148967684794,
+      "angular_error_deg": 17.713999952868207,
+      "iou_error": 0.6358388730531088,
       "grid_points": 396,
       "matched_objects": 6
     }
@@ -4239,16 +4239,16 @@
       "median": 0.8994867937617492
     },
     "distance_error": {
-      "mean": 1.191535249622627,
-      "median": 1.0696419874174572
+      "mean": 1.3000367220260296,
+      "median": 1.135619730513113
     },
     "angular_error_deg": {
-      "mean": 55.63484326514994,
-      "median": 48.41040900558847
+      "mean": 56.24775989968687,
+      "median": 51.10738377215529
     },
     "iou_error": {
-      "mean": 0.7845269277100809,
-      "median": 0.7960094237294828
+      "mean": 0.7765304928711708,
+      "median": 0.7951290578312094
     },
     "hit_radii": [
       0.75,

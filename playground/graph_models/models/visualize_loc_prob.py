@@ -39,8 +39,9 @@ The rest of the pipeline (heatmap, Open3D) is unchanged.
 """
 
 from __future__ import annotations
-import argparse, json, math, sys
+import argparse, hashlib, json, math, sys
 from pathlib import Path
+import re
 
 import numpy as np
 import torch
@@ -57,6 +58,7 @@ sys.path.append('../data_processing')
 sys.path.append('../../../')
 
 from scene_graph import SceneGraph                    # noqa: E402
+from graph_loader_utils import get_word2vec          # noqa: E402
 from data_distribution_analysis.helper import get_matching_subgraph  # noqa: E402
 
 
@@ -97,24 +99,212 @@ def load_scene(scan_dir: Path):
 # ════════════════════════════════════════════════════════════════════════════
 #  Cosine-similarity Top-K matcher                                            ═
 # ════════════════════════════════════════════════════════════════════════════
-def topk_matched_objects(qg: SceneGraph, sg: SceneGraph, k: int = 5):
-    qf, _, _ = qg.to_pyg()
-    sf, _, _ = sg.to_pyg()
-    qf = F.normalize(torch.tensor(np.asarray(qf), dtype=torch.float32), dim=1)
-    sf = F.normalize(torch.tensor(np.asarray(sf), dtype=torch.float32), dim=1)
+def topk_matched_objects(qg: SceneGraph,
+                         sg: SceneGraph,
+                         k: int = 5,
+                         return_scores: bool = False,
+                         use_subgraph: bool = False,
+                         score_threshold: float = -1.0,
+                         dynamic_k: bool = False,
+                         exact_label_score: float = -1e9,
+                         homogenize_label_embeddings: bool = False,
+                         ensure_query_coverage: bool = False):
+    query_obj_count = len(qg.nodes)
+    if dynamic_k:
+        k = query_obj_count
+    k = max(1, int(k))
+
+    if use_subgraph:
+        try:
+            q_sub, s_sub = get_matching_subgraph(qg, sg)
+        except Exception:  # noqa: BLE001
+            q_sub, s_sub = None, None
+        if q_sub is None or len(q_sub.nodes) < 3:
+            q_sub = qg
+        if s_sub is None or len(s_sub.nodes) < 3:
+            s_sub = sg
+        qg = q_sub
+        sg = s_sub
+
+    qids = list(qg.nodes)
+    sids = list(sg.nodes)
+    if not qids or not sids:
+        if return_scores:
+            return [], []
+        return []
+
+    if homogenize_label_embeddings:
+        qmat = np.asarray([label_embedding_for_matching(qg.nodes[qid].label)
+                           for qid in qids], dtype=np.float32)
+        smat = np.asarray([label_embedding_for_matching(sg.nodes[sid].label)
+                           for sid in sids], dtype=np.float32)
+    else:
+        qmat = np.asarray([qg.nodes[qid].features for qid in qids], dtype=np.float32)
+        smat = np.asarray([sg.nodes[sid].features for sid in sids], dtype=np.float32)
+
+    qf = F.normalize(torch.tensor(qmat, dtype=torch.float32), dim=1)
+    sf = F.normalize(torch.tensor(smat, dtype=torch.float32), dim=1)
+    if qf.numel() == 0 or sf.numel() == 0:
+        if return_scores:
+            return [], []
+        return []
 
     sim = qf @ sf.T                                   # (|Q|, |S|)
-    topv, topi = torch.topk(sim.flatten(), min(k, sim.numel()))
-    sids  = list(sg.nodes)
-    S     = sf.size(0)
+    qlabels = [qg.nodes[qid].label for qid in qids]
+    slabels = [sg.nodes[sid].label for sid in sids]
+    sim = apply_exact_label_score(sim, qlabels, slabels, exact_label_score)
     picks = []
-    for idx in topi.tolist():
-        sid = sids[idx % S]
-        if sid not in picks:
-            picks.append(sid)
-        if len(picks) == k:
-            break
+    scores = []
+    picked_set = set()
+    S = sf.size(0)
+
+    if ensure_query_coverage:
+        # Pass 1: each query node contributes its best available match.
+        for qi in range(sim.size(0)):
+            row_order = torch.argsort(sim[qi], descending=True)
+            for si in row_order.tolist():
+                val = float(sim[qi, si])
+                if val < float(score_threshold):
+                    break
+                sid = sids[si]
+                if sid in picked_set:
+                    continue
+                picks.append(sid)
+                scores.append(val)
+                picked_set.add(sid)
+                break
+            if len(picks) == k:
+                break
+
+    if len(picks) < k:
+        # Pass 2: fill remaining slots from global top scores.
+        flat = sim.flatten()
+        if flat.numel() > 0:
+            order = torch.argsort(flat, descending=True)
+            for idx in order.tolist():
+                val = float(flat[idx])
+                if val < float(score_threshold):
+                    break
+                sid = sids[idx % S]
+                if sid in picked_set:
+                    continue
+                picks.append(sid)
+                scores.append(val)
+                picked_set.add(sid)
+                if len(picks) == k:
+                    break
+    if return_scores:
+        return picks, scores
     return picks
+
+
+def canonical_label(label: str) -> str:
+    """Light canonicalization for label identity matching."""
+    text = str(label).strip().lower()
+    text = re.sub(r"\b([a-z0-9]+)'s\b", r"\1", text)
+    text = text.replace("_", " ").replace("-", " ")
+    text = re.sub(r"[^a-z0-9\s]", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+_MATCH_W2V_CACHE: dict[str, np.ndarray] = {}
+_MATCH_EMBED_CACHE: dict[str, np.ndarray] = {}
+_MATCH_EMBED_DIM = 300
+_MATCH_W2V_BLEND = 0.8
+
+
+def _l2_normalize(vec: np.ndarray) -> np.ndarray:
+    arr = np.asarray(vec, dtype=np.float32).reshape(-1)
+    nrm = float(np.linalg.norm(arr))
+    if not np.isfinite(nrm) or nrm < 1e-9:
+        return np.zeros_like(arr, dtype=np.float32)
+    return (arr / nrm).astype(np.float32)
+
+
+def _stable_hash32(text: str) -> int:
+    digest = hashlib.blake2b(text.encode("utf-8"), digest_size=4).digest()
+    return int.from_bytes(digest, byteorder="little", signed=False)
+
+
+def _hashed_label_embedding(key: str, dim: int = _MATCH_EMBED_DIM) -> np.ndarray:
+    """Deterministic lexical embedding used when word2vec is weak/OOV."""
+    out = np.zeros(dim, dtype=np.float32)
+    if not key:
+        return out
+    wrapped = f"^{key}$"
+    for n in (3, 4, 5):
+        if len(wrapped) < n:
+            continue
+        for i in range(len(wrapped) - n + 1):
+            gram = wrapped[i:i + n]
+            h = _stable_hash32(gram)
+            out[h % dim] += 1.0 if ((h >> 1) & 1) == 0 else -1.0
+    if not np.any(out):
+        out[_stable_hash32(wrapped) % dim] = 1.0
+    return _l2_normalize(out)
+
+
+def label_embedding_for_matching(label: str) -> np.ndarray:
+    """Shared label encoding for query/scene matching with robust OOV fallback."""
+    key = canonical_label(label)
+    cached = _MATCH_EMBED_CACHE.get(key)
+    if cached is not None:
+        return cached
+
+    lexical = _hashed_label_embedding(key, dim=_MATCH_EMBED_DIM)
+    w2v = get_word2vec(key, _MATCH_W2V_CACHE)
+    vec = w2v[0] if isinstance(w2v, tuple) else w2v
+    w2v_arr = np.asarray(vec, dtype=np.float32).reshape(-1)
+
+    if w2v_arr.size == 0:
+        w2v_arr = np.zeros(_MATCH_EMBED_DIM, dtype=np.float32)
+    elif w2v_arr.size > _MATCH_EMBED_DIM:
+        w2v_arr = w2v_arr[:_MATCH_EMBED_DIM]
+    elif w2v_arr.size < _MATCH_EMBED_DIM:
+        w2v_arr = np.pad(w2v_arr, (0, _MATCH_EMBED_DIM - w2v_arr.size))
+
+    w2v_unit = _l2_normalize(w2v_arr)
+    if not np.any(w2v_unit):
+        out = lexical
+    elif not np.any(lexical):
+        out = w2v_unit
+    else:
+        out = _l2_normalize(_MATCH_W2V_BLEND * w2v_unit + (1.0 - _MATCH_W2V_BLEND) * lexical)
+
+    _MATCH_EMBED_CACHE[key] = out
+    return out
+
+
+def apply_exact_label_score(sim: torch.Tensor,
+                            query_labels: list[str],
+                            scene_labels: list[str],
+                            exact_label_score: float = -1e9) -> torch.Tensor:
+    """Force canonical exact-label pairs to at least exact_label_score."""
+    if sim.numel() == 0:
+        return sim
+    if exact_label_score <= -1e9:
+        return sim
+
+    qcanon = [canonical_label(l) for l in query_labels]
+    scanon = [canonical_label(l) for l in scene_labels]
+    if not qcanon or not scanon:
+        return sim
+
+    match_mask = torch.zeros((len(qcanon), len(scanon)),
+                             dtype=torch.bool,
+                             device=sim.device)
+    for qi, ql in enumerate(qcanon):
+        if not ql:
+            continue
+        for si, sl in enumerate(scanon):
+            if ql == sl:
+                match_mask[qi, si] = True
+
+    if not torch.any(match_mask):
+        return sim
+    score_tensor = torch.full_like(sim, float(exact_label_score))
+    return torch.where(match_mask, torch.maximum(sim, score_tensor), sim)
 
 
 # ════════════════════════════════════════════════════════════════════════════
@@ -272,6 +462,10 @@ def main():
                         help="processed_data/{3dssg,scanscribe}/")
     parser.add_argument("--top_k", type=int, default=25,
                         help="How many object matches to keep per caption")
+    parser.add_argument("--dynamic_top_k", action="store_true",
+                        help="Use number of detected query objects as Top-K.")
+    parser.add_argument("--score_threshold", type=float, default=-1.0,
+                        help="Minimum cosine match score to keep (e.g. 0.1).")
     parser.add_argument("--grid_step", type=float, default=0.25,
                         help="XY grid spacing in metres")
     parser.add_argument("--query_limit", type=int,
@@ -331,7 +525,10 @@ def main():
         sid = qg.scene_id
         sg  = scenes[sid]
 
-        obj_ids = topk_matched_objects(qg, sg, k=args.top_k)
+        obj_ids = topk_matched_objects(qg, sg,
+                                       k=args.top_k,
+                                       score_threshold=args.score_threshold,
+                                       dynamic_k=args.dynamic_top_k)
         if not obj_ids:
             print(f"[{qi}] {sid} : no cosine matches — skipped")
             continue

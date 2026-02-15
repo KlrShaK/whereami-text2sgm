@@ -19,9 +19,10 @@ ground-truth camera poses. For every 3RScan scene this script:
     reports Hit@r curve, mass-radius, Top-K min distance, angular error, and
     distance error at the ground-truth.
 7.  Optionally aggregates viewing directions into a FOV-weighted arrow field
-    and prints the strongest pose candidates.
-8.  Chooses a final camera prediction (argmax/random/cluster-weighted) from the
-    grid or arrow candidates, optionally averaging directions.
+    and softmaxes those counts into probabilities.
+8.  Chooses camera predictions for both the grid and arrow candidates using
+    the same strategy (argmax/random/cluster-weighted), optionally averaging
+    directions for the arrow field.
 9.  Visualises heatmap scatter, arrow quiver, and an Open3D scene with matched
     objects, probability spheres, and GT/predicted cameras.
 10. Logs a per-scene table, aggregate metrics, and optionally saves a JSON dump.
@@ -31,7 +32,7 @@ caption graphs directly from the structured per-frame JSON to avoid any LLM
 dependency during evaluation.
 
 
-### WITH IOU CALCULATION AND VISUALISATION
+### FILTERING MESH FOR GROUND and keeping sampled points above GROUND and within walls
 """
 
 from __future__ import annotations
@@ -618,31 +619,61 @@ def top_n_fov_poses(positions: np.ndarray,
     return results
 
 
+def softmax_probs(scores: np.ndarray, tau: float) -> np.ndarray:
+    """Return softmax probabilities over scores with temperature tau."""
+    scores = np.asarray(scores, dtype=np.float64)
+    if scores.size == 0:
+        return scores
+    tau = max(float(tau), 1e-6)
+    scores = scores / tau
+    scores -= scores.max()
+    exp_scores = np.exp(scores)
+    denom = exp_scores.sum()
+    if denom <= 0:
+        return np.full_like(scores, 1.0 / len(scores))
+    return exp_scores / denom
+
+
 def add_heatmap_markers(gt_cam: np.ndarray,
-                        pred_cam: np.ndarray,
+                        pred_grid: Optional[np.ndarray],
+                        pred_arrow: Optional[np.ndarray],
                         label_gt: str = "GT",
-                        label_pred: str = "Pred") -> None:
+                        label_grid: str = "Pred (grid)",
+                        label_arrow: str = "Pred (arrow)") -> None:
     plt.scatter(gt_cam[0], gt_cam[1],
                 c="red", marker="*", s=160,
                 linewidths=1.2, edgecolors="black",
                 label=label_gt)
-    plt.scatter(pred_cam[0], pred_cam[1],
-                c="orange", marker="o", s=80,
-                linewidths=1.0, edgecolors="black",
-                label=label_pred)
+    if pred_grid is not None:
+        plt.scatter(pred_grid[0], pred_grid[1],
+                    c="orange", marker="o", s=80,
+                    linewidths=1.0, edgecolors="black",
+                    label=label_grid)
+    if pred_arrow is not None:
+        plt.scatter(pred_arrow[0], pred_arrow[1],
+                    c="#18a0fb", marker="D", s=70,
+                    linewidths=1.0, edgecolors="black",
+                    label=label_arrow)
     plt.legend(loc="best")
 
 
 def add_arrow_markers(gt_cam: np.ndarray,
-                      pred_cam: np.ndarray) -> None:
+                      pred_grid: Optional[np.ndarray],
+                      pred_arrow: Optional[np.ndarray]) -> None:
     plt.scatter([gt_cam[0]], [gt_cam[1]],
                 c="red", marker="*", s=160,
                 linewidths=1.0, edgecolors="black",
                 label="GT")
-    plt.scatter([pred_cam[0]], [pred_cam[1]],
-                c="orange", marker="o", s=80,
-                linewidths=1.0, edgecolors="black",
-                label="Pred")
+    if pred_grid is not None:
+        plt.scatter([pred_grid[0]], [pred_grid[1]],
+                    c="orange", marker="o", s=80,
+                    linewidths=1.0, edgecolors="black",
+                    label="Pred (grid)")
+    if pred_arrow is not None:
+        plt.scatter([pred_arrow[0]], [pred_arrow[1]],
+                    c="#18a0fb", marker="D", s=70,
+                    linewidths=1.0, edgecolors="black",
+                    label="Pred (arrow)")
     plt.legend(loc="best")
 
 
@@ -767,15 +798,15 @@ def parse_args() -> argparse.Namespace:
                         help="Visualise mesh with probability spheres in Open3D.")
     parser.add_argument("--show_arrows", action="store_true",
                         help="Show FOV-weighted arrow (quiver) plot.")
-    parser.add_argument("--h_fov_deg", type=float, default=40.0,
+    parser.add_argument("--h_fov_deg", type=float, default=39.31,
                         help="Horizontal FOV (degrees) for arrow aggregation.")
-    parser.add_argument("--v_fov_deg", type=float, default=65.0,
+    parser.add_argument("--v_fov_deg", type=float, default=64.76,
                         help="Vertical FOV (degrees) for arrow aggregation.")
     parser.add_argument("--arrow_stride", type=int, default=2,
                         help="Plot every Nth grid camera in the arrow field.")
     parser.add_argument("--arrow_len", type=float, default=0.0,
                         help="Maximum arrow length (metres). 0 → 0.9 * grid_step.")
-    parser.add_argument("--score_tau", type=float, default= 0.5, #1.5, # 0.5, # works quite well
+    parser.add_argument("--score_tau", type=float, default= 1.5, #1.5, # 0.5, # works quite well
                         help="Temperature for softmax sharpening over visibility counts.")
 
     parser.add_argument("--save_metrics", type=Path,
@@ -807,6 +838,41 @@ def ensure_query_root(query_root: Optional[Path], root: Path) -> Path:
     if query_root is not None:
         return query_root
     return root
+
+
+def _extract_floor_bbox(scene_dir: Path,
+                        verts: np.ndarray,
+                        tris: np.ndarray,
+                        obj2faces: Dict[int, np.ndarray]) -> Optional[Dict[str, float]]:
+    """Return the AABB of all 'floor'-labelled objects as {x_min, x_max,
+    y_min, y_max, z_min, z_max}.  Returns None when semseg.v2.json is
+    missing or contains no floor segment."""
+    semseg_path = scene_dir / "semseg.v2.json"
+    if not semseg_path.exists():
+        return None
+
+    groups = json.loads(semseg_path.read_text())["segGroups"]
+    floor_ids = {int(g["objectId"]) for g in groups
+                 if g.get("label", "").strip().lower() == "floor"}
+    if not floor_ids:
+        return None
+
+    face_lists = [obj2faces[oid] for oid in floor_ids if oid in obj2faces]
+    if not face_lists:
+        return None
+
+    floor_faces = np.concatenate(face_lists)
+    floor_vert_idx = np.unique(tris[floor_faces].ravel())
+    floor_verts = verts[floor_vert_idx]
+
+    return {
+        "x_min": float(floor_verts[:, 0].min()),
+        "x_max": float(floor_verts[:, 0].max()),
+        "y_min": float(floor_verts[:, 1].min()),
+        "y_max": float(floor_verts[:, 1].max()),
+        "z_min": float(floor_verts[:, 2].min()),
+        "z_max": float(floor_verts[:, 2].max()),
+    }
 
 
 def evaluate_scene(scene_id: str,
@@ -877,12 +943,25 @@ def evaluate_scene(scene_id: str,
     tri_cross = np.cross(tri_vecs, tri_vecs_b)
     tri_areas = 0.5 * np.linalg.norm(tri_cross, axis=1)
     tri_centroids = tri_pts.mean(axis=1)
-    cams = sample_grid(verts, step=args.grid_step, z_eye=args.eye_height)
+    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces)
+    if floor_bbox is not None:
+        x_min, x_max = floor_bbox["x_min"], floor_bbox["x_max"]
+        y_min, y_max = floor_bbox["y_min"], floor_bbox["y_max"]
+        z_eye = floor_bbox["z_max"] + args.eye_height
+        print(f"    floor bbox: X=[{x_min:.2f}, {x_max:.2f}] "
+              f"Y=[{y_min:.2f}, {y_max:.2f}] Z_eye={z_eye:.2f} m")
+    else:
+        print(f"    [WARN] No floor in semseg — sampling over full mesh bounds.")
+        x_min, x_max = float(verts[:, 0].min()), float(verts[:, 0].max())
+        y_min, y_max = float(verts[:, 1].min()), float(verts[:, 1].max())
+        z_eye = float(verts[:, 2].min()) + args.eye_height
 
-    xs, ys = verts[:, 0], verts[:, 1]
-    gx = np.arange(xs.min(), xs.max() + 1e-4, args.grid_step)
-    gy = np.arange(ys.min(), ys.max() + 1e-4, args.grid_step)
+    gx = np.arange(x_min, x_max + 1e-4, args.grid_step)
+    gy = np.arange(y_min, y_max + 1e-4, args.grid_step)
     Nx, Ny = len(gx), len(gy)
+    xv, yv = np.meshgrid(gx, gy, indexing="xy")
+    n = xv.size
+    cams = np.stack([xv.ravel(), yv.ravel(), np.full(n, z_eye)], axis=1)
 
     centroids: Dict[int, np.ndarray] = {}
     for oid in obj_ids:
@@ -909,15 +988,10 @@ def evaluate_scene(scene_id: str,
     if total == 0:
         print(f"[WARN] {scene_id}: matched objects invisible from grid — skipped.")
         return None
-    #CHANGED
     # Softmax over scores to sharpen peaks (set tau=1.0; smaller -> sharper)
-    tau = float(args.score_tau)
-    scores_f = counts.astype(np.float32) / max(tau, 1e-6)
-    scores_f -= scores_f.max()  # numerical stability
-    exp_scores = np.exp(scores_f)
-    probs = exp_scores / exp_scores.sum()
+    grid_probs = softmax_probs(counts, args.score_tau)
 
-    pred_idx, metrics = compute_metrics(cams, probs, gt_cam,
+    pred_idx, metrics = compute_metrics(cams, grid_probs, gt_cam,
                                         hit_radii=args.hit_radii,
                                         mass_percentiles=args.mass_percentiles,
                                         topk_k=args.top_k_min_dist)
@@ -925,7 +999,19 @@ def evaluate_scene(scene_id: str,
     metrics.frame_id = str(frame.get("image_index", selection.path.name))
     metrics.matched_objects = len(obj_ids)
 
-    pred_cam_prob = cams[pred_idx]
+    try:
+        pred_cam_grid, grid_sel_idx, grid_sel_weights = select_prediction_point(
+            cams,
+            grid_probs,
+            strategy=args.prediction_strategy,
+            rng=rng,
+            bandwidth=args.cluster_bandwidth,
+            max_points=args.max_cluster_points,
+        )
+    except ValueError:
+        pred_cam_grid = cams[pred_idx]
+        grid_sel_idx = [int(pred_idx)]
+        grid_sel_weights = np.asarray([1.0], dtype=np.float64)
 
     hfov_rad = math.radians(args.h_fov_deg)
     vfov_rad = math.radians(args.v_fov_deg)
@@ -933,7 +1019,7 @@ def evaluate_scene(scene_id: str,
     # ---- Arrow-based aggregation (computed regardless of plotting)
     arrow_positions: List[np.ndarray] = []
     arrow_dirs: List[np.ndarray] = []
-    arrow_weights: List[float] = []
+    arrow_counts: List[float] = []
 
     have_arrow_helpers = bool(dir_to_yaw_pitch and best_fov_window and average_direction)
     if have_arrow_helpers:
@@ -958,73 +1044,131 @@ def evaluate_scene(scene_id: str,
                     continue
                 arrow_positions.append(cams[idx])
                 arrow_dirs.append(mdir)
-                arrow_weights.append(float(count))
+                arrow_counts.append(float(count))
 
-    candidate_dirs: Optional[np.ndarray] = None
-    candidate_source = "grid_probability"
-    if arrow_weights:
-        candidate_source = "arrow_field"
-        candidate_positions = np.asarray(arrow_positions, dtype=np.float64)
-        candidate_weights = np.asarray(arrow_weights, dtype=np.float64)
-        candidate_dirs = np.asarray(arrow_dirs, dtype=np.float64)
-        top_fov_poses = top_n_fov_poses(candidate_positions,
-                                        candidate_weights,
+    arrow_probs: Optional[np.ndarray] = None
+    pred_cam_arrow: Optional[np.ndarray] = None
+    pred_dir_arrow: Optional[np.ndarray] = None
+    arrow_sel_idx: List[int] = []
+    arrow_sel_weights = np.asarray([], dtype=np.float64)
+
+    if arrow_counts:
+        arrow_positions_np = np.asarray(arrow_positions, dtype=np.float64)
+        arrow_dirs_np = np.asarray(arrow_dirs, dtype=np.float64)
+        arrow_probs = softmax_probs(np.asarray(arrow_counts, dtype=np.float64),
+                                    args.score_tau)
+        top_fov_poses = top_n_fov_poses(arrow_positions_np,
+                                        arrow_probs,
                                         n=args.top_pose_count,
                                         rng=rng,
-                                        directions=candidate_dirs)
-        print(f"    top-{args.top_pose_count} FOV-weighted poses (pose x,y + dir): "
-              f"{top_fov_poses}")
-    else:
-        candidate_positions = cams
-        candidate_weights = probs
+                                        directions=arrow_dirs_np)
+        # print(f"    top-{args.top_pose_count} FOV-weighted poses (pose x,y + dir): "
+        #       f"{top_fov_poses}")
+        try:
+            pred_cam_arrow, arrow_sel_idx, arrow_sel_weights = select_prediction_point(
+                arrow_positions_np,
+                arrow_probs,
+                strategy=args.prediction_strategy,
+                rng=rng,
+                bandwidth=args.cluster_bandwidth,
+                max_points=args.max_cluster_points,
+            )
+        except ValueError:
+            idx_fallback = int(np.argmax(arrow_probs))
+            pred_cam_arrow = arrow_positions_np[idx_fallback]
+            arrow_sel_idx = [idx_fallback]
+            arrow_sel_weights = np.asarray([1.0], dtype=np.float64)
 
-    pred_dir: Optional[np.ndarray] = None
-    try:
-        pred_cam, selection_idx, selection_weights = select_prediction_point(
-            candidate_positions,
-            candidate_weights,
-            strategy=args.prediction_strategy,
-            rng=rng,
-            bandwidth=args.cluster_bandwidth,
-            max_points=args.max_cluster_points,
-        )
-    except ValueError:
-        pred_cam = pred_cam_prob
-        selection_idx = [int(pred_idx)]
-        selection_weights = np.asarray([1.0], dtype=np.float64)
+        if arrow_sel_idx:
+            dir_vectors = arrow_dirs_np[arrow_sel_idx]
+            weight_vec = arrow_sel_weights
+            if weight_vec.shape[0] != len(arrow_sel_idx):
+                weight_vec = np.ones(len(arrow_sel_idx), dtype=np.float64)
+            weight_vec = np.clip(weight_vec, 0.0, None)
+            if not np.any(weight_vec > 0):
+                weight_vec = np.ones_like(weight_vec)
+            weight_vec /= weight_vec.sum()
+            mean_dir = np.sum(weight_vec[:, None] * dir_vectors, axis=0)
+            norm_dir = float(np.linalg.norm(mean_dir))
+            if norm_dir > 1e-6:
+                pred_dir_arrow = mean_dir / norm_dir
 
-    if candidate_dirs is not None and selection_idx:
-        dir_vectors = candidate_dirs[selection_idx]
-        weight_vec = selection_weights
-        if weight_vec.shape[0] != len(selection_idx):
-            weight_vec = np.ones(len(selection_idx), dtype=np.float64)
-        weight_vec = np.clip(weight_vec, 0.0, None)
-        if not np.any(weight_vec > 0):
-            weight_vec = np.ones_like(weight_vec)
-        weight_vec /= weight_vec.sum()
-        mean_dir = np.sum(weight_vec[:, None] * dir_vectors, axis=0)
-        norm_dir = float(np.linalg.norm(mean_dir))
-        if norm_dir > 1e-6:
-            pred_dir = mean_dir / norm_dir
+    pred_source_primary = "arrow_field" if pred_cam_arrow is not None else "grid_probability"
+    pred_cam_primary = pred_cam_arrow if pred_cam_arrow is not None else pred_cam_grid
+    pred_dir_primary = pred_dir_arrow if pred_cam_arrow is not None else None
 
-    pred_source = f"{candidate_source}:{args.prediction_strategy}"
-    metrics.distance_error = float(np.linalg.norm(pred_cam - gt_cam))
-    if gt_dir is not None and pred_dir is not None:
-        dot = float(np.clip(np.dot(gt_dir, pred_dir), -1.0, 1.0))
+    pred_source = f"{pred_source_primary}:{args.prediction_strategy}"
+    metrics.distance_error = float(np.linalg.norm(pred_cam_primary - gt_cam))
+    if gt_dir is not None and pred_dir_primary is not None:
+        dot = float(np.clip(np.dot(gt_dir, pred_dir_primary), -1.0, 1.0))
         metrics.angular_error_deg = float(math.degrees(math.acos(dot)))
     else:
         metrics.angular_error_deg = None
 
-    print(f"    predicted camera ({pred_source}): "
-          f"{pred_cam.tolist()}")
-    if pred_dir is not None:
-        print(f"    approx. viewing direction: {pred_dir.tolist()}")
+    grid_err = float(np.linalg.norm(pred_cam_grid - gt_cam))
+    print(f"    predicted camera (grid:{args.prediction_strategy}): "
+          f"{pred_cam_grid.tolist()} | err={grid_err:.3f} m")
+    if pred_cam_arrow is not None:
+        arrow_err = float(np.linalg.norm(pred_cam_arrow - gt_cam))
+        print(f"    predicted camera (arrow:{args.prediction_strategy}): "
+              f"{pred_cam_arrow.tolist()} | err={arrow_err:.3f} m")
+        if pred_dir_arrow is not None:
+            print(f"    approx. viewing direction (arrow): {pred_dir_arrow.tolist()}")
+        else:
+            print("    approx. viewing direction (arrow): n/a (no directional vote)")
     else:
-        print("    approx. viewing direction: n/a (no directional vote)")
+        print("    predicted camera (arrow): n/a (no valid FOV windows)")
+    print(f"    primary prediction used for metrics: {pred_source}")
+
+    # --- debug: per-object visibility from GT vs predicted pose ---------------
+    semseg_path = scene_dir / "semseg.v2.json"
+    obj_labels: Dict[int, str] = {}
+    if semseg_path.exists():
+        for g in json.loads(semseg_path.read_text())["segGroups"]:
+            obj_labels[int(g["objectId"])] = g.get("label", "").strip()
+
+    gt_vis_oids: List[int] = []
+    pred_vis_oids: List[int] = []
+    for oid, centre in centroids.items():
+        if first_hit_is_object(gt_cam, centre, oid, rc, tri2obj):
+            gt_vis_oids.append(oid)
+        if first_hit_is_object(pred_cam_primary, centre, oid, rc, tri2obj):
+            pred_vis_oids.append(oid)
+
+    gt_vis_oid_set = set(gt_vis_oids)
+    pred_vis_oid_set = set(pred_vis_oids)
+    missed = gt_vis_oid_set - pred_vis_oid_set
+    print(f"    [DEBUG] matched-object visibility  ({len(centroids)} objects):")
+    print(f"    {'oid':<8} {'label':<22} {'d_GT':>7} {'GT':>4} {'d_pred':>8} {'pred':>5}")
+    for oid in sorted(centroids):
+        centre = centroids[oid]
+        label = obj_labels.get(oid, "?")
+        d_gt   = float(np.linalg.norm(centre - gt_cam))
+        d_pred = float(np.linalg.norm(centre - pred_cam_primary))
+        v_gt   = "YES" if oid in gt_vis_oid_set   else "no"
+        v_pred = "YES" if oid in pred_vis_oid_set else "no"
+        print(f"    {oid:<8} {label:<22} {d_gt:>6.2f}m {v_gt:>4} {d_pred:>7.2f}m {v_pred:>5}")
+    shared = gt_vis_oid_set & pred_vis_oid_set
+    missed = gt_vis_oid_set - pred_vis_oid_set
+
+
+    print(f"    [DEBUG] GT sees {len(gt_vis_oids)}/{len(centroids)} | "
+          f"pred sees {len(pred_vis_oids)}/{len(centroids)} | "
+          f"shared {len(shared)} | "
+          f"missed by pred: {len(missed)}")
+    if missed:
+        print(f"    {'oid':<8} {'label':<22} {'d_GT':>7} {'d_pred':>8}")
+        for oid in sorted(missed):
+            centre = centroids[oid]
+            label  = obj_labels.get(oid, "?")
+            d_gt   = float(np.linalg.norm(centre - gt_cam))
+            d_pred = float(np.linalg.norm(centre - pred_cam_primary))
+            print(f"    {oid:<8} {label:<22} {d_gt:>6.2f}m {d_pred:>7.2f}m")
+    # ---------------------------------------------------------------------------
 
     iou_val, iou_err, gt_vis_set, pred_vis_set = compute_view_iou_error(
         gt_cam, gt_dir,
-        pred_cam, pred_dir,
+        pred_cam_primary, pred_dir_primary,
         hfov=hfov_rad,
         vfov=vfov_rad,
         rc=rc,
@@ -1043,22 +1187,25 @@ def evaluate_scene(scene_id: str,
 
     if args.show_heatmap:
         plt.figure(figsize=(6.5, 6.2))
-        sc = plt.scatter(cams[:, 0], cams[:, 1], c=probs,
+        sc = plt.scatter(cams[:, 0], cams[:, 1], c=grid_probs,
                          cmap="viridis", s=14)
         plt.colorbar(sc, label="Probability")
         plt.axis("equal")
         plt.xlabel("X (m)")
         plt.ylabel("Y (m)")
         plt.title(f"{scene_id} · {metrics.frame_id} · grid {args.grid_step:.2f} m")
-        add_heatmap_markers(gt_cam, pred_cam,
-                            label_pred=f"Pred ({pred_source})")
+        add_heatmap_markers(gt_cam,
+                            pred_grid=pred_cam_grid,
+                            pred_arrow=pred_cam_arrow,
+                            label_grid=f"Pred grid ({args.prediction_strategy})",
+                            label_arrow=f"Pred arrow ({args.prediction_strategy})")
         plt.tight_layout()
         plt.show()
 
     if args.show_arrows:
-        if arrow_weights:
+        if arrow_probs is not None and arrow_positions:
             max_len = (0.9 * args.grid_step) if args.arrow_len <= 0 else args.arrow_len
-            W_np = np.asarray(arrow_weights, dtype=np.float32)
+            W_np = np.asarray(arrow_probs, dtype=np.float32)
             scale = np.where(W_np > 0, W_np / W_np.max(), 0.0)
             dirs_xy = np.asarray([d[:2] for d in arrow_dirs], dtype=np.float32)
             norms = np.linalg.norm(dirs_xy, axis=1, keepdims=True)
@@ -1073,13 +1220,15 @@ def evaluate_scene(scene_id: str,
             plt.quiver(Qx, Qy, U_np, V_np, W_np,
                        angles="xy", scale_units="xy", scale=1.0,
                        cmap="viridis", width=0.004, minlength=0.01)
-            plt.colorbar(label="Max visible objects within FOV")
+            plt.colorbar(label="FOV probability")
             plt.axis("equal")
             plt.xlabel("X (m)")
             plt.ylabel("Y (m)")
             plt.title(f"{scene_id} · {metrics.frame_id} · FOV arrows "
                       f"(H={math.degrees(hfov_rad):.0f}°, V={math.degrees(vfov_rad):.0f}°)")
-            add_arrow_markers(gt_cam, pred_cam)
+            add_arrow_markers(gt_cam,
+                              pred_grid=pred_cam_grid,
+                              pred_arrow=pred_cam_arrow)
             plt.tight_layout()
             plt.show()
         else:
@@ -1141,7 +1290,7 @@ def evaluate_scene(scene_id: str,
         prob_material = rendering.MaterialRecord()
         prob_material.shader = "defaultLit"
         prob_material.base_color = [1.0, 1.0, 1.0, 1.0]
-        for idx_point, (point, colour) in enumerate(zip(cams, colormap(probs))):
+        for idx_point, (point, colour) in enumerate(zip(cams, colormap(grid_probs))):
             s = o3d.geometry.TriangleMesh.create_sphere(radius=0.04)
             s.translate(point)
             s.paint_uniform_color(colour)
@@ -1157,13 +1306,25 @@ def evaluate_scene(scene_id: str,
         vis.add_geometry("gt_cam", gt_sphere, material)
         vis.add_3d_label(gt_cam, "GT")
 
-        pred_sphere = o3d.geometry.TriangleMesh.create_sphere(radius=0.085)
-        pred_sphere.translate(pred_cam)
-        pred_sphere.paint_uniform_color([1.0, 0.9, 0.0])
-        if not pred_sphere.has_vertex_normals():
-            pred_sphere.compute_vertex_normals()
-        vis.add_geometry("pred_cam", pred_sphere, material)
-        vis.add_3d_label(pred_cam, f"Pred ({pred_source})")
+        pred_sphere_grid = o3d.geometry.TriangleMesh.create_sphere(radius=0.085)
+        pred_sphere_grid.translate(pred_cam_grid)
+        pred_sphere_grid.paint_uniform_color([1.0, 0.9, 0.0])
+        if not pred_sphere_grid.has_vertex_normals():
+            pred_sphere_grid.compute_vertex_normals()
+        vis.add_geometry("pred_cam_grid", pred_sphere_grid, material)
+        vis.add_3d_label(pred_cam_grid, f"Pred grid ({args.prediction_strategy})")
+
+        pred_sphere_arrow = None
+        if pred_cam_arrow is not None:
+            pred_sphere_arrow = o3d.geometry.TriangleMesh.create_sphere(radius=0.082)
+            pred_sphere_arrow.translate(pred_cam_arrow)
+            pred_sphere_arrow.paint_uniform_color([0.1, 0.8, 0.9])
+            if not pred_sphere_arrow.has_vertex_normals():
+                pred_sphere_arrow.compute_vertex_normals()
+            vis.add_geometry("pred_cam_arrow", pred_sphere_arrow, material)
+            vis.add_3d_label(pred_cam_arrow, f"Pred arrow ({args.prediction_strategy})")
+
+        pred_sphere_primary = pred_sphere_arrow if pred_sphere_arrow is not None else pred_sphere_grid
 
         frustum_mat = None
         frustum_mat_pred = None
@@ -1172,8 +1333,9 @@ def evaluate_scene(scene_id: str,
                                            h_fov=hfov_rad,
                                            v_fov=vfov_rad,
                                            scale=frustum_scale)
-        frustum_pred = create_camera_frustum(pred_cam, pred_dir,
-                                             colour=(1.0, 0.9, 0.0),
+        pred_colour = (0.1, 0.8, 0.9) if pred_cam_arrow is not None else (1.0, 0.9, 0.0)
+        frustum_pred = create_camera_frustum(pred_cam_primary, pred_dir_primary,
+                                             colour=pred_colour,
                                              h_fov=hfov_rad,
                                              v_fov=vfov_rad,
                                              scale=frustum_scale)
@@ -1243,7 +1405,7 @@ def evaluate_scene(scene_id: str,
             vis_iou.add_geometry(name, mesh_subset, mat)
 
         vis_iou.add_geometry("gt_cam_iou", gt_sphere, material)
-        vis_iou.add_geometry("pred_cam_iou", pred_sphere, material)
+        vis_iou.add_geometry("pred_cam_iou", pred_sphere_primary, material)
         if frustum_gt is not None:
             vis_iou.add_geometry("frustum_gt_iou", frustum_gt, frustum_mat)
         if frustum_pred is not None:
