@@ -70,3 +70,6 @@ relationship based cosine simmilarity? instead of just label based and maybe usi
 filtering top 10 worst looking at whats the problem and then iterating like that
 
 VLA baseline 
+
+using GPT to extract relationships and objects
+Creating a file that extracts relationships and objects and creates sub-graphs

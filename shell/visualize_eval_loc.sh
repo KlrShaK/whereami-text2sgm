@@ -17,15 +17,15 @@ GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_mod
 
 # Optional: restrict to a subset of scene IDs (space separated). Leave empty for all.
 # SCENE_IDS=(41385867-a238-2435-8152-dc84ef14eae1 )
-SCENE_IDS=(5341b7d3-8a66-2cdd-8633-0a3da632befa 0cac75b1-8d6f-2d13-8c17-9099db8915bc e61b0e04-bada-2f31-82d6-72831a602ba7 1d234004-e280-2b1a-8ec8-560046b9fc96 0cac75dc-8d6f-2d13-8d08-9c497bd6acdc)
-# SCENE_IDS=()
+# SCENE_IDS=(5341b7d3-8a66-2cdd-8633-0a3da632befa 0cac75b1-8d6f-2d13-8c17-9099db8915bc e61b0e04-bada-2f31-82d6-72831a602ba7 1d234004-e280-2b1a-8ec8-560046b9fc96 0cac75dc-8d6f-2d13-8d08-9c497bd6acdc)
+SCENE_IDS=()
 
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
-  --show_heatmap
-  --show_arrows
-  --show_3d
+  # --show_heatmap
+  # --show_arrows
+  # --show_3d
   # --coarse_disable_nms # Disable NMS for coarse localization
   --save_metrics "./eval/eval_metrics_mk3.json"
   --log_file "./eval/eval_loc_summary_mk3.log"
@@ -36,9 +36,9 @@ EXTRA_ARGS=(
   # --no_homogenize_label_embeddings
   # ---------
   # --scene_use_attributes
-  --debug_match_labels
+  # --debug_match_labels
   # --debug_match_topn 5
-  --debug_match_all_scores
+  # --debug_match_all_scores
   # --debug_match_csv_dir "./eval/baseline_match_scores"
   --dynamic_top_k
   --ensure_query_coverage

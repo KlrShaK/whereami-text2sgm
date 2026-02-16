@@ -225,7 +225,20 @@ def load_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
     frames: List[FrameSelection] = []
     if not desc_dir.exists():
         return frames
-    for path in sorted(desc_dir.glob("*.json")):
+
+    frame_jsons = sorted(desc_dir.glob("frame-*.json"))
+    if frame_jsons:
+        # Prefer explicit per-frame JSON files when available.
+        candidate_paths = frame_jsons
+    else:
+        # Fallback to aggregate file; if absent, use broad JSON fallback.
+        all_desc = desc_dir / "all_descriptions.json"
+        if all_desc.exists():
+            candidate_paths = [all_desc]
+        else:
+            candidate_paths = sorted(desc_dir.glob("*.json"))
+
+    for path in candidate_paths:
         try:
             data = json.loads(path.read_text())
         except json.JSONDecodeError:
@@ -239,7 +252,19 @@ def load_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
                     continue
                 virtual_name = path.with_name(f"{path.stem}_{idx:03d}{path.suffix}")
                 frames.append(FrameSelection(frame=item, path=virtual_name))
-    return frames
+
+    # De-duplicate by image_index so aggregate JSONs do not create duplicate
+    # candidates for the same frame.
+    deduped: List[FrameSelection] = []
+    seen_image_indices: set[str] = set()
+    for fs in frames:
+        image_index = str(fs.frame.get("image_index", "")).strip()
+        if image_index:
+            if image_index in seen_image_indices:
+                continue
+            seen_image_indices.add(image_index)
+        deduped.append(fs)
+    return deduped
 
 
 def select_frame(frames: List[FrameSelection],
@@ -249,6 +274,16 @@ def select_frame(frames: List[FrameSelection],
     if not frames:
         return None
 
+    def total_pixels(fs: FrameSelection) -> int:
+        objs = fs.frame.get("visible_objects", {}) or {}
+        total = 0
+        for obj in objs.values():
+            try:
+                total += int((obj or {}).get("pixel_count", 0))
+            except (TypeError, ValueError):
+                continue
+        return total
+
     if policy == "first":
         return frames[0]
     if policy == "index":
@@ -256,13 +291,19 @@ def select_frame(frames: List[FrameSelection],
     if policy == "random":
         return frames[int(rng.integers(0, len(frames)))]
     if policy == "max_visible":
-        return max(frames,
-                   key=lambda fs: len(fs.frame.get("visible_objects", {})))
+        # Deterministic tie-break:
+        # 1) highest visible-object count
+        # 2) highest total pixel_count
+        # 3) stable filename order
+        return min(
+            frames,
+            key=lambda fs: (
+                -len(fs.frame.get("visible_objects", {}) or {}),
+                -total_pixels(fs),
+                fs.path.name,
+            ),
+        )
     if policy == "max_pixels":
-        def total_pixels(fs: FrameSelection) -> int:
-            objs = fs.frame.get("visible_objects", {})
-            return sum(int(obj.get("pixel_count", 0)) for obj in objs.values())
-
         return max(frames, key=total_pixels)
 
     raise ValueError(f"Unknown frame selection policy '{policy}'")
