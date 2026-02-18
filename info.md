@@ -73,3 +73,28 @@ VLA baseline
 
 using GPT to extract relationships and objects
 Creating a file that extracts relationships and objects and creates sub-graphs
+
+
+
+
+MK-6 CLIP relationships
+ Verification
+
+ 1. Run reprocess_3dssg_clip.py — verify output .pt has 512-dim for label_ada, attributes_ada, relation_ada
+ 2. Run mk6 on 2-3 scenes with --relation_weight 0 --neighbor_weight 0 — baseline CLIP-only (no relationship boost)
+ 3. Run mk6 with --relation_weight 0.2 --neighbor_weight 0.1 and compare
+ 4. Check that scenes with duplicate-label objects show improved matching accuracy
+
+│ │ Action │                              File                               │                                                                                                                             │
+│ │ New    │ playground/graph_models/data_processing/reprocess_3dssg_clip.py │                                                                                                                             │
+│ │ New    │ playground/graph_models/models/visualize_eval_loc_mk6.py        │                                                                                                                             │
+│ │ New    │ shell/reprocess_3dssg_clip.sh                                   │                                                                                                                             │
+│ │ New    │ shell/visualize_eval_loc_mk6.sh                   
+
+
+VLA baseline
+Top-Down View and VLA sending to gpt and asking location
+
+
+# TOP DOWN APPROACH 
+the ceiling is showing up maybe remove everything about a certain height maybe 2m or 1.9 or something tru it out

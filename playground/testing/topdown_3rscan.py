@@ -11,13 +11,13 @@ Single scan:
     python topdown_3rscan.py \
         --root /path/to/3RScan \
         --scan-id 095821f7-e2c2-2de1-9568-b9ce59920e29 \
-        --output ./095821f7_topdown.png
+        --output ./out_dir
 
 Batch for every scan under --root:
     python topdown_3rscan.py \
         --root /path/to/3RScan \
         --all-scans \
-        --out-dir ./topdown_maps
+        --output ./topdown_maps
 
 
 python playground/testing/topdown_3rscan.py     --root "/media/klrshak/Backup/Datasets/3RScan_processed"     --scan-id 0cac761b-8d6f-2d13-8f16-23a7d73c54fe --output .  --visualize
@@ -28,12 +28,16 @@ python playground/testing/topdown_3rscan.py     --root "/media/klrshak/Backup/Da
 from __future__ import annotations
 
 import argparse
+import logging
 from pathlib import Path
 from typing import List, Tuple
 
 import numpy as np
 import open3d as o3d
 from PIL import Image
+from tqdm import tqdm
+
+log = logging.getLogger(__name__)
 
 
 PREFERRED_MESH_FILES = (
@@ -301,7 +305,7 @@ def render_topdown_mesh(mesh: o3d.geometry.TriangleMesh,
     ctr.set_lookat(lookat)
     ctr.set_front(front)
     ctr.set_up(up)
-    ctr.set_zoom(0.7)
+    ctr.set_zoom(0.5)
 
     vis.poll_events()
     vis.update_renderer()
@@ -309,7 +313,7 @@ def render_topdown_mesh(mesh: o3d.geometry.TriangleMesh,
     output.parent.mkdir(parents=True, exist_ok=True)
     vis.capture_screen_image(str(output), do_render=True)
     vis.destroy_window()
-    print(f"Saved: {output}")
+    log.debug("Saved: %s", output)
 
 
 def make_topdown(scan_dir: Path,
@@ -372,10 +376,15 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--all-scans", "--all_scans", dest="all_scans", action="store_true",
                         help="Render every scan folder under --root.")
     parser.add_argument("--output", type=Path,
-                        help="Output directory/prefix root. Files are saved as "
-                             "<output>/<scene_id>_topdown.png.")
+                        help="Output directory. Single scan saves as "
+                             "<output>/<scene_id>_topdown.png; "
+                             "--all-scans saves as <output>/<scene_id>/<output-name>.")
     parser.add_argument("--out-dir", "--out_dir", dest="out_dir", type=Path,
                         help="Output directory for --all-scans mode.")
+    parser.add_argument("--output-name", "--output_name", dest="output_name", type=str,
+                        default="topdown.png",
+                        help="Filename to use per scene in --all-scans mode. "
+                             "Saved as <output>/<scene-id>/<output-name>.")
     parser.add_argument("--plane", choices=("xy", "xz", "yz"), default="xy",
                         help="Projection plane. Top-down for 3RScan is usually 'xy'.")
     parser.add_argument("--floor_percentile", type=float, default=0.5,
@@ -405,6 +414,7 @@ def validate_args(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
     args = parse_args()
     validate_args(args)
 
@@ -436,14 +446,15 @@ def main() -> None:
     if not scan_dirs:
         raise RuntimeError(f"No scan folders with known mesh files found under {root}")
 
-    out_dir = args.output or args.out_dir or (Path.cwd() / "topdown_3rscan")
+    out_dir = args.output or args.out_dir or root
     out_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Found {len(scan_dirs)} scan(s). Saving maps to {out_dir}")
+    print(f"Found {len(scan_dirs)} scan(s). Saving maps as <scene-id>/{args.output_name} under {out_dir}")
 
     ok = 0
     failed = 0
-    for scan_dir in scan_dirs:
-        out_file = out_dir / f"{scan_dir.name}_topdown.png"
+    pbar = tqdm(scan_dirs, desc="Rendering topdown", unit="scene")
+    for scan_dir in pbar:
+        out_file = out_dir / scan_dir.name / args.output_name
         try:
             make_topdown(
                 scan_dir=scan_dir,
@@ -457,9 +468,11 @@ def main() -> None:
                 visualize_full=args.visualize_full,
             )
             ok += 1
+            pbar.set_postfix(ok=ok, failed=failed, refresh=False)
         except Exception as exc:  # noqa: BLE001
             failed += 1
             print(f"[ERROR] {scan_dir.name}: {exc}")
+            pbar.set_postfix(ok=ok, failed=failed, refresh=False)
 
     print(f"Done. Success={ok}, Failed={failed}")
 
