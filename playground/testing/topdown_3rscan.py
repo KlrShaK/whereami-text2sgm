@@ -8,10 +8,12 @@ appearance with a white background.
 Examples
 --------
 Single scan:
-    python topdown_3rscan.py \
-        --root /path/to/3RScan \
-        --scan-id 095821f7-e2c2-2de1-9568-b9ce59920e29 \
+    python playground/testing/topdown_3rscan.py 
+        --root /media/klrshak/Backup/Datasets/3RScan_processed 
+        --scan-id 0ad2d3a1-79e2-2212-9b99-a96495d9f7fe 
+        --visualize 
         --output ./out_dir
+
 
 Batch for every scan under --root:
     python topdown_3rscan.py \
@@ -141,17 +143,18 @@ def _bake_texture_to_vertex_colors(mesh_path: Path,
     h, w = tex_img.shape[:2]
     uvs_per_face = triangle_uvs.reshape(-1, 3, 2)  # (F, 3, 2)
 
-    # Accumulate UVs per vertex
-    uv_sum = np.zeros((num_verts, 2), dtype=np.float64)
-    uv_count = np.zeros(num_verts, dtype=np.float64)
-    for corner in range(3):
-        vert_ids = faces[:, corner]
-        np.add.at(uv_sum, vert_ids, uvs_per_face[:, corner, :].astype(np.float64))
-        np.add.at(uv_count, vert_ids, 1.0)
+    # Accumulate UVs per vertex using vectorized bincount (faster than np.add.at)
+    all_vert_ids = faces.reshape(-1)                          # (F*3,)
+    all_uvs = uvs_per_face.reshape(-1, 2).astype(np.float64)  # (F*3, 2)
+
+    uv_sum_u = np.bincount(all_vert_ids, weights=all_uvs[:, 0], minlength=num_verts)
+    uv_sum_v = np.bincount(all_vert_ids, weights=all_uvs[:, 1], minlength=num_verts)
+    uv_count = np.bincount(all_vert_ids, minlength=num_verts).astype(np.float64)
 
     valid = uv_count > 0
     uv_avg = np.zeros((num_verts, 2), dtype=np.float32)
-    uv_avg[valid] = (uv_sum[valid] / uv_count[valid, None]).astype(np.float32)
+    uv_avg[valid, 0] = (uv_sum_u[valid] / uv_count[valid]).astype(np.float32)
+    uv_avg[valid, 1] = (uv_sum_v[valid] / uv_count[valid]).astype(np.float32)
 
     px = np.clip((uv_avg[:, 0] * w).astype(int), 0, w - 1)
     py = np.clip(((1.0 - uv_avg[:, 1]) * h).astype(int), 0, h - 1)
@@ -211,11 +214,20 @@ def filter_faces_by_height(vertices: np.ndarray,
                            faces: np.ndarray,
                            height_axis: int,
                            floor_percentile: float,
-                           ceiling_percentile: float) -> np.ndarray:
+                           ceiling_percentile: float,
+                           cutoff_above_ground_m: float | None = None) -> np.ndarray:
     """Return a face mask for triangles whose all three vertices fall in height range."""
     heights = vertices[:, height_axis]
     lo = float(np.percentile(heights, floor_percentile))
     hi = float(np.percentile(heights, ceiling_percentile))
+    if cutoff_above_ground_m is not None:
+        # Estimate ground from a lower-height band, then clamp at ground + offset meters.
+        # This is more robust than using the global minimum height (which may be an outlier).
+        ground_lo = float(np.percentile(heights, max(0.0, floor_percentile)))
+        ground_hi = float(np.percentile(heights, min(100.0, floor_percentile + 5.0)))
+        ground_band = heights[(heights >= ground_lo) & (heights <= ground_hi)]
+        ground_height = float(np.median(ground_band)) if ground_band.size else ground_lo
+        hi = min(hi, ground_height + cutoff_above_ground_m)
 
     # A face is kept if all its vertices are within range
     face_heights = heights[faces]  # (F, 3)
@@ -321,6 +333,7 @@ def make_topdown(scan_dir: Path,
                  plane: str,
                  floor_percentile: float,
                  ceiling_percentile: float,
+                 cutoff_above_ground_m: float | None,
                  dpi: int,
                  show: bool,
                  visualize: bool = False,
@@ -338,6 +351,7 @@ def make_topdown(scan_dir: Path,
         vertices, faces, height_axis,
         floor_percentile=floor_percentile,
         ceiling_percentile=ceiling_percentile,
+        cutoff_above_ground_m=cutoff_above_ground_m,
     )
     filtered_mesh = build_filtered_mesh(
         mesh_full=mesh,
@@ -350,7 +364,7 @@ def make_topdown(scan_dir: Path,
     if len(filtered_mesh.triangles) == 0:
         raise RuntimeError(
             f"All faces were removed by height filtering for {scan_dir.name}. "
-            "Try a wider percentile range."
+            "Try a wider percentile range or increase/disable --cutoff_above_ground_m."
         )
 
     if visualize:
@@ -387,10 +401,13 @@ def parse_args() -> argparse.Namespace:
                              "Saved as <output>/<scene-id>/<output-name>.")
     parser.add_argument("--plane", choices=("xy", "xz", "yz"), default="xy",
                         help="Projection plane. Top-down for 3RScan is usually 'xy'.")
-    parser.add_argument("--floor_percentile", type=float, default=0.5,
+    parser.add_argument("--floor_percentile", type=float, default=0.2,
                         help="Lower height percentile to keep (removes floor outliers).")
-    parser.add_argument("--ceiling_percentile", type=float, default=97.0,
+    parser.add_argument("--ceiling_percentile", type=float, default=95.0,
                         help="Upper height percentile to keep (removes ceilings/noise).")
+    parser.add_argument("--cutoff_above_ground_m", type=float, default=2.5,
+                        help="Additionally cap max height to this many meters above "
+                             "estimated ground on the selected height axis.")
     parser.add_argument("--dpi", type=int, default=300,
                         help="Output image DPI.")
     parser.add_argument("--show", action="store_true",
@@ -411,6 +428,8 @@ def validate_args(args: argparse.Namespace) -> None:
 
     if not (0.0 <= args.floor_percentile < args.ceiling_percentile <= 100.0):
         raise ValueError("Percentiles must satisfy 0 <= floor < ceiling <= 100.")
+    if args.cutoff_above_ground_m is not None and args.cutoff_above_ground_m <= 0.0:
+        raise ValueError("--cutoff_above_ground_m must be > 0 when provided.")
 
 
 def main() -> None:
@@ -435,6 +454,7 @@ def main() -> None:
             plane=args.plane,
             floor_percentile=args.floor_percentile,
             ceiling_percentile=args.ceiling_percentile,
+            cutoff_above_ground_m=args.cutoff_above_ground_m,
             dpi=args.dpi,
             show=args.show,
             visualize=args.visualize,
@@ -462,6 +482,7 @@ def main() -> None:
                 plane=args.plane,
                 floor_percentile=args.floor_percentile,
                 ceiling_percentile=args.ceiling_percentile,
+                cutoff_above_ground_m=args.cutoff_above_ground_m,
                 dpi=args.dpi,
                 show=False,
                 visualize=args.visualize,

@@ -24,11 +24,13 @@ import json
 import os
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import openai
+from tqdm import tqdm
 
 # --------------------------------------------------------------------------- #
 # Repository imports                                                          #
@@ -104,51 +106,86 @@ def parsed_path_for(frame_path: Path) -> Path:
 
 
 # --------------------------------------------------------------------------- #
-# Process a single frame                                                      #
+# Process a single frame (split into GPT call + embedding for concurrency)    #
 # --------------------------------------------------------------------------- #
 
-def process_frame(frame_path: Path,
-                  embedding_mode: str,
-                  dry_run: bool = False) -> Optional[dict]:
-    """Parse description via GPT, embed with word2vec, return parsed dict."""
+def _gpt_parse_frame(frame_path: Path,
+                     max_retries: int = 3) -> Optional[Tuple[Path, dict, str, str, str]]:
+    """Read frame JSON and call GPT to parse the description (thread-safe).
+
+    Returns (frame_path, parsed_graph, description, scene_index, image_index)
+    or None if the frame has no description.
+    """
     data = json.loads(frame_path.read_text())
     description = data.get("description", "")
     if not description.strip():
-        print(f"  [SKIP] No description in {frame_path.name}")
         return None
 
     scene_index = data.get("scene_index", "")
     image_index = data.get("image_index", frame_path.stem)
 
-    if dry_run:
-        print(f"  [DRY RUN] Would parse: {frame_path.name} "
-              f"(scene={scene_index}, desc length={len(description)})")
-        return None
+    # Call GPT with retry on rate-limit / transient errors
+    last_exc = None
+    for attempt in range(max_retries):
+        try:
+            parsed = parse_text_to_json(description)
+            return (frame_path, parsed, description, scene_index, image_index)
+        except openai.RateLimitError as exc:
+            last_exc = exc
+            wait = 2 ** attempt
+            print(f"  [RATE LIMIT] {frame_path.name} – retrying in {wait}s …")
+            time.sleep(wait)
+        except openai.APIError as exc:
+            last_exc = exc
+            wait = 2 ** attempt
+            print(f"  [API ERROR] {frame_path.name} – retrying in {wait}s …")
+            time.sleep(wait)
+    raise last_exc  # type: ignore[misc]
 
-    # Call GPT to parse
-    parsed = parse_text_to_json(description)
 
-    # Embed nodes
+def _embed_parsed_graph(parsed: dict, embedding_mode: str) -> None:
+    """Add word2vec embeddings to parsed graph nodes/edges (NOT thread-safe)."""
     for node in parsed.get("nodes", []):
         node["label_word2vec"] = _embed_word2vec(node["label"], mode=embedding_mode)
         node["attributes_word2vec"] = {
             "all": [_embed_word2vec(a, mode=embedding_mode)
                     for a in node.get("attributes", [])]
         }
-
-    # Embed edges
     for edge in parsed.get("edges", []):
         edge["relation_word2vec"] = _embed_word2vec(
             edge["relationship"], mode=embedding_mode
         )
 
-    result = {
+
+def process_frame(frame_path: Path,
+                  embedding_mode: str,
+                  dry_run: bool = False) -> Optional[dict]:
+    """Parse description via GPT, embed with word2vec, return parsed dict."""
+    if dry_run:
+        data = json.loads(frame_path.read_text())
+        description = data.get("description", "")
+        scene_index = data.get("scene_index", "")
+        if not description.strip():
+            print(f"  [SKIP] No description in {frame_path.name}")
+            return None
+        print(f"  [DRY RUN] Would parse: {frame_path.name} "
+              f"(scene={scene_index}, desc length={len(description)})")
+        return None
+
+    result_tuple = _gpt_parse_frame(frame_path)
+    if result_tuple is None:
+        print(f"  [SKIP] No description in {frame_path.name}")
+        return None
+
+    _, parsed, description, scene_index, image_index = result_tuple
+    _embed_parsed_graph(parsed, embedding_mode)
+
+    return {
         "source_frame": image_index,
         "scene_index": scene_index,
         "description": description,
         "parsed_graph": parsed,
     }
-    return result
 
 
 # --------------------------------------------------------------------------- #
@@ -174,6 +211,13 @@ def parse_args() -> argparse.Namespace:
                    help="Re-process frames even if *_parsed.json already exists.")
     p.add_argument("--max_frames", type=int,
                    help="Limit the number of frames to process (for testing).")
+    p.add_argument("--workers", type=int, default=8,
+                   help="Number of parallel threads for GPT API calls (default: 8). "
+                        "Set to 1 for sequential processing.")
+    p.add_argument("--batch_size", type=int, default=32,
+                   help="Number of frames per batch (default: 32). Each batch is "
+                        "GPT-parsed concurrently, then embedded and saved before "
+                        "starting the next batch.")
     return p.parse_args()
 
 
@@ -215,36 +259,97 @@ def main() -> None:
     if args.max_frames is not None:
         todo = todo[: args.max_frames]
 
-    print(f"Processing {len(todo)} frame(s)...\n")
+    workers = max(1, args.workers)
+    print(f"Processing {len(todo)} frame(s) with {workers} worker(s)...\n")
 
+    t_start = time.monotonic()
     success = 0
     errors = 0
-    for idx, frame_path in enumerate(todo, start=1):
-        scene_id = frame_path.parts[-4]  # .../scene_id/output/descriptions/frame-*.json
-        print(f"[{idx:04d}/{len(todo):04d}] {scene_id}/{frame_path.name}")
+    failed_scans = set()
 
-        try:
-            result = process_frame(frame_path, args.embedding_mode, dry_run=args.dry_run)
-        except Exception as exc:
-            print(f"  [ERROR] {exc}")
-            errors += 1
-            continue
+    if args.dry_run or workers == 1:
+        # --- Sequential path (dry-run or single worker) ---
+        for frame_path in tqdm(todo, desc="Processing", unit="frame"):
+            scene_id = frame_path.parts[-4]
+            try:
+                result = process_frame(frame_path, args.embedding_mode, dry_run=args.dry_run)
+            except Exception as exc:
+                tqdm.write(f"  [ERROR] {scene_id}/{frame_path.name}: {exc}")
+                errors += 1
+                failed_scans.add(scene_id)
+                continue
+            if result is None:
+                continue
+            out_path = parsed_path_for(frame_path)
+            out_path.write_text(json.dumps(result, indent=2))
+            success += 1
+    else:
+        # --- Parallel path: process in batches for crash resilience ---
+        batch_size = max(1, args.batch_size)
+        n_batches = (len(todo) + batch_size - 1) // batch_size
+        overall_pbar = tqdm(total=len(todo), desc="Overall", unit="frame")
 
-        if result is None:
-            continue
+        for batch_idx in range(n_batches):
+            batch_start = batch_idx * batch_size
+            batch = todo[batch_start : batch_start + batch_size]
+            tqdm.write(f"\n--- Batch {batch_idx + 1}/{n_batches} "
+                       f"({len(batch)} frames) ---")
 
-        out_path = parsed_path_for(frame_path)
-        out_path.write_text(json.dumps(result, indent=2))
-        print(f"  -> saved {out_path.name} "
-              f"({len(result['parsed_graph']['nodes'])} nodes, "
-              f"{len(result['parsed_graph']['edges'])} edges)")
-        success += 1
+            # Phase 1: GPT-parse this batch concurrently
+            future_to_path = {}
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                for frame_path in batch:
+                    fut = executor.submit(_gpt_parse_frame, frame_path)
+                    future_to_path[fut] = frame_path
 
-        # Small delay to avoid rate limits
-        time.sleep(0.1)
+                gpt_results: List[Tuple[Path, dict, str, str, str]] = []
+                for fut in as_completed(future_to_path):
+                    frame_path = future_to_path[fut]
+                    scene_id = frame_path.parts[-4]
+                    try:
+                        result_tuple = fut.result()
+                    except Exception as exc:
+                        tqdm.write(f"  [ERROR] {scene_id}/{frame_path.name}: {exc}")
+                        errors += 1
+                        failed_scans.add(scene_id)
+                        overall_pbar.update(1)
+                        continue
+                    if result_tuple is None:
+                        overall_pbar.update(1)
+                        continue
+                    gpt_results.append(result_tuple)
 
-    print(f"\nDone. Success: {success} | Errors: {errors} | "
-          f"Dry-run skipped: {len(todo) - success - errors}")
+            # Phase 2: embed + save this batch (main thread)
+            for frame_path, parsed, description, scene_index, image_index in sorted(
+                gpt_results, key=lambda r: r[0]
+            ):
+                _embed_parsed_graph(parsed, args.embedding_mode)
+                result = {
+                    "source_frame": image_index,
+                    "scene_index": scene_index,
+                    "description": description,
+                    "parsed_graph": parsed,
+                }
+                out_path = parsed_path_for(frame_path)
+                out_path.write_text(json.dumps(result, indent=2))
+                success += 1
+                overall_pbar.update(1)
+
+            tqdm.write(f"  Batch {batch_idx + 1} saved: {len(gpt_results)} frames")
+
+        overall_pbar.close()
+
+    elapsed = time.monotonic() - t_start
+    rate = success / elapsed if elapsed > 0 else 0
+    print(f"\nDone in {elapsed:.1f}s ({rate:.1f} frames/sec). "
+          f"Success: {success} | Errors: {errors} | "
+          f"Skipped: {len(todo) - success - errors}")
+    if failed_scans:
+        print("Failed scans:")
+        for scan_id in sorted(failed_scans):
+            print(f"  - {scan_id}")
+    else:
+        print("Failed scans: none")
 
 
 if __name__ == "__main__":

@@ -34,6 +34,8 @@ SCENE_IDS=()
 # Additional options (uncomment as needed)
 EXTRA_ARGS=(
   --embedding_mode doc
+  --workers 3216
+  --batch_size 200
   # --dry_run
   # --overwrite
   # --max_frames 5
