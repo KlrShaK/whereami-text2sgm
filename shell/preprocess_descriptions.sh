@@ -34,7 +34,7 @@ SCENE_IDS=()
 # Additional options (uncomment as needed)
 EXTRA_ARGS=(
   --embedding_mode doc
-  --workers 3216
+  --workers 8 #32
   --batch_size 200
   # --dry_run
   # --overwrite

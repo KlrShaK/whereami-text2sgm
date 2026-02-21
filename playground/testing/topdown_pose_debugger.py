@@ -17,7 +17,6 @@ Outputs:
 
 python3 playground/testing/topdown_pose_debugger.py \
   --dataset-root /media/klrshak/Backup/Datasets/3RScan_processed \
-  --topdown-root . \
   --scene-id 2e4a3962-d452-21a0-9fd2-7a325c600a49 \
   --pred-u 512 --pred-v 512 --pred-omega-deg 45 \
   --h-fov-deg 90 --v-fov-deg 60 --frustum-near-m 0.1 --frustum-far-m 1.2
@@ -137,23 +136,26 @@ def read_image_size(image_path: Path) -> Tuple[int, int]:
     return w, h
 
 
-def resolve_topdown_paths(topdown_root: Path, scene_id: str, output_name: str) -> Tuple[Path, Path]:
+def resolve_topdown_paths(scene_dir: Path, output_name: str) -> Tuple[Path, Path]:
     stem = Path(output_name).stem
     image_candidates = [
-        topdown_root / f"{scene_id}_topdown.png",
-        topdown_root / scene_id / output_name,
+        scene_dir / output_name,
+        scene_dir / "topdown.png",
+        scene_dir / "topdown.pn",
     ]
     for img_path in image_candidates:
-        cam_path = img_path.with_name(f"{img_path.stem}_camera.npz")
-        if img_path.exists() and cam_path.exists():
-            return img_path, cam_path
+        cam_candidates = [
+            img_path.with_name(f"{img_path.stem}_camera.npz"),
+            scene_dir / "topdown_camera.npz",
+            scene_dir / f"{stem}_camera.npz",
+        ]
+        for cam_path in cam_candidates:
+            if img_path.exists() and cam_path.exists():
+                return img_path, cam_path
 
-    # Secondary candidate for custom stem under per-scene folder.
-    img_path = topdown_root / scene_id / output_name
-    cam_path = img_path.with_name(f"{stem}_camera.npz")
     raise FileNotFoundError(
         "Could not find matching topdown image + camera sidecar. "
-        f"Tried candidates under {topdown_root} for scene {scene_id}."
+        f"Expected files in {scene_dir} (e.g., topdown.png + topdown_camera.npz)."
     )
 
 
@@ -356,12 +358,6 @@ def parse_args() -> argparse.Namespace:
         help="Root containing <scene_id>/ mesh and frame JSONs.",
     )
     parser.add_argument(
-        "--topdown-root",
-        type=Path,
-        default=Path.cwd(),
-        help="Root containing rendered topdown image and *_camera.npz sidecar.",
-    )
-    parser.add_argument(
         "--scene-id",
         type=str,
         default=DEFAULT_SCENE_ID,
@@ -394,7 +390,7 @@ def main() -> None:
     if not scene_dir.exists():
         raise FileNotFoundError(scene_dir)
 
-    topdown_image, camera_npz = resolve_topdown_paths(args.topdown_root, args.scene_id, args.output_name)
+    topdown_image, camera_npz = resolve_topdown_paths(scene_dir, args.output_name)
     img_w, img_h = read_image_size(topdown_image)
     k, e = load_topdown_camera(camera_npz)
 
