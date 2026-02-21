@@ -106,18 +106,29 @@ if start == -1 or end == -1 or end <= start:
 
 pred = json.loads(response[start:end + 1])
 
-u, v, w = float(pred["u"]), float(pred["v"]), float(pred["w"])
+u = pred["u"]
+v = pred["v"]
+w = pred["w"]
+
+for name, value in (("u", u), ("v", v), ("w", w)):
+    if not isinstance(value, (int, float)):
+        raise ValueError(f"Expected numeric {name} in model output, got {type(value).__name__}")
 
 # If the model implicitly predicted in "seen" coords, map to original.
 # (This is a safety net; prompt asks for original coords, but models sometimes ignore.)
 if W1 and H1 and (W1 != W0 or H1 != H0):
     # assume uniform resize without crop/pad
-    u = u * (W0 / W1)
-    v = v * (H0 / H1)
+    u = float(u) * (W0 / W1)
+    v = float(v) * (H0 / H1)
 
-# Clamp + normalize
-u = max(0.0, min(u, W0 - 1e-3))
-v = max(0.0, min(v, H0 - 1e-3))
-w = w % 360.0
+# Pixel outputs should be integer coordinates.
+u = int(round(u))
+v = int(round(v))
+
+# Clamp + normalize only if needed; if any value is out of bounds, normalize all.
+if not (0 <= u < W0 and 0 <= v < H0 and 0 <= w < 360):
+    u = max(0, min(u, W0 - 1))
+    v = max(0, min(v, H0 - 1))
+    w = w % 360
 
 print("PARSED:", {"u": u, "v": v, "w": w})
