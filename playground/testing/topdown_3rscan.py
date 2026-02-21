@@ -293,6 +293,12 @@ def _topdown_camera_vectors(plane: str) -> Tuple[np.ndarray, np.ndarray]:
     raise ValueError(f"Unsupported plane '{plane}'")
 
 
+def _camera_param_path(output: Path) -> Path:
+    """Return output path for camera matrices saved together in a .npz file."""
+    base = output.stem
+    return output.with_name(f"{base}_camera.npz")
+
+
 def render_topdown_mesh(mesh: o3d.geometry.TriangleMesh,
                         plane: str,
                         output: Path,
@@ -323,9 +329,17 @@ def render_topdown_mesh(mesh: o3d.geometry.TriangleMesh,
     vis.update_renderer()
 
     output.parent.mkdir(parents=True, exist_ok=True)
+    
+    params = ctr.convert_to_pinhole_camera_parameters()
+    intrinsic = np.asarray(params.intrinsic.intrinsic_matrix, dtype=np.float64)
+    extrinsic = np.asarray(params.extrinsic, dtype=np.float64)
+    camera_out = _camera_param_path(output)
+    np.savez(camera_out, intrinsic=intrinsic, extrinsic=extrinsic)
+
     vis.capture_screen_image(str(output), do_render=True)
     vis.destroy_window()
     log.debug("Saved: %s", output)
+    log.debug("Saved camera params: %s", camera_out)
 
 
 def make_topdown(scan_dir: Path,
@@ -391,14 +405,16 @@ def parse_args() -> argparse.Namespace:
                         help="Render every scan folder under --root.")
     parser.add_argument("--output", type=Path,
                         help="Output directory. Single scan saves as "
-                             "<output>/<scene_id>_topdown.png; "
+                             "<output>/<scene_id>_topdown.png + "
+                             "<scene_id>_topdown_camera.npz; "
                              "--all-scans saves as <output>/<scene_id>/<output-name>.")
     parser.add_argument("--out-dir", "--out_dir", dest="out_dir", type=Path,
                         help="Output directory for --all-scans mode.")
     parser.add_argument("--output-name", "--output_name", dest="output_name", type=str,
                         default="topdown.png",
                         help="Filename to use per scene in --all-scans mode. "
-                             "Saved as <output>/<scene-id>/<output-name>.")
+                             "Saved as <output>/<scene-id>/<output-name>, with "
+                             "camera parameters in *_camera.npz (intrinsic + extrinsic).")
     parser.add_argument("--plane", choices=("xy", "xz", "yz"), default="xy",
                         help="Projection plane. Top-down for 3RScan is usually 'xy'.")
     parser.add_argument("--floor_percentile", type=float, default=0.2,
