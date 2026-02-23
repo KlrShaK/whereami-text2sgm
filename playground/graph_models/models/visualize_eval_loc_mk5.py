@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import logging
 import math
 import sys
 from dataclasses import dataclass
@@ -31,6 +32,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import open3d as o3d
 import torch
+
+logger = logging.getLogger(__name__)
 
 # --------------------------------------------------------------------------- #
 # Repository imports                                                          #
@@ -407,6 +410,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--save_metrics", type=Path)
     parser.add_argument("--log_file", type=Path, default=Path("eval_loc_summary_mk5.log"))
     parser.add_argument("--top_pose_count", type=int, default=5)
+    parser.add_argument("--log_level", choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+                        default="INFO")
     return parser.parse_args()
 
 
@@ -417,7 +422,7 @@ def evaluate_scene(scene_id: str,
     mesh_root = Path(args.root)
     scene_dir = mesh_root / scene_id
     if not scene_dir.exists():
-        print(f"[WARN] Scene directory missing for {scene_id} — skipped.")
+        logger.warning(f"[WARN] Scene directory missing for {scene_id} — skipped.")
         return None
 
     query_root = ensure_query_root(args.query_root, Path(args.root))
@@ -428,12 +433,12 @@ def evaluate_scene(scene_id: str,
     # Load parsed frames instead of raw frames
     frames = load_parsed_frame_jsons(desc_dir)
     if not frames:
-        print(f"[WARN] No parsed frame JSONs under {desc_dir} — skipped.")
+        logger.warning(f"[WARN] No parsed frame JSONs under {desc_dir} — skipped.")
         return None
 
     selection = select_parsed_frame(frames, args.frame_policy, args.frame_index, rng)
     if selection is None:
-        print(f"[WARN] Frame selection failed for {scene_id} — skipped.")
+        logger.warning(f"[WARN] Frame selection failed for {scene_id} — skipped.")
         return None
 
     frame_data = selection.frame
@@ -446,22 +451,22 @@ def evaluate_scene(scene_id: str,
             centroid_similarity_threshold=args.centroid_similarity_threshold,
         )
     except Exception as exc:
-        print(f"[WARN] Failed to build caption graph for {scene_id}: {exc}")
+        logger.warning(f"[WARN] Failed to build caption graph for {scene_id}: {exc}")
         return None
 
     if not caption_meta:
-        print(f"[WARN] {scene_id}: no parsed nodes matched visible objects — skipped.")
+        logger.warning(f"[WARN] {scene_id}: no parsed nodes matched visible objects — skipped.")
         return None
 
     frame_id_dbg = str(frame_data.get("source_frame", selection.path.name))
 
     # Print centroid recovery summary
     n_nodes = len(frame_data.get("parsed_graph", {}).get("nodes", []))
-    print(f"    parsed graph: {n_nodes} nodes, "
-          f"{len(caption_meta)} matched to visible objects")
+    logger.debug(f"    parsed graph: {n_nodes} nodes, "
+                 f"{len(caption_meta)} matched to visible objects")
     for nid, m in sorted(caption_meta.items()):
-        print(f"      node[{nid}] '{m['label']}' -> vo '{m['matched_vo_label']}' "
-              f"(sim={m['match_similarity']:.3f})")
+        logger.debug(f"      node[{nid}] '{m['label']}' -> vo '{m['matched_vo_label']}' "
+                     f"(sim={m['match_similarity']:.3f})")
 
     if args.debug_match_labels or args.debug_match_all_scores or args.debug_match_csv_dir is not None:
         debug_label_matches(caption_graph,
@@ -478,13 +483,13 @@ def evaluate_scene(scene_id: str,
     original_name = selection.path.stem.replace("_parsed", "") + ".json"
     original_path = selection.path.with_name(original_name)
     if not original_path.exists():
-        print(f"[WARN] Original frame JSON not found: {original_path} — skipped.")
+        logger.warning(f"[WARN] Original frame JSON not found: {original_path} — skipped.")
         return None
 
     original_frame = json.loads(original_path.read_text())
     gt_pose = original_frame.get("scene_pose")
     if gt_pose is None:
-        print(f"[WARN] scene_pose missing in {original_path} — skipped.")
+        logger.warning(f"[WARN] scene_pose missing in {original_path} — skipped.")
         return None
 
     pose_mat = np.asarray(gt_pose, dtype=np.float64)
@@ -508,7 +513,7 @@ def evaluate_scene(scene_id: str,
         ensure_query_coverage=args.ensure_query_coverage,
     )
     if not obj_ids:
-        print(f"[WARN] {scene_id}: no cosine matches — skipped.")
+        logger.warning(f"[WARN] {scene_id}: no cosine matches — skipped.")
         return None
 
     mesh, tri2obj, obj2faces = load_scene(scene_dir)
@@ -530,10 +535,10 @@ def evaluate_scene(scene_id: str,
         x_min, x_max = floor_bbox["x_min"], floor_bbox["x_max"]
         y_min, y_max = floor_bbox["y_min"], floor_bbox["y_max"]
         z_eye = floor_bbox["z_max"] + args.eye_height
-        print(f"    floor bbox: X=[{x_min:.2f}, {x_max:.2f}] "
-              f"Y=[{y_min:.2f}, {y_max:.2f}] Z_eye={z_eye:.2f} m")
+        logger.info(f"    floor bbox: X=[{x_min:.2f}, {x_max:.2f}] "
+                    f"Y=[{y_min:.2f}, {y_max:.2f}] Z_eye={z_eye:.2f} m")
     else:
-        print(f"    [WARN] No floor in semseg — sampling over full mesh bounds.")
+        logger.warning(f"    [WARN] No floor in semseg — sampling over full mesh bounds.")
         x_min, x_max = float(verts[:, 0].min()), float(verts[:, 0].max())
         y_min, y_max = float(verts[:, 1].min()), float(verts[:, 1].max())
         z_eye = float(verts[:, 2].min()) + args.eye_height
@@ -553,7 +558,7 @@ def evaluate_scene(scene_id: str,
         centroids[int(oid)] = verts[np.unique(tris[faces].ravel())].mean(axis=0)
 
     if not centroids:
-        print(f"[WARN] {scene_id}: matched objects missing geometry — skipped.")
+        logger.warning(f"[WARN] {scene_id}: matched objects missing geometry — skipped.")
         return None
 
     visible_dirs: List[List[np.ndarray]] = [[] for _ in range(len(cams))]
@@ -570,7 +575,7 @@ def evaluate_scene(scene_id: str,
     counts = np.array([len(v) for v in visible_dirs], dtype=np.int32)
     total = counts.sum()
     if total == 0:
-        print(f"[WARN] {scene_id}: matched objects invisible from grid — skipped.")
+        logger.warning(f"[WARN] {scene_id}: matched objects invisible from grid — skipped.")
         return None
 
     dist_bonus = np.array(
@@ -693,19 +698,19 @@ def evaluate_scene(scene_id: str,
         metrics.angular_error_deg = None
 
     grid_err = float(np.linalg.norm(pred_cam_grid - gt_cam))
-    print(f"    predicted camera (grid:{args.prediction_strategy}): "
-          f"{pred_cam_grid.tolist()} | err={grid_err:.3f} m")
+    logger.debug(f"    predicted camera (grid:{args.prediction_strategy}): "
+                 f"{pred_cam_grid.tolist()} | err={grid_err:.3f} m")
     if pred_cam_arrow is not None:
         arrow_err = float(np.linalg.norm(pred_cam_arrow - gt_cam))
-        print(f"    predicted camera (arrow:{args.prediction_strategy}): "
-              f"{pred_cam_arrow.tolist()} | err={arrow_err:.3f} m")
+        logger.debug(f"    predicted camera (arrow:{args.prediction_strategy}): "
+                     f"{pred_cam_arrow.tolist()} | err={arrow_err:.3f} m")
         if pred_dir_arrow is not None:
-            print(f"    approx. viewing direction (arrow): {pred_dir_arrow.tolist()}")
+            logger.debug(f"    approx. viewing direction (arrow): {pred_dir_arrow.tolist()}")
         else:
-            print("    approx. viewing direction (arrow): n/a (no directional vote)")
+            logger.debug("    approx. viewing direction (arrow): n/a (no directional vote)")
     else:
-        print("    predicted camera (arrow): n/a (no valid FOV windows)")
-    print(f"    primary prediction used for metrics: {pred_source}")
+        logger.debug("    predicted camera (arrow): n/a (no valid FOV windows)")
+    logger.debug(f"    primary prediction used for metrics: {pred_source}")
 
     # Per-object visibility debug
     semseg_path = scene_dir / "semseg.v2.json"
@@ -726,8 +731,8 @@ def evaluate_scene(scene_id: str,
     pred_vis_oid_set = set(pred_vis_oids)
     missed = gt_vis_oid_set - pred_vis_oid_set
     score_map = {int(oid): float(score) for oid, score in zip(obj_ids, obj_scores)}
-    print(f"    [DEBUG] matched-object visibility  ({len(centroids)} objects):")
-    print(f"    {'oid':<8} {'label':<22} {'score':>7} {'d_GT':>7} {'GT':>4} {'d_pred':>8} {'pred':>5}")
+    logger.debug(f"    [DEBUG] matched-object visibility  ({len(centroids)} objects):")
+    logger.debug(f"    {'oid':<8} {'label':<22} {'score':>7} {'d_GT':>7} {'GT':>4} {'d_pred':>8} {'pred':>5}")
     for oid in sorted(centroids):
         centre = centroids[oid]
         label = obj_labels.get(oid, "?")
@@ -736,21 +741,21 @@ def evaluate_scene(scene_id: str,
         d_pred = float(np.linalg.norm(centre - pred_cam_primary))
         v_gt   = "YES" if oid in gt_vis_oid_set   else "no"
         v_pred = "YES" if oid in pred_vis_oid_set else "no"
-        print(f"    {oid:<8} {label:<22} {score:>7.3f} {d_gt:>6.2f}m {v_gt:>4} {d_pred:>7.2f}m {v_pred:>5}")
+        logger.debug(f"    {oid:<8} {label:<22} {score:>7.3f} {d_gt:>6.2f}m {v_gt:>4} {d_pred:>7.2f}m {v_pred:>5}")
     shared = gt_vis_oid_set & pred_vis_oid_set
 
-    print(f"    [DEBUG] GT sees {len(gt_vis_oids)}/{len(centroids)} | "
-          f"pred sees {len(pred_vis_oids)}/{len(centroids)} | "
-          f"shared {len(shared)} | "
-          f"missed by pred: {len(missed)}")
+    logger.debug(f"    [DEBUG] GT sees {len(gt_vis_oids)}/{len(centroids)} | "
+                 f"pred sees {len(pred_vis_oids)}/{len(centroids)} | "
+                 f"shared {len(shared)} | "
+                 f"missed by pred: {len(missed)}")
     if missed:
-        print(f"    {'oid':<8} {'label':<22} {'d_GT':>7} {'d_pred':>8}")
+        logger.debug(f"    {'oid':<8} {'label':<22} {'d_GT':>7} {'d_pred':>8}")
         for oid in sorted(missed):
             centre = centroids[oid]
             label  = obj_labels.get(oid, "?")
             d_gt   = float(np.linalg.norm(centre - gt_cam))
             d_pred = float(np.linalg.norm(centre - pred_cam_primary))
-            print(f"    {oid:<8} {label:<22} {d_gt:>6.2f}m {d_pred:>7.2f}m")
+            logger.debug(f"    {oid:<8} {label:<22} {d_gt:>6.2f}m {d_pred:>7.2f}m")
 
     iou_val, iou_err, gt_vis_set, pred_vis_set = compute_view_iou_error(
         gt_cam, gt_dir,
@@ -762,9 +767,9 @@ def evaluate_scene(scene_id: str,
     )
     metrics.iou_error = iou_err
     if iou_val is not None and iou_err is not None:
-        print(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
+        logger.info(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
     else:
-        print("    view IoU: n/a (missing direction or empty visibility)\n")
+        logger.info("    view IoU: n/a (missing direction or empty visibility)\n")
 
     # --- Visualisation (same as mk4) ---
     if args.show_heatmap:
@@ -814,7 +819,7 @@ def evaluate_scene(scene_id: str,
             plt.tight_layout()
             plt.show()
         else:
-            print("    [info] Arrow plot skipped (no valid FOV windows).")
+            logger.debug("    [info] Arrow plot skipped (no valid FOV windows).")
 
     if args.show_3d:
         matched_set: set[int] = {int(o) for o in obj_ids}
@@ -833,7 +838,7 @@ def evaluate_scene(scene_id: str,
             if not mesh_vis.has_vertex_normals():
                 mesh_vis.compute_vertex_normals()
         except Exception as exc:
-            print(f"    [warn] Segment mesh loading failed ({exc}) — falling back to legacy mesh.")
+            logger.warning(f"    [warn] Segment mesh loading failed ({exc}) — falling back to legacy mesh.")
             mesh_vis = colour_objects(mesh, obj2faces, obj_ids)
             obj_stats = []
         if not mesh_vis.has_vertex_normals():
@@ -994,6 +999,11 @@ def evaluate_scene(scene_id: str,
 
 def main() -> None:
     args = parse_args()
+    logging.basicConfig(
+        level=getattr(logging, args.log_level.upper()),
+        format="%(message)s",
+        stream=sys.stdout,
+    )
     args.hit_radii = [float(r) for r in args.hit_radii]
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
@@ -1004,9 +1014,9 @@ def main() -> None:
     candidate_ids = list(scenes.keys())
     if args.visualize_scene:
         if args.scene_ids:
-            print("[WARN] --visualize_scene overrides --scene_ids.")
+            logger.warning("[WARN] --visualize_scene overrides --scene_ids.")
         if args.visualize_scene not in scenes:
-            print(f"[ERROR] Requested scene '{args.visualize_scene}' not found in processed graphs.")
+            logger.error(f"[ERROR] Requested scene '{args.visualize_scene}' not found in processed graphs.")
             return
         candidate_ids = [args.visualize_scene]
     elif args.scene_ids:
@@ -1024,42 +1034,42 @@ def main() -> None:
     if args.max_scenes is not None:
         candidate_ids = candidate_ids[: args.max_scenes]
 
-    print(f"Evaluating {len(candidate_ids)} scene(s) [mk5 — parsed descriptions]...\n")
+    logger.info(f"Evaluating {len(candidate_ids)} scene(s) [mk5 — parsed descriptions]...\n")
 
     metrics_list: List[SceneMetrics] = []
     for idx, sid in enumerate(candidate_ids, start=1):
-        print(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
+        logger.info(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
         scene_metrics = evaluate_scene(sid, scenes[sid], args, rng)
         if scene_metrics is None:
             continue
         metrics_list.append(scene_metrics)
-        print(f"    frame: {scene_metrics.frame_id}")
-        print(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
+        logger.info(f"    frame: {scene_metrics.frame_id}")
+        logger.info(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
         hit_line = " | ".join(
             f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
             for r in sorted(scene_metrics.hit_masses)
         )
-        print(f"    {hit_line}")
+        logger.info(f"    {hit_line}")
         mass_line = " | ".join(
             f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
             for p in sorted(scene_metrics.mass_radii)
         )
         if mass_line:
-            print(f"    mass-radius: {mass_line}")
+            logger.info(f"    mass-radius: {mass_line}")
         ang_err = ("n/a" if scene_metrics.angular_error_deg is None
                    else f"{scene_metrics.angular_error_deg:.2f}°")
-        print(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
-              f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
+        logger.info(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
+                    f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
         if scene_metrics.iou_error is not None:
-            print(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+            logger.info(f"    view IoU error: {scene_metrics.iou_error:.3f}")
 
     if not metrics_list:
-        print("No scenes produced metrics. Nothing to report.")
+        logger.info("No scenes produced metrics. Nothing to report.")
         if args.log_file:
             args.log_file.parent.mkdir(parents=True, exist_ok=True)
             payload = "No scenes produced metrics.\n\n" + params_text + "\n"
             args.log_file.write_text(payload)
-            print(f"Empty summary logged to {args.log_file}")
+            logger.info(f"Empty summary logged to {args.log_file}")
         return
 
     table_text = build_metrics_table(metrics_list,
@@ -1067,9 +1077,9 @@ def main() -> None:
                                      args.mass_percentiles,
                                      args.top_k_min_dist)
     if table_text:
-        print("Scene-level summary table -------------------------------")
-        print(table_text)
-        print("---------------------------------------------------------\n")
+        logger.info("Scene-level summary table -------------------------------")
+        logger.info(table_text)
+        logger.info("---------------------------------------------------------\n")
 
     def agg(values: List[float]) -> Tuple[float, float]:
         arr = np.asarray(values, dtype=np.float64)
@@ -1120,7 +1130,7 @@ def main() -> None:
     if mean_iou_err is not None and med_iou_err is not None:
         agg_lines.insert(-1,
                          f"  View IoU error     : mean={mean_iou_err:.3f} | median={med_iou_err:.3f}")
-    print("\n".join(agg_lines))
+    logger.info("\n".join(agg_lines))
 
     log_sections: List[str] = [params_text]
     if table_text:
@@ -1131,7 +1141,7 @@ def main() -> None:
     if args.log_file:
         args.log_file.parent.mkdir(parents=True, exist_ok=True)
         args.log_file.write_text(log_payload)
-        print(f"Metrics summary logged to {args.log_file}")
+        logger.info(f"Metrics summary logged to {args.log_file}")
 
     if args.save_metrics:
         payload = [
@@ -1174,7 +1184,7 @@ def main() -> None:
                 "grid_step": args.grid_step,
             },
         }, indent=2))
-        print(f"Metrics saved to {args.save_metrics}")
+        logger.info(f"Metrics saved to {args.save_metrics}")
 
 
 GUI_INITIALISED = False
