@@ -421,7 +421,7 @@ def parse_args() -> argparse.Namespace:
                         help="Lower height percentile to keep (removes floor outliers).")
     parser.add_argument("--ceiling_percentile", type=float, default=95.0,
                         help="Upper height percentile to keep (removes ceilings/noise).")
-    parser.add_argument("--cutoff_above_ground_m", type=float, default=2.5,
+    parser.add_argument("--cutoff_above_ground_m", type=float, default=2.1, # 2.3,
                         help="Additionally cap max height to this many meters above "
                              "estimated ground on the selected height axis.")
     parser.add_argument("--dpi", type=int, default=300,

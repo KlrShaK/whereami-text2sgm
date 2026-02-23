@@ -69,9 +69,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--visualize_scene",
                         help="Scene ID to evaluate alone. Overrides --scene_ids when set.")
     parser.add_argument("--frame_policy",
-                        choices=["first", "index", "random", "max_visible", "max_pixels"],
+                        choices=["first", "index", "random", "max_visible", "max_pixels", "all"],
                         default="max_visible",
-                        help="Strategy for selecting a frame JSON per scene.")
+                        help="Strategy for selecting frame JSON(s) per scene. "
+                             "'all' evaluates every frame in the scene.")
     parser.add_argument("--frame_index", type=int, default=0,
                         help="Frame index used when --frame_policy=index.")
     parser.add_argument("--seed", type=int, default=0,
@@ -96,7 +97,7 @@ def parse_args() -> argparse.Namespace:
 
     parser.add_argument("--save_metrics", type=Path,
                         default=Path("eval/baseline_eval_metrics_mid_point.json"),
-                        help="Path to save per-scene metrics JSON.")
+                        help="Path to save metrics JSON (one entry per evaluated frame).")
     parser.add_argument("--log_file", type=Path,
                         default=Path("eval/baseline_eval_loc_summary_mid_point.log"),
                         help="Path to write summary log.")
@@ -105,11 +106,11 @@ def parse_args() -> argparse.Namespace:
 
 def evaluate_scene(scene_id: str,
                    args: argparse.Namespace,
-                   rng: np.random.Generator) -> Optional[SceneMetrics]:
+                   rng: np.random.Generator) -> List[SceneMetrics]:
     scene_dir = Path(args.root) / scene_id
     if not scene_dir.exists():
         print(f"[WARN] Scene directory missing for {scene_id} — skipped.")
-        return None
+        return []
 
     query_root = ensure_query_root(args.query_root, Path(args.root))
     desc_dir = query_root / scene_id / "output" / "descriptions"
@@ -118,25 +119,16 @@ def evaluate_scene(scene_id: str,
     frames = load_frame_jsons(desc_dir)
     if not frames:
         print(f"[WARN] No frame JSONs under {desc_dir} — skipped.")
-        return None
+        return []
 
-    selection = select_frame(frames, args.frame_policy, args.frame_index, rng)
-    if selection is None:
-        print(f"[WARN] Frame selection failed for {scene_id} — skipped.")
-        return None
-    frame = selection.frame
-
-    gt_pose = frame.get("scene_pose")
-    if gt_pose is None:
-        print(f"[WARN] scene_pose missing in {selection.path} — skipped.")
-        return None
-
-    pose_mat = np.asarray(gt_pose, dtype=np.float64)
-    gt_cam = camera_center_from_pose(pose_mat)
-    rot_cam_world = pose_mat[:3, :3]
-    gt_forward = rot_cam_world @ np.array([0.0, 0.0, 1.0], dtype=np.float64)
-    gt_forward_norm = float(np.linalg.norm(gt_forward))
-    gt_dir = gt_forward / gt_forward_norm if gt_forward_norm > 1e-6 else None
+    if args.frame_policy == "all":
+        selected_frames = frames
+    else:
+        selection = select_frame(frames, args.frame_policy, args.frame_index, rng)
+        if selection is None:
+            print(f"[WARN] Frame selection failed for {scene_id} — skipped.")
+            return []
+        selected_frames = [selection]
 
     mesh, _tri2obj, obj2faces = load_scene(scene_dir)
     rc = o3d.t.geometry.RaycastingScene()
@@ -168,46 +160,69 @@ def evaluate_scene(scene_id: str,
                       f"z_eye={z_eye:.2f} m")
 
     pred_cam = np.array([x_mid, y_mid, z_eye], dtype=np.float64)
-    pred_dir = random_forward(rng, args.random_pitch_deg)
-
     cams = pred_cam.reshape(1, 3)
     probs = np.array([1.0], dtype=np.float64)
-    _pred_idx, metrics = compute_metrics(cams, probs, gt_cam,
-                                         hit_radii=args.hit_radii,
-                                         mass_percentiles=args.mass_percentiles,
-                                         topk_k=args.top_k_min_dist)
-    metrics.scene_id = scene_id
-    metrics.frame_id = str(frame.get("image_index", selection.path.name))
-    metrics.matched_objects = 0
-    metrics.distance_error = float(np.linalg.norm(pred_cam - gt_cam))
-
-    if gt_dir is not None:
-        dot = float(np.clip(np.dot(gt_dir, pred_dir), -1.0, 1.0))
-        metrics.angular_error_deg = float(math.degrees(math.acos(dot)))
-    else:
-        metrics.angular_error_deg = None
-
     hfov = math.radians(args.h_fov_deg)
     vfov = math.radians(args.v_fov_deg)
-    iou_val, iou_err, _gt_set, _pred_set = compute_view_iou_error(
-        gt_cam, gt_dir, pred_cam, pred_dir,
-        hfov=hfov, vfov=vfov,
-        rc=rc, geom_id=int(mesh_id),
-        tri_pts=tri_pts, tri_centroids=tri_centroids, tri_areas=tri_areas,
-        near=0.05, far=None,
-    )
-    metrics.iou_error = iou_err
 
-    print(f"    baseline pose: {bounds_msg}")
-    print(f"    predicted camera (midpoint): {pred_cam.tolist()} | "
-          f"err={metrics.distance_error:.3f} m")
-    print(f"    predicted direction (random): {pred_dir.tolist()}")
-    if iou_val is not None and iou_err is not None:
-        print(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
-    else:
-        print("    view IoU: n/a (missing direction or empty visibility)\n")
+    if len(selected_frames) > 1:
+        print(f"    evaluating all {len(selected_frames)} frames in scene")
 
-    return metrics
+    scene_metrics_list: List[SceneMetrics] = []
+    for frame_idx, selection in enumerate(selected_frames, start=1):
+        frame = selection.frame
+        gt_pose = frame.get("scene_pose")
+        if gt_pose is None:
+            print(f"[WARN] scene_pose missing in {selection.path} — skipped.")
+            continue
+
+        pose_mat = np.asarray(gt_pose, dtype=np.float64)
+        gt_cam = camera_center_from_pose(pose_mat)
+        rot_cam_world = pose_mat[:3, :3]
+        gt_forward = rot_cam_world @ np.array([0.0, 0.0, 1.0], dtype=np.float64)
+        gt_forward_norm = float(np.linalg.norm(gt_forward))
+        gt_dir = gt_forward / gt_forward_norm if gt_forward_norm > 1e-6 else None
+        pred_dir = random_forward(rng, args.random_pitch_deg)
+
+        _pred_idx, metrics = compute_metrics(cams, probs, gt_cam,
+                                             hit_radii=args.hit_radii,
+                                             mass_percentiles=args.mass_percentiles,
+                                             topk_k=args.top_k_min_dist)
+        metrics.scene_id = scene_id
+        metrics.frame_id = str(frame.get("image_index", selection.path.name))
+        metrics.matched_objects = 0
+        metrics.distance_error = float(np.linalg.norm(pred_cam - gt_cam))
+
+        if gt_dir is not None:
+            dot = float(np.clip(np.dot(gt_dir, pred_dir), -1.0, 1.0))
+            metrics.angular_error_deg = float(math.degrees(math.acos(dot)))
+        else:
+            metrics.angular_error_deg = None
+
+        iou_val, iou_err, _gt_set, _pred_set = compute_view_iou_error(
+            gt_cam, gt_dir, pred_cam, pred_dir,
+            hfov=hfov, vfov=vfov,
+            rc=rc, geom_id=int(mesh_id),
+            tri_pts=tri_pts, tri_centroids=tri_centroids, tri_areas=tri_areas,
+            near=0.05, far=None,
+        )
+        metrics.iou_error = iou_err
+
+        if len(selected_frames) > 1:
+            print(f"    frame [{frame_idx:03d}/{len(selected_frames):03d}]: "
+                  f"{metrics.frame_id} ({selection.path.name})")
+        print(f"    baseline pose: {bounds_msg}")
+        print(f"    predicted camera (midpoint): {pred_cam.tolist()} | "
+              f"err={metrics.distance_error:.3f} m")
+        print(f"    predicted direction (random): {pred_dir.tolist()}")
+        if iou_val is not None and iou_err is not None:
+            print(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
+        else:
+            print("    view IoU: n/a (missing direction or empty visibility)\n")
+
+        scene_metrics_list.append(metrics)
+
+    return scene_metrics_list
 
 
 def main() -> None:
@@ -247,29 +262,30 @@ def main() -> None:
     metrics_list: List[SceneMetrics] = []
     for idx, sid in enumerate(candidate_ids, start=1):
         print(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
-        scene_metrics = evaluate_scene(sid, args, rng)
-        if scene_metrics is None:
+        scene_metrics_items = evaluate_scene(sid, args, rng)
+        if not scene_metrics_items:
             continue
-        metrics_list.append(scene_metrics)
-        print(f"    frame: {scene_metrics.frame_id}")
-        print(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
-        hit_line = " | ".join(
-            f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
-            for r in sorted(scene_metrics.hit_masses)
-        )
-        print(f"    {hit_line}")
-        mass_line = " | ".join(
-            f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
-            for p in sorted(scene_metrics.mass_radii)
-        )
-        if mass_line:
-            print(f"    mass-radius: {mass_line}")
-        ang_err = ("n/a" if scene_metrics.angular_error_deg is None
-                   else f"{scene_metrics.angular_error_deg:.2f}°")
-        print(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
-              f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
-        if scene_metrics.iou_error is not None:
-            print(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+        metrics_list.extend(scene_metrics_items)
+        for scene_metrics in scene_metrics_items:
+            print(f"    frame: {scene_metrics.frame_id}")
+            print(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
+            hit_line = " | ".join(
+                f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
+                for r in sorted(scene_metrics.hit_masses)
+            )
+            print(f"    {hit_line}")
+            mass_line = " | ".join(
+                f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
+                for p in sorted(scene_metrics.mass_radii)
+            )
+            if mass_line:
+                print(f"    mass-radius: {mass_line}")
+            ang_err = ("n/a" if scene_metrics.angular_error_deg is None
+                       else f"{scene_metrics.angular_error_deg:.2f}°")
+            print(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
+                  f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
+            if scene_metrics.iou_error is not None:
+                print(f"    view IoU error: {scene_metrics.iou_error:.3f}")
 
     if not metrics_list:
         print("No scenes produced metrics. Nothing to report.")
@@ -284,7 +300,7 @@ def main() -> None:
                                      args.mass_percentiles,
                                      args.top_k_min_dist)
     if table_text:
-        print("Scene-level summary table -------------------------------")
+        print("Scene/frame summary table -------------------------------")
         print(table_text)
         print("---------------------------------------------------------\n")
 
@@ -337,7 +353,7 @@ def main() -> None:
 
     log_sections: List[str] = [params_text]
     if table_text:
-        log_sections.extend(["Scene-level summary table", table_text])
+        log_sections.extend(["Scene/frame summary table", table_text])
     log_sections.append("\n".join(agg_lines))
     log_payload = "\n\n".join(log_sections).rstrip() + "\n"
     args.log_file.parent.mkdir(parents=True, exist_ok=True)
