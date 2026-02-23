@@ -226,9 +226,13 @@ def load_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
     if not desc_dir.exists():
         return frames
 
-    frame_jsons = sorted(desc_dir.glob("frame-*.json"))
+    frame_jsons = sorted(
+        p for p in desc_dir.glob("frame-*.json")
+        if not p.stem.endswith("_parsed")
+    )
     if frame_jsons:
         # Prefer explicit per-frame JSON files when available.
+        # Exclude parser byproducts such as frame-xxxx_parsed.json.
         candidate_paths = frame_jsons
     else:
         # Fallback to aggregate file; if absent, use broad JSON fallback.
@@ -236,7 +240,10 @@ def load_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
         if all_desc.exists():
             candidate_paths = [all_desc]
         else:
-            candidate_paths = sorted(desc_dir.glob("*.json"))
+            candidate_paths = sorted(
+                p for p in desc_dir.glob("*.json")
+                if not p.stem.endswith("_parsed")
+            )
 
     for path in candidate_paths:
         try:
@@ -931,7 +938,9 @@ def load_scene_graphs(graphs_dir: Path,
     g3d_path = graphs_dir / "3dssg" / "3dssg_graphs_processed_edgelists_relationembed.pt"
     if not g3d_path.exists():
         raise FileNotFoundError(g3d_path)
-    g3d = torch.load(g3d_path, map_location="cpu")
+    # Processed graph bundle is a trusted local pickle-like payload (not just weights).
+    # PyTorch 2.6 defaults torch.load(..., weights_only=True), which breaks this file.
+    g3d = torch.load(g3d_path, map_location="cpu", weights_only=False)
     scenes: Dict[str, SceneGraph] = {}
     for sid, graph in g3d.items():
         scenes[sid] = SceneGraph(sid,
