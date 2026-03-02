@@ -24,8 +24,8 @@ EXTRA_ARGS=(
   # Use --frame_policy all to evaluate every frame JSON in each scene.
   --seed 0
   --random_pitch_deg 30.0
-  --save_metrics "./eval/baseline_eval_metrics_mid_point.json"
-  --log_file "./eval/baseline_eval_loc_summary_mid_point.log"
+  --save_metrics "./eval/baseline_eval_metrics_mid_point_scannet.json"
+  --log_file "./eval/baseline_eval_metrics_mid_point_scannet.log"
 )
 
 cd "$PROJECT_DIR" || exit 1
