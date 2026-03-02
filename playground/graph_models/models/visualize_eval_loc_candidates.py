@@ -342,8 +342,13 @@ def parse_args() -> argparse.Namespace:
 
     parser.add_argument("--scene_ids", nargs="+",
                         help="Subset of scene IDs to evaluate. Defaults to intersection of graphs and query_root.")
-    parser.add_argument("--max_scenes", type=int,
-                        help="Limit number of scenes processed (after filtering).")
+    parser.add_argument("--max_scenes", type=int, default=300,
+                        help="Limit number of scenes processed (after filtering). "
+                             "Use 0 or a negative value to disable the limit.")
+    parser.add_argument("--scene_sample_policy",
+                        choices=["random", "first"],
+                        default="random",
+                        help="How to pick scenes when --max_scenes is smaller than available scenes.")
     parser.add_argument("--visualize_scene",
                         help="Scene ID to focus on. Overrides --scene_ids when set.")
 
@@ -353,8 +358,8 @@ def parse_args() -> argparse.Namespace:
                         help="Strategy to pick which frame JSON to evaluate per scene.")
     parser.add_argument("--frame_index", type=int, default=0,
                         help="Frame index used when --frame_policy=index.")
-    parser.add_argument("--seed", type=int, default=0,
-                        help="RNG seed for random frame selection.")
+    parser.add_argument("--seed", type=int, default=42,
+                        help="RNG seed for random scene/frame selection.")
 
     parser.add_argument("--top_k", type=int, default=25,
                         help="How many object matches to keep per caption.")
@@ -391,7 +396,9 @@ def load_scene_graphs(graphs_dir: Path) -> Dict[str, SceneGraph]:
     g3d_path = graphs_dir / "3dssg" / "3dssg_graphs_processed_edgelists_relationembed.pt"
     if not g3d_path.exists():
         raise FileNotFoundError(g3d_path)
-    g3d = torch.load(g3d_path, map_location="cpu")
+
+    # PyTorch >=2.6 defaults to weights_only=True, which breaks loading this graph dict.
+    g3d = torch.load(g3d_path, map_location="cpu", weights_only=False)
     scenes: Dict[str, SceneGraph] = {}
     for sid, graph in g3d.items():
         scenes[sid] = SceneGraph(sid,
@@ -624,8 +631,13 @@ def main() -> None:
         ]
 
     candidate_ids.sort()
-    if args.max_scenes is not None:
-        candidate_ids = candidate_ids[: args.max_scenes]
+    if args.max_scenes is not None and args.max_scenes > 0 and len(candidate_ids) > args.max_scenes:
+        if args.scene_sample_policy == "random":
+            sample_idx = rng.choice(len(candidate_ids), size=args.max_scenes, replace=False)
+            candidate_ids = [candidate_ids[int(i)] for i in sample_idx]
+            candidate_ids.sort()
+        else:
+            candidate_ids = candidate_ids[: args.max_scenes]
 
     if args.output_json is None:
         args.output_json = _THIS_DIR / "eval" / "eval_pose_candidates.json"
@@ -649,6 +661,8 @@ def main() -> None:
             "frame_policy": args.frame_policy,
             "frame_index": args.frame_index,
             "seed": args.seed,
+            "max_scenes": args.max_scenes,
+            "scene_sample_policy": args.scene_sample_policy,
             "top_k": args.top_k,
             "grid_step": args.grid_step,
             "eye_height": args.eye_height,
@@ -661,6 +675,7 @@ def main() -> None:
             "top_candidates": args.top_candidates,
             "top_pose_candidates": args.top_pose_candidates,
         },
+        "selected_scene_ids": candidate_ids,
     }
 
     output_path = Path(args.output_json)
