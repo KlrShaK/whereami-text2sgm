@@ -24,6 +24,7 @@ import json
 import logging
 import math
 import sys
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -34,6 +35,16 @@ import open3d as o3d
 import torch
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class FrameEvalFailure:
+    scene_id: str
+    frame_id: str
+    parsed_path: str
+    raw_path: Optional[str]
+    stage: str
+    reason: str
 
 # --------------------------------------------------------------------------- #
 # Repository imports                                                          #
@@ -354,9 +365,10 @@ def parse_args() -> argparse.Namespace:
                         help="Scene ID to focus on for visualisation.")
 
     parser.add_argument("--frame_policy",
-                        choices=["first", "index", "random", "max_visible", "max_pixels"],
+                        choices=["first", "index", "random", "max_visible", "max_pixels", "all"],
                         default="max_visible",
-                        help="Strategy to pick which parsed frame to evaluate per scene.")
+                        help="Strategy to pick parsed frame JSON(s) per scene. "
+                             "'all' evaluates every parsed frame in the scene.")
     parser.add_argument("--frame_index", type=int, default=0)
     parser.add_argument("--seed", type=int, default=0)
 
@@ -415,32 +427,34 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def evaluate_scene(scene_id: str,
-                   scene_graph: SceneGraph,
-                   args: argparse.Namespace,
-                   rng: np.random.Generator) -> Optional[SceneMetrics]:
-    mesh_root = Path(args.root)
-    scene_dir = mesh_root / scene_id
-    if not scene_dir.exists():
-        logger.warning(f"[WARN] Scene directory missing for {scene_id} — skipped.")
-        return None
+def _make_failure(scene_id: str,
+                  stage: str,
+                  reason: str,
+                  selection: Optional[FrameSelection] = None,
+                  frame_data: Optional[dict] = None,
+                  raw_path: Optional[Path] = None) -> FrameEvalFailure:
+    fd = frame_data if frame_data is not None else (selection.frame if selection is not None else {})
+    frame_id = "scene_level"
+    if isinstance(fd, dict):
+        frame_id = str(fd.get("source_frame") or fd.get("image_index") or frame_id)
+    if frame_id == "scene_level" and selection is not None:
+        frame_id = selection.path.name
+    return FrameEvalFailure(
+        scene_id=scene_id,
+        frame_id=frame_id,
+        parsed_path=(str(selection.path) if selection is not None else "n/a"),
+        raw_path=(str(raw_path) if raw_path is not None else None),
+        stage=stage,
+        reason=reason,
+    )
 
-    query_root = ensure_query_root(args.query_root, Path(args.root))
-    desc_dir = query_root / scene_id / "output" / "descriptions"
-    if not desc_dir.exists():
-        desc_dir = scene_dir / "output" / "descriptions"
 
-    # Load parsed frames instead of raw frames
-    frames = load_parsed_frame_jsons(desc_dir)
-    if not frames:
-        logger.warning(f"[WARN] No parsed frame JSONs under {desc_dir} — skipped.")
-        return None
-
-    selection = select_parsed_frame(frames, args.frame_policy, args.frame_index, rng)
-    if selection is None:
-        logger.warning(f"[WARN] Frame selection failed for {scene_id} — skipped.")
-        return None
-
+def _evaluate_selected_frame(scene_id: str,
+                             scene_graph: SceneGraph,
+                             selection: FrameSelection,
+                             scene_dir: Path,
+                             args: argparse.Namespace,
+                             rng: np.random.Generator) -> Tuple[Optional[SceneMetrics], Optional[FrameEvalFailure]]:
     frame_data = selection.frame
 
     try:
@@ -452,11 +466,15 @@ def evaluate_scene(scene_id: str,
         )
     except Exception as exc:
         logger.warning(f"[WARN] Failed to build caption graph for {scene_id}: {exc}")
-        return None
+        return None, _make_failure(scene_id, "parsed_graph_build",
+                                   f"Failed to build caption graph: {exc}",
+                                   selection=selection, frame_data=frame_data)
 
     if not caption_meta:
         logger.warning(f"[WARN] {scene_id}: no parsed nodes matched visible objects — skipped.")
-        return None
+        return None, _make_failure(scene_id, "grounding",
+                                   "no parsed nodes matched visible objects",
+                                   selection=selection, frame_data=frame_data)
 
     frame_id_dbg = str(frame_data.get("source_frame", selection.path.name))
 
@@ -484,13 +502,19 @@ def evaluate_scene(scene_id: str,
     original_path = selection.path.with_name(original_name)
     if not original_path.exists():
         logger.warning(f"[WARN] Original frame JSON not found: {original_path} — skipped.")
-        return None
+        return None, _make_failure(scene_id, "raw_frame_lookup",
+                                   "Original frame JSON not found",
+                                   selection=selection, frame_data=frame_data,
+                                   raw_path=original_path)
 
     original_frame = json.loads(original_path.read_text())
     gt_pose = original_frame.get("scene_pose")
     if gt_pose is None:
         logger.warning(f"[WARN] scene_pose missing in {original_path} — skipped.")
-        return None
+        return None, _make_failure(scene_id, "gt_pose",
+                                   "scene_pose missing in raw frame JSON",
+                                   selection=selection, frame_data=frame_data,
+                                   raw_path=original_path)
 
     pose_mat = np.asarray(gt_pose, dtype=np.float64)
     gt_cam = camera_center_from_pose(pose_mat)
@@ -514,7 +538,10 @@ def evaluate_scene(scene_id: str,
     )
     if not obj_ids:
         logger.warning(f"[WARN] {scene_id}: no cosine matches — skipped.")
-        return None
+        return None, _make_failure(scene_id, "object_match",
+                                   "no cosine matches",
+                                   selection=selection, frame_data=frame_data,
+                                   raw_path=original_path)
 
     mesh, tri2obj, obj2faces = load_scene(scene_dir)
     rc = o3d.t.geometry.RaycastingScene()
@@ -559,7 +586,10 @@ def evaluate_scene(scene_id: str,
 
     if not centroids:
         logger.warning(f"[WARN] {scene_id}: matched objects missing geometry — skipped.")
-        return None
+        return None, _make_failure(scene_id, "geometry",
+                                   "matched objects missing geometry",
+                                   selection=selection, frame_data=frame_data,
+                                   raw_path=original_path)
 
     visible_dirs: List[List[np.ndarray]] = [[] for _ in range(len(cams))]
     visible_dists: List[List[float]] = [[] for _ in range(len(cams))]
@@ -576,7 +606,10 @@ def evaluate_scene(scene_id: str,
     total = counts.sum()
     if total == 0:
         logger.warning(f"[WARN] {scene_id}: matched objects invisible from grid — skipped.")
-        return None
+        return None, _make_failure(scene_id, "visibility",
+                                   "matched objects invisible from grid",
+                                   selection=selection, frame_data=frame_data,
+                                   raw_path=original_path)
 
     dist_bonus = np.array(
         [proximity_bonus(np.asarray(d, dtype=np.float64), args.distance_bonus_decay)
@@ -994,7 +1027,87 @@ def evaluate_scene(scene_id: str,
         gui.Application.instance.add_window(vis_iou)
         gui.Application.instance.run()
 
-    return metrics
+    return metrics, None
+
+
+def evaluate_scene(scene_id: str,
+                   scene_graph: SceneGraph,
+                   args: argparse.Namespace,
+                   rng: np.random.Generator) -> Tuple[List[SceneMetrics], List[FrameEvalFailure]]:
+    mesh_root = Path(args.root)
+    scene_dir = mesh_root / scene_id
+    if not scene_dir.exists():
+        msg = f"Scene directory missing for {scene_id}"
+        logger.warning(f"[WARN] {msg} — skipped.")
+        return [], [_make_failure(scene_id, "scene_setup", msg)]
+
+    query_root = ensure_query_root(args.query_root, Path(args.root))
+    desc_dir = query_root / scene_id / "output" / "descriptions"
+    if not desc_dir.exists():
+        desc_dir = scene_dir / "output" / "descriptions"
+
+    frames = load_parsed_frame_jsons(desc_dir)
+    if not frames:
+        msg = f"No parsed frame JSONs under {desc_dir}"
+        logger.warning(f"[WARN] {msg} — skipped.")
+        return [], [_make_failure(scene_id, "scene_setup", msg)]
+
+    if args.frame_policy == "all":
+        selected_frames = frames
+    else:
+        selection = select_parsed_frame(frames, args.frame_policy, args.frame_index, rng)
+        if selection is None:
+            msg = "Frame selection failed"
+            logger.warning(f"[WARN] {msg} for {scene_id} — skipped.")
+            return [], [_make_failure(scene_id, "frame_selection", msg)]
+        selected_frames = [selection]
+
+    if args.frame_policy == "all" and len(selected_frames) > 1:
+        logger.info(f"    evaluating all {len(selected_frames)} parsed frames in scene")
+
+    metrics_items: List[SceneMetrics] = []
+    failures: List[FrameEvalFailure] = []
+    for frame_idx, selection in enumerate(selected_frames, start=1):
+        if args.frame_policy == "all" and len(selected_frames) > 1:
+            frame_id = str(selection.frame.get("source_frame", selection.path.name))
+            logger.info(f"    frame [{frame_idx:03d}/{len(selected_frames):03d}]: "
+                        f"{frame_id} ({selection.path.name})")
+        metric, failure = _evaluate_selected_frame(scene_id, scene_graph, selection, scene_dir, args, rng)
+        if failure is not None:
+            failures.append(failure)
+            continue
+        if metric is not None:
+            metrics_items.append(metric)
+
+    return metrics_items, failures
+
+
+def _format_failures_section(failures: List[FrameEvalFailure]) -> str:
+    lines: List[str] = ["Failed frames summary", "--------------------",
+                        f"Total failed frames: {len(failures)}"]
+    if not failures:
+        lines.append("No failed frames.")
+        return "\n".join(lines)
+
+    stage_counts = Counter(f.stage for f in failures)
+    lines.append("")
+    lines.append("By stage")
+    for stage in sorted(stage_counts):
+        lines.append(f"  {stage}: {stage_counts[stage]}")
+
+    reason_counts = Counter(f.reason for f in failures)
+    lines.append("")
+    lines.append("By reason")
+    for reason, count in sorted(reason_counts.items(), key=lambda kv: (-kv[1], kv[0])):
+        lines.append(f"  {count:>4} | {reason}")
+
+    lines.append("")
+    lines.append("Details")
+    for f in failures:
+        raw = f.raw_path if f.raw_path is not None else "n/a"
+        lines.append(f"{f.scene_id} | {f.frame_id} | {f.stage} | {f.reason} | "
+                     f"parsed={f.parsed_path} | raw={raw}")
+    return "\n".join(lines)
 
 
 def main() -> None:
@@ -1037,37 +1150,41 @@ def main() -> None:
     logger.info(f"Evaluating {len(candidate_ids)} scene(s) [mk5 — parsed descriptions]...\n")
 
     metrics_list: List[SceneMetrics] = []
+    failures: List[FrameEvalFailure] = []
     for idx, sid in enumerate(candidate_ids, start=1):
         logger.info(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
-        scene_metrics = evaluate_scene(sid, scenes[sid], args, rng)
-        if scene_metrics is None:
+        scene_metrics_items, scene_failures = evaluate_scene(sid, scenes[sid], args, rng)
+        failures.extend(scene_failures)
+        if not scene_metrics_items:
             continue
-        metrics_list.append(scene_metrics)
-        logger.info(f"    frame: {scene_metrics.frame_id}")
-        logger.info(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
-        hit_line = " | ".join(
-            f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
-            for r in sorted(scene_metrics.hit_masses)
-        )
-        logger.info(f"    {hit_line}")
-        mass_line = " | ".join(
-            f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
-            for p in sorted(scene_metrics.mass_radii)
-        )
-        if mass_line:
-            logger.info(f"    mass-radius: {mass_line}")
-        ang_err = ("n/a" if scene_metrics.angular_error_deg is None
-                   else f"{scene_metrics.angular_error_deg:.2f}°")
-        logger.info(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
-                    f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
-        if scene_metrics.iou_error is not None:
-            logger.info(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+        metrics_list.extend(scene_metrics_items)
+        for scene_metrics in scene_metrics_items:
+            logger.info(f"    frame: {scene_metrics.frame_id}")
+            logger.info(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
+            hit_line = " | ".join(
+                f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
+                for r in sorted(scene_metrics.hit_masses)
+            )
+            logger.info(f"    {hit_line}")
+            mass_line = " | ".join(
+                f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
+                for p in sorted(scene_metrics.mass_radii)
+            )
+            if mass_line:
+                logger.info(f"    mass-radius: {mass_line}")
+            ang_err = ("n/a" if scene_metrics.angular_error_deg is None
+                       else f"{scene_metrics.angular_error_deg:.2f}°")
+            logger.info(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
+                        f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
+            if scene_metrics.iou_error is not None:
+                logger.info(f"    view IoU error: {scene_metrics.iou_error:.3f}")
 
     if not metrics_list:
         logger.info("No scenes produced metrics. Nothing to report.")
         if args.log_file:
             args.log_file.parent.mkdir(parents=True, exist_ok=True)
-            payload = "No scenes produced metrics.\n\n" + params_text + "\n"
+            failure_lines = _format_failures_section(failures)
+            payload = "No scenes produced metrics.\n\n" + params_text + "\n\n" + failure_lines + "\n"
             args.log_file.write_text(payload)
             logger.info(f"Empty summary logged to {args.log_file}")
         return
@@ -1077,7 +1194,7 @@ def main() -> None:
                                      args.mass_percentiles,
                                      args.top_k_min_dist)
     if table_text:
-        logger.info("Scene-level summary table -------------------------------")
+        logger.info("Scene/frame summary table -------------------------------")
         logger.info(table_text)
         logger.info("---------------------------------------------------------\n")
 
@@ -1134,9 +1251,10 @@ def main() -> None:
 
     log_sections: List[str] = [params_text]
     if table_text:
-        log_sections.append("Scene-level summary table")
+        log_sections.append("Scene/frame summary table")
         log_sections.append(table_text)
     log_sections.append("\n".join(agg_lines))
+    log_sections.append(_format_failures_section(failures))
     log_payload = "\n\n".join(log_sections).rstrip() + "\n"
     if args.log_file:
         args.log_file.parent.mkdir(parents=True, exist_ok=True)
@@ -1167,8 +1285,20 @@ def main() -> None:
             str(p): {"mean": mean_r, "median": med_r}
             for p, (mean_r, med_r) in mass_radius_stats.items()
         }
+        args.save_metrics.parent.mkdir(parents=True, exist_ok=True)
         args.save_metrics.write_text(json.dumps({
             "metrics": payload,
+            "failures": [
+                {
+                    "scene_id": f.scene_id,
+                    "frame_id": f.frame_id,
+                    "parsed_path": f.parsed_path,
+                    "raw_path": f.raw_path,
+                    "stage": f.stage,
+                    "reason": f.reason,
+                }
+                for f in failures
+            ],
             "aggregate": {
                 "hit_masses": hit_mass_summary,
                 "mass_radii": mass_radius_summary,

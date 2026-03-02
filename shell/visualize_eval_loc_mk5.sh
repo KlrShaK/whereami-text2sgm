@@ -15,17 +15,17 @@ QUERY_ROOT="/media/klrshak/Backup/Datasets/3RScan_processed"
 GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data"
 
 # Optional: restrict to a subset of scene IDs (space separated). Leave empty for all.
-SCENE_IDS=(0ad2d3a5-79e2-2212-9a9e-2502a05fa678 8eabc42c-5af7-2f32-87c4-bf646779aa62 283ccfed-107c-24d5-8b72-5f6004ef4f94 422885ad-192d-25fc-8631-c3a978a9d3d4)
-# SCENE_IDS=()
+# SCENE_IDS=(0ad2d3a5-79e2-2212-9a9e-2502a05fa678 8eabc42c-5af7-2f32-87c4-bf646779aa62 283ccfed-107c-24d5-8b72-5f6004ef4f94 422885ad-192d-25fc-8631-c3a978a9d3d4)
+SCENE_IDS=()
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
   # --show_heatmap
   # --show_arrows
   # --show_3d
-  --save_metrics "./eval/eval_metrics_mk5.json"
-  --log_file "./eval/eval_loc_summary_mk5.log"
-  --frame_policy max_visible
+  --save_metrics "./eval/eval_metrics_mk5_all.json"
+  --log_file "./eval/eval_loc_summary_mk5_all.log"
+  --frame_policy all
   --query_embedding_mode doc
   --homogenize_label_embeddings
   --dynamic_top_k
