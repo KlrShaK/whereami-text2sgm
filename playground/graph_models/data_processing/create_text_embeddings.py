@@ -61,6 +61,21 @@ def check_tokens():
 # -------------------------------------------------------------------------------------------
 # Function to create an embedding using OpenAI's API
 # CHANGED to implement clip embeddings
+def _extract_clip_text_features(outputs):
+    """Normalize CLIP text outputs across transformers versions to a tensor."""
+    if isinstance(outputs, torch.Tensor):
+        return outputs
+    if hasattr(outputs, "text_embeds") and outputs.text_embeds is not None:
+        return outputs.text_embeds
+    if hasattr(outputs, "pooler_output") and outputs.pooler_output is not None:
+        return outputs.pooler_output
+    if isinstance(outputs, (tuple, list)) and outputs:
+        first = outputs[0]
+        if isinstance(first, torch.Tensor):
+            return first
+    raise TypeError(f"Unsupported CLIP output type: {type(outputs)!r}")
+
+
 def create_embedding_clip(text: str) -> torch.Tensor:
     """
     Returns a 512-dimensional CLIP text embedding for the given string.
@@ -73,8 +88,9 @@ def create_embedding_clip(text: str) -> torch.Tensor:
         return_tensors="pt"
     )
     with torch.no_grad():
-        outputs   = _clip_model.get_text_features(**inputs)
-        embedding = outputs.squeeze(0)
+        outputs = _clip_model.get_text_features(**inputs)
+        text_features = _extract_clip_text_features(outputs)
+        embedding = text_features.squeeze(0)
     return embedding
 
 # CHANGED to implement clip embeddings (optional batch version)
@@ -90,8 +106,9 @@ def create_embeddings_clip_batch(texts: list[str]) -> torch.Tensor:
         return_tensors="pt"
     )
     with torch.no_grad():
-        outputs = _clip_model.get_text_features(**inputs)  # (N, 512)
-    return outputs
+        outputs = _clip_model.get_text_features(**inputs)
+        text_features = _extract_clip_text_features(outputs)  # (N, D)
+    return text_features
 # -------------------------------------------------------------------------------------------
 
 def create_embedding(text):
