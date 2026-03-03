@@ -65,35 +65,15 @@ from data_distribution_analysis.helper import get_matching_subgraph  # noqa: E40
 # ════════════════════════════════════════════════════════════════════════════
 #  Utility: load mesh + obj↔face maps                                         ═
 # ════════════════════════════════════════════════════════════════════════════
-def load_scene(scan_dir: Path):
-    """Return (legacy mesh, faces→object-id array, obj→faces dict)."""
-    ply = scan_dir / "labels.instances.annotated.v2.ply"
-    if not ply.exists():
-        raise FileNotFoundError(ply)
-    mesh = o3d.io.read_triangle_mesh(str(ply))
-    mesh.compute_vertex_normals()
+def load_scene(scan_dir: Path, dataset: str = "3rscan"):
+    """Return (legacy mesh, faces→object-id array, obj→faces dict).
 
-    vc   = (np.asarray(mesh.vertex_colors) * 255 + 0.5).astype(np.uint32)
-    vhex = (vc[:, 0] << 16) | (vc[:, 1] << 8) | vc[:, 2]
+    Backward-compatible wrapper used by evaluation scripts. Defaults to the
+    historic 3RScan behavior when dataset is not provided.
+    """
+    from localization_dataset_io import load_scene_geometry
 
-    meta = {
-        s["scan"]: s
-        for s in json.load(open(scan_dir.parent / "objects.json"))["scans"]
-    }[scan_dir.name]
-    color2oid = {int(o["ply_color"].lstrip("#"), 16): int(o["id"])
-                 for o in meta["objects"]}
-
-    v_oid = np.array([color2oid.get(int(h), 0) for h in vhex], dtype=np.int32)
-    tris  = np.asarray(mesh.triangles, dtype=np.int32)
-    tri2obj = np.array([np.bincount(v_oid[t]).argmax() for t in tris],
-                       dtype=np.int32)
-
-    obj2faces = {}
-    for fid, oid in enumerate(tri2obj):
-        if oid != 0:
-            obj2faces.setdefault(int(oid), []).append(fid)
-    obj2faces = {k: np.asarray(v, dtype=np.int32) for k, v in obj2faces.items()}
-    return mesh, tri2obj, obj2faces
+    return load_scene_geometry(scan_dir, dataset=dataset)
 
 
 # ════════════════════════════════════════════════════════════════════════════
