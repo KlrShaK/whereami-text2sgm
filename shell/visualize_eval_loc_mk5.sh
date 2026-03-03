@@ -14,6 +14,16 @@ QUERY_ROOT="/media/klrshak/Backup/Datasets/3RScan_processed"
 # Processed graphs directory (contains processed_data/3dssg/*.pt)
 GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data"
 
+# Dataset layout for loaders: 3rscan | scannet
+DATASET="3rscan"
+
+# # ScanNet example:
+# DATASET="scannet"
+# SCENE_ROOT="/media/klrshak/Backup/Datasets/Scannet_300_Scenes"
+# QUERY_ROOT="/media/klrshak/Backup/Datasets/Scannet_300_Scenes"
+# GRAPHS_DIR=""
+
+
 # Optional: restrict to a subset of scene IDs (space separated). Leave empty for all.
 # SCENE_IDS=(0ad2d3a5-79e2-2212-9a9e-2502a05fa678 8eabc42c-5af7-2f32-87c4-bf646779aa62 283ccfed-107c-24d5-8b72-5f6004ef4f94 422885ad-192d-25fc-8631-c3a978a9d3d4)
 SCENE_IDS=()
@@ -43,6 +53,7 @@ cd "$PROJECT_DIR" || exit 1
 CMD=(
   python visualize_eval_loc_mk5.py
   --root "$SCENE_ROOT"
+  --dataset "$DATASET"
   --graphs "$GRAPHS_DIR"
   --query_root "$QUERY_ROOT"
 )
