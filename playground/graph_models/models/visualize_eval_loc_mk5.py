@@ -3,7 +3,7 @@
 visualize_eval_loc_mk5.py
 -------------------------
 Evaluate localisation quality using **GPT-parsed description graphs** cached as
-``frame-XXXXXX_parsed.json`` files (produced by ``preprocess_descriptions.py``).
+``*_parsed.json`` files (produced by ``preprocess_descriptions.py``).
 
 This is the same evaluation pipeline as ``visualize_eval_loc_mk4.py`` but the
 caption SceneGraph is built from the pre-parsed + pre-embedded text description
@@ -57,6 +57,11 @@ from scene_graph import SceneGraph  # noqa: E402
 from create_text_embeddings import create_embedding_nlp  # noqa: E402
 from graph_loader_utils import get_word2vec  # noqa: E402
 from visualize_3rscan_segments import build_segmented_mesh  # noqa: E402
+from localization_dataset_io import (
+    load_object_labels,
+    load_parsed_frame_jsons as load_parsed_frame_records,
+    resolve_raw_frame_path_from_parsed,
+)
 
 # --------------------------------------------------------------------------- #
 # Import helpers from visualize_loc_prob.py                                   #
@@ -145,19 +150,8 @@ def _embed_word2vec(text: str, mode: str = "token") -> List[float]:
 # --------------------------------------------------------------------------- #
 
 def load_parsed_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
-    """Load *_parsed.json files from a descriptions directory."""
-    frames: List[FrameSelection] = []
-    if not desc_dir.exists():
-        return frames
-
-    for path in sorted(desc_dir.glob("frame-*_parsed.json")):
-        try:
-            data = json.loads(path.read_text())
-        except json.JSONDecodeError:
-            continue
-        if isinstance(data, dict) and "parsed_graph" in data:
-            frames.append(FrameSelection(frame=data, path=path))
-    return frames
+    records = load_parsed_frame_records(desc_dir)
+    return [FrameSelection(frame=rec.frame, path=rec.path) for rec in records]
 
 
 def select_parsed_frame(frames: List[FrameSelection],
@@ -209,8 +203,10 @@ def recover_centroids(parsed_graph: dict,
     Returns a dict mapping parsed node id -> meta dict with centroid_world.
     """
     # Load the original frame JSON (strip _parsed suffix)
-    original_name = frame_path.stem.replace("_parsed", "") + ".json"
-    original_path = frame_path.with_name(original_name)
+    try:
+        original_path = resolve_raw_frame_path_from_parsed(frame_path)
+    except ValueError:
+        return {}
     if not original_path.exists():
         return {}
 
@@ -352,10 +348,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--root", required=True,
                         help="Root directory containing <scene_id>/ meshes.")
+    parser.add_argument("--dataset", required=True, choices=["3rscan", "scannet"],
+                        help="Dataset layout used under --root and --query_root.")
     parser.add_argument("--graphs", required=True, type=Path,
                         help="processed_data directory holding 3dssg/*.pt files.")
     parser.add_argument("--query_root", type=Path,
-                        help="Root containing per-scene output/descriptions/frame-*_parsed.json")
+                        help="Root containing per-scene output/descriptions/*_parsed.json")
 
     parser.add_argument("--scene_ids", nargs="+",
                         help="Subset of scene IDs to evaluate.")
@@ -498,8 +496,13 @@ def _evaluate_selected_frame(scene_id: str,
                             homogenize_label_embeddings=args.homogenize_label_embeddings)
 
     # Load GT pose from original frame JSON
-    original_name = selection.path.stem.replace("_parsed", "") + ".json"
-    original_path = selection.path.with_name(original_name)
+    try:
+        original_path = resolve_raw_frame_path_from_parsed(selection.path)
+    except ValueError:
+        logger.warning(f"[WARN] Invalid parsed frame path: {selection.path} — skipped.")
+        return None, _make_failure(scene_id, "raw_frame_lookup",
+                                   "Invalid parsed frame naming (expected *_parsed.json)",
+                                   selection=selection, frame_data=frame_data)
     if not original_path.exists():
         logger.warning(f"[WARN] Original frame JSON not found: {original_path} — skipped.")
         return None, _make_failure(scene_id, "raw_frame_lookup",
@@ -543,7 +546,7 @@ def _evaluate_selected_frame(scene_id: str,
                                    selection=selection, frame_data=frame_data,
                                    raw_path=original_path)
 
-    mesh, tri2obj, obj2faces = load_scene(scene_dir)
+    mesh, tri2obj, obj2faces = load_scene(scene_dir, dataset=args.dataset)
     rc = o3d.t.geometry.RaycastingScene()
     mesh_id = rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
     if not mesh.has_vertex_normals():
@@ -557,7 +560,7 @@ def _evaluate_selected_frame(scene_id: str,
     tri_cross = np.cross(tri_vecs, tri_vecs_b)
     tri_areas = 0.5 * np.linalg.norm(tri_cross, axis=1)
     tri_centroids = tri_pts.mean(axis=1)
-    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces)
+    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces, args.dataset)
     if floor_bbox is not None:
         x_min, x_max = floor_bbox["x_min"], floor_bbox["x_max"]
         y_min, y_max = floor_bbox["y_min"], floor_bbox["y_max"]
@@ -565,7 +568,7 @@ def _evaluate_selected_frame(scene_id: str,
         logger.info(f"    floor bbox: X=[{x_min:.2f}, {x_max:.2f}] "
                     f"Y=[{y_min:.2f}, {y_max:.2f}] Z_eye={z_eye:.2f} m")
     else:
-        logger.warning(f"    [WARN] No floor in semseg — sampling over full mesh bounds.")
+        logger.warning(f"    [WARN] No floor in semantic labels — sampling over full mesh bounds.")
         x_min, x_max = float(verts[:, 0].min()), float(verts[:, 0].max())
         y_min, y_max = float(verts[:, 1].min()), float(verts[:, 1].max())
         z_eye = float(verts[:, 2].min()) + args.eye_height
@@ -746,11 +749,7 @@ def _evaluate_selected_frame(scene_id: str,
     logger.debug(f"    primary prediction used for metrics: {pred_source}")
 
     # Per-object visibility debug
-    semseg_path = scene_dir / "semseg.v2.json"
-    obj_labels: Dict[int, str] = {}
-    if semseg_path.exists():
-        for g in json.loads(semseg_path.read_text())["segGroups"]:
-            obj_labels[int(g["objectId"])] = g.get("label", "").strip()
+    obj_labels = load_object_labels(scene_dir, args.dataset)
 
     gt_vis_oids: List[int] = []
     pred_vis_oids: List[int] = []
@@ -1121,6 +1120,7 @@ def main() -> None:
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
+    logger.info(f"Dataset mode: {args.dataset}")
 
     scenes = load_scene_graphs(args.graphs, scene_use_attributes=args.scene_use_attributes)
 

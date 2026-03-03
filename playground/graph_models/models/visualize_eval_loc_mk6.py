@@ -46,6 +46,11 @@ from create_text_embeddings import (  # noqa: E402
     create_embeddings_clip_batch,
 )
 from visualize_3rscan_segments import build_segmented_mesh  # noqa: E402
+from localization_dataset_io import (
+    load_object_labels,
+    load_parsed_frame_jsons as load_parsed_frame_records,
+    resolve_raw_frame_path_from_parsed,
+)
 
 # --------------------------------------------------------------------------- #
 # Import helpers from visualize_loc_prob.py                                   #
@@ -147,17 +152,8 @@ def load_scene_graphs_clip(graphs_dir: Path,
 # --------------------------------------------------------------------------- #
 
 def load_parsed_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
-    frames: List[FrameSelection] = []
-    if not desc_dir.exists():
-        return frames
-    for path in sorted(desc_dir.glob("frame-*_parsed.json")):
-        try:
-            data = json.loads(path.read_text())
-        except json.JSONDecodeError:
-            continue
-        if isinstance(data, dict) and "parsed_graph" in data:
-            frames.append(FrameSelection(frame=data, path=path))
-    return frames
+    records = load_parsed_frame_records(desc_dir)
+    return [FrameSelection(frame=rec.frame, path=rec.path) for rec in records]
 
 
 def select_parsed_frame(frames: List[FrameSelection],
@@ -199,8 +195,10 @@ def recover_centroids(parsed_graph: dict,
                       similarity_threshold: float = 0.7) -> Dict[int, dict]:
     """Match parsed node labels to visible_objects via CLIP cosine similarity
     and recover centroid_world for each matched parsed node."""
-    original_name = frame_path.stem.replace("_parsed", "") + ".json"
-    original_path = frame_path.with_name(original_name)
+    try:
+        original_path = resolve_raw_frame_path_from_parsed(frame_path)
+    except ValueError:
+        return {}
     if not original_path.exists():
         return {}
 
@@ -551,8 +549,10 @@ def debug_match_labels_mk6(
     label_sim = (qf @ sf.T).numpy()
 
     # Load GT visible_objects if available
-    original_name = frame_path.stem.replace("_parsed", "") + ".json"
-    original_path = frame_path.with_name(original_name)
+    try:
+        original_path = resolve_raw_frame_path_from_parsed(frame_path)
+    except ValueError:
+        original_path = frame_path.with_name(frame_path.stem + ".json")
     gt_labels: Dict[str, str] = {}
     if original_path.exists():
         original = json.loads(original_path.read_text())
@@ -689,10 +689,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--root", required=True,
                         help="Root directory containing <scene_id>/ meshes.")
+    parser.add_argument("--dataset", required=True, choices=["3rscan", "scannet"],
+                        help="Dataset layout used under --root and --query_root.")
     parser.add_argument("--graphs", required=True, type=Path,
                         help="processed_data directory holding 3dssg/*.pt files.")
     parser.add_argument("--query_root", type=Path,
-                        help="Root containing per-scene output/descriptions/frame-*_parsed.json")
+                        help="Root containing per-scene output/descriptions/*_parsed.json")
 
     parser.add_argument("--scene_ids", nargs="+",
                         help="Subset of scene IDs to evaluate.")
@@ -845,8 +847,11 @@ def evaluate_scene(scene_id: str,
         )
 
     # Load GT pose from original frame JSON
-    original_name = selection.path.stem.replace("_parsed", "") + ".json"
-    original_path = selection.path.with_name(original_name)
+    try:
+        original_path = resolve_raw_frame_path_from_parsed(selection.path)
+    except ValueError:
+        logger.warning(f"Invalid parsed frame path: {selection.path} - skipped.")
+        return None
     if not original_path.exists():
         logger.warning(f"Original frame JSON not found: {original_path} - skipped.")
         return None
@@ -883,7 +888,7 @@ def evaluate_scene(scene_id: str,
         logger.warning(f"{scene_id}: no matches - skipped.")
         return None
 
-    mesh, tri2obj, obj2faces = load_scene(scene_dir)
+    mesh, tri2obj, obj2faces = load_scene(scene_dir, dataset=args.dataset)
     rc = o3d.t.geometry.RaycastingScene()
     mesh_id = rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
     if not mesh.has_vertex_normals():
@@ -897,7 +902,7 @@ def evaluate_scene(scene_id: str,
     tri_cross = np.cross(tri_vecs, tri_vecs_b)
     tri_areas = 0.5 * np.linalg.norm(tri_cross, axis=1)
     tri_centroids = tri_pts.mean(axis=1)
-    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces)
+    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces, args.dataset)
     if floor_bbox is not None:
         x_min, x_max = floor_bbox["x_min"], floor_bbox["x_max"]
         y_min, y_max = floor_bbox["y_min"], floor_bbox["y_max"]
@@ -907,7 +912,7 @@ def evaluate_scene(scene_id: str,
             f"Y=[{y_min:.2f}, {y_max:.2f}] Z_eye={z_eye:.2f} m"
         )
     else:
-        logger.warning("    No floor in semseg - sampling over full mesh bounds.")
+        logger.warning("    No floor in semantic labels - sampling over full mesh bounds.")
         x_min, x_max = float(verts[:, 0].min()), float(verts[:, 0].max())
         y_min, y_max = float(verts[:, 1].min()), float(verts[:, 1].max())
         z_eye = float(verts[:, 2].min()) + args.eye_height
@@ -1086,11 +1091,7 @@ def evaluate_scene(scene_id: str,
     logger.info(f"    primary prediction used for metrics: {pred_source}")
 
     # Per-object visibility debug
-    semseg_path = scene_dir / "semseg.v2.json"
-    obj_labels: Dict[int, str] = {}
-    if semseg_path.exists():
-        for g in json.loads(semseg_path.read_text())["segGroups"]:
-            obj_labels[int(g["objectId"])] = g.get("label", "").strip()
+    obj_labels = load_object_labels(scene_dir, args.dataset)
 
     gt_vis_oids: List[int] = []
     pred_vis_oids: List[int] = []
@@ -1378,6 +1379,7 @@ def main() -> None:
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
+    logger.info(f"Dataset mode: {args.dataset}")
 
     scenes = load_scene_graphs_clip(args.graphs, scene_use_attributes=args.scene_use_attributes)
 

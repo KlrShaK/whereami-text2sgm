@@ -41,6 +41,7 @@ sys.path.append("../../../")
 
 from scene_graph import SceneGraph  # noqa: E402
 from create_text_embeddings import create_embedding_nlp  # noqa: E402
+from localization_dataset_io import load_structured_frame_jsons
 
 # --------------------------------------------------------------------------- #
 # Import helpers from visualize_loc_prob.py                                  #
@@ -92,24 +93,8 @@ def _embed_word2vec(text: str) -> List[float]:
 
 
 def load_frame_jsons(desc_dir: Path) -> List[FrameSelection]:
-    frames: List[FrameSelection] = []
-    if not desc_dir.exists():
-        return frames
-    for path in sorted(desc_dir.glob("*.json")):
-        try:
-            data = json.loads(path.read_text())
-        except json.JSONDecodeError:
-            continue
-
-        if isinstance(data, dict):
-            frames.append(FrameSelection(frame=data, path=path))
-        elif isinstance(data, list):
-            for idx, item in enumerate(data):
-                if not isinstance(item, dict):
-                    continue
-                virtual_name = path.with_name(f"{path.stem}_{idx:03d}{path.suffix}")
-                frames.append(FrameSelection(frame=item, path=virtual_name))
-    return frames
+    records = load_structured_frame_jsons(desc_dir)
+    return [FrameSelection(frame=rec.frame, path=rec.path) for rec in records]
 
 
 def select_frame(frames: List[FrameSelection],
@@ -335,10 +320,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--root", required=True,
                         help="Root directory containing <scene_id>/ meshes.")
+    parser.add_argument("--dataset", required=True, choices=["3rscan", "scannet"],
+                        help="Dataset layout used under --root and --query_root.")
     parser.add_argument("--graphs", required=True, type=Path,
                         help="processed_data directory holding 3dssg/*.pt files.")
     parser.add_argument("--query_root", type=Path,
-                        help="Root containing per-scene output/descriptions/frame-*.json")
+                        help="Root containing per-scene output/descriptions/*.json")
 
     parser.add_argument("--scene_ids", nargs="+",
                         help="Subset of scene IDs to evaluate. Defaults to intersection of graphs and query_root.")
@@ -458,7 +445,7 @@ def evaluate_scene(scene_id: str,
     if not obj_ids:
         return None, "no cosine matches"
 
-    mesh, tri2obj, obj2faces = load_scene(scene_dir)
+    mesh, tri2obj, obj2faces = load_scene(scene_dir, dataset=args.dataset)
     rc = o3d.t.geometry.RaycastingScene()
     rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
 
@@ -611,6 +598,7 @@ def main() -> None:
     rng = np.random.default_rng(seed=args.seed)
 
     print(f"Loading graphs from {args.graphs} ...")
+    print(f"Dataset mode: {args.dataset}")
     scenes = load_scene_graphs(args.graphs)
 
     candidate_ids = list(scenes.keys())
@@ -656,6 +644,7 @@ def main() -> None:
         "skipped": skipped,
         "args": {
             "root": str(args.root),
+            "dataset": args.dataset,
             "graphs": str(args.graphs),
             "query_root": str(args.query_root) if args.query_root else None,
             "frame_policy": args.frame_policy,

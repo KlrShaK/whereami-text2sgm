@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import math
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -34,6 +35,8 @@ from visualize_eval_loc_mk4 import (  # noqa: E402
     select_frame,
 )
 
+LOGGER = logging.getLogger(__name__)
+
 
 def random_forward(rng: np.random.Generator, max_pitch_deg: float) -> np.ndarray:
     """Sample a random unit direction from yaw + bounded pitch."""
@@ -52,16 +55,79 @@ def random_forward(rng: np.random.Generator, max_pitch_deg: float) -> np.ndarray
     return direction / norm
 
 
+def _normalize(v: np.ndarray, eps: float = 1e-9) -> Optional[np.ndarray]:
+    norm = float(np.linalg.norm(v))
+    if norm < eps:
+        return None
+    return v / norm
+
+
+def visualize_midpoint_debug(scene_id: str,
+                             frame_id: str,
+                             mesh: o3d.geometry.TriangleMesh,
+                             gt_cam: np.ndarray,
+                             gt_dir: Optional[np.ndarray],
+                             pred_cam: np.ndarray,
+                             pred_dir: Optional[np.ndarray],
+                             marker_radius: float = 0.08,
+                             arrow_length: float = 0.8) -> None:
+    geoms: List[o3d.geometry.Geometry] = [mesh]
+
+    def marker(center: np.ndarray,
+               color: Tuple[float, float, float]) -> o3d.geometry.TriangleMesh:
+        sphere = o3d.geometry.TriangleMesh.create_sphere(radius=marker_radius)
+        sphere.compute_vertex_normals()
+        sphere.paint_uniform_color(np.asarray(color, dtype=np.float64))
+        sphere.translate(np.asarray(center, dtype=np.float64))
+        return sphere
+
+    def direction_line(center: np.ndarray,
+                       direction: Optional[np.ndarray],
+                       color: Tuple[float, float, float]) -> Optional[o3d.geometry.LineSet]:
+        if direction is None:
+            return None
+        d = _normalize(np.asarray(direction, dtype=np.float64))
+        if d is None:
+            return None
+        p0 = np.asarray(center, dtype=np.float64)
+        p1 = p0 + d * float(arrow_length)
+        line = o3d.geometry.LineSet()
+        line.points = o3d.utility.Vector3dVector(np.vstack([p0, p1]))
+        line.lines = o3d.utility.Vector2iVector(np.array([[0, 1]], dtype=np.int32))
+        line.colors = o3d.utility.Vector3dVector(np.asarray([color], dtype=np.float64))
+        return line
+
+    geoms.append(marker(gt_cam, (0.1, 0.8, 0.1)))
+    geoms.append(marker(pred_cam, (0.9, 0.1, 0.1)))
+    gt_line = direction_line(gt_cam, gt_dir, (0.1, 0.8, 0.1))
+    pred_line = direction_line(pred_cam, pred_dir, (0.9, 0.1, 0.1))
+    if gt_line is not None:
+        geoms.append(gt_line)
+    if pred_line is not None:
+        geoms.append(pred_line)
+
+    o3d.visualization.draw_geometries(
+        geoms,
+        window_name=f"Midpoint Baseline - {scene_id} - {frame_id}",
+        width=1400,
+        height=900,
+        mesh_show_back_face=True,
+    )
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Mid-point + random-pose localisation baseline evaluator."
     )
     parser.add_argument("--root", required=True,
                         help="Root directory containing <scene_id>/ meshes.")
-    parser.add_argument("--graphs", required=True, type=Path,
-                        help="processed_data directory holding 3dssg/*.pt files.")
+    parser.add_argument("--dataset", required=True, choices=["3rscan", "scannet"],
+                        help="Dataset layout used under --root and --query_root.")
+    parser.add_argument("--graphs", type=Path,
+                        help=("Optional processed_data directory holding 3dssg/*.pt files. "
+                              "If omitted, scenes are discovered from --root."))
     parser.add_argument("--query_root", type=Path,
-                        help="Root containing per-scene output/descriptions/frame-*.json")
+                        help="Root containing per-scene output/descriptions/*.json")
     parser.add_argument("--scene_ids", nargs="+",
                         help="Subset of scene IDs to evaluate.")
     parser.add_argument("--max_scenes", type=int,
@@ -81,6 +147,8 @@ def parse_args() -> argparse.Namespace:
                         help="Eye-height offset from floor/bounds.")
     parser.add_argument("--random_pitch_deg", type=float, default=30.0,
                         help="Random pitch sampled uniformly in [-deg, +deg].")
+    parser.add_argument("--show_3d", action="store_true",
+                        help="Visualize mesh with GT/pred camera markers and direction lines.")
 
     parser.add_argument("--hit_radii", nargs="+", type=float,
                         default=[0.75, 1.0, 1.5, 2.0, 2.5],
@@ -101,6 +169,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--log_file", type=Path,
                         default=Path("eval/baseline_eval_loc_summary_mid_point.log"),
                         help="Path to write summary log.")
+    parser.add_argument("--log_level",
+                        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+                        default="INFO",
+                        help="Console logging level.")
     return parser.parse_args()
 
 
@@ -109,7 +181,7 @@ def evaluate_scene(scene_id: str,
                    rng: np.random.Generator) -> List[SceneMetrics]:
     scene_dir = Path(args.root) / scene_id
     if not scene_dir.exists():
-        print(f"[WARN] Scene directory missing for {scene_id} — skipped.")
+        LOGGER.warning("Scene directory missing for %s - skipped.", scene_id)
         return []
 
     query_root = ensure_query_root(args.query_root, Path(args.root))
@@ -118,7 +190,7 @@ def evaluate_scene(scene_id: str,
         desc_dir = scene_dir / "output" / "descriptions"
     frames = load_frame_jsons(desc_dir)
     if not frames:
-        print(f"[WARN] No frame JSONs under {desc_dir} — skipped.")
+        LOGGER.warning("No frame JSONs under %s - skipped.", desc_dir)
         return []
 
     if args.frame_policy == "all":
@@ -126,11 +198,11 @@ def evaluate_scene(scene_id: str,
     else:
         selection = select_frame(frames, args.frame_policy, args.frame_index, rng)
         if selection is None:
-            print(f"[WARN] Frame selection failed for {scene_id} — skipped.")
+            LOGGER.warning("Frame selection failed for %s - skipped.", scene_id)
             return []
         selected_frames = [selection]
 
-    mesh, _tri2obj, obj2faces = load_scene(scene_dir)
+    mesh, _tri2obj, obj2faces = load_scene(scene_dir, dataset=args.dataset)
     rc = o3d.t.geometry.RaycastingScene()
     mesh_id = rc.add_triangles(o3d.t.geometry.TriangleMesh.from_legacy(mesh))
     if not mesh.has_vertex_normals():
@@ -145,7 +217,7 @@ def evaluate_scene(scene_id: str,
     tri_areas = 0.5 * np.linalg.norm(tri_cross, axis=1)
     tri_centroids = tri_pts.mean(axis=1)
 
-    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces)
+    floor_bbox = _extract_floor_bbox(scene_dir, verts, tris, obj2faces, args.dataset)
     if floor_bbox is not None:
         x_mid = 0.5 * (floor_bbox["x_min"] + floor_bbox["x_max"])
         y_mid = 0.5 * (floor_bbox["y_min"] + floor_bbox["y_max"])
@@ -166,14 +238,14 @@ def evaluate_scene(scene_id: str,
     vfov = math.radians(args.v_fov_deg)
 
     if len(selected_frames) > 1:
-        print(f"    evaluating all {len(selected_frames)} frames in scene")
+        LOGGER.debug("Evaluating all %d frames in scene %s.", len(selected_frames), scene_id)
 
     scene_metrics_list: List[SceneMetrics] = []
     for frame_idx, selection in enumerate(selected_frames, start=1):
         frame = selection.frame
         gt_pose = frame.get("scene_pose")
         if gt_pose is None:
-            print(f"[WARN] scene_pose missing in {selection.path} — skipped.")
+            LOGGER.warning("scene_pose missing in %s - skipped.", selection.path)
             continue
 
         pose_mat = np.asarray(gt_pose, dtype=np.float64)
@@ -209,16 +281,31 @@ def evaluate_scene(scene_id: str,
         metrics.iou_error = iou_err
 
         if len(selected_frames) > 1:
-            print(f"    frame [{frame_idx:03d}/{len(selected_frames):03d}]: "
-                  f"{metrics.frame_id} ({selection.path.name})")
-        print(f"    baseline pose: {bounds_msg}")
-        print(f"    predicted camera (midpoint): {pred_cam.tolist()} | "
-              f"err={metrics.distance_error:.3f} m")
-        print(f"    predicted direction (random): {pred_dir.tolist()}")
+            LOGGER.debug(
+                "Frame [%03d/%03d]: %s (%s)",
+                frame_idx, len(selected_frames), metrics.frame_id, selection.path.name,
+            )
+        LOGGER.debug("Baseline pose: %s", bounds_msg)
+        LOGGER.debug(
+            "Predicted camera (midpoint): %s | err=%.3f m",
+            pred_cam.tolist(), metrics.distance_error,
+        )
+        LOGGER.debug("Predicted direction (random): %s", pred_dir.tolist())
         if iou_val is not None and iou_err is not None:
-            print(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
+            LOGGER.debug("View IoU: %.3f | IoU error: %.3f", iou_val, iou_err)
         else:
-            print("    view IoU: n/a (missing direction or empty visibility)\n")
+            LOGGER.debug("View IoU: n/a (missing direction or empty visibility)")
+
+        if args.show_3d:
+            visualize_midpoint_debug(
+                scene_id=scene_id,
+                frame_id=metrics.frame_id,
+                mesh=mesh,
+                gt_cam=gt_cam,
+                gt_dir=gt_dir,
+                pred_cam=pred_cam,
+                pred_dir=pred_dir,
+            )
 
         scene_metrics_list.append(metrics)
 
@@ -227,19 +314,40 @@ def evaluate_scene(scene_id: str,
 
 def main() -> None:
     args = parse_args()
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="[%(levelname)s] %(message)s",
+    )
     args.hit_radii = [float(r) for r in args.hit_radii]
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
+    LOGGER.info("Dataset mode: %s", args.dataset)
 
-    scenes = load_scene_graphs(args.graphs)
-    candidate_ids = list(scenes.keys())
+    scenes = None
+    if args.graphs is not None:
+        scenes = load_scene_graphs(args.graphs)
+        candidate_ids = list(scenes.keys())
+        LOGGER.info("Scene source: graphs (%s)", args.graphs)
+    else:
+        candidate_ids = [
+            p.name for p in Path(args.root).iterdir()
+            if p.is_dir()
+        ]
+        LOGGER.info("Scene source: root directory scan (no --graphs provided)")
 
     if args.visualize_scene:
         if args.scene_ids:
-            print("[WARN] --visualize_scene overrides --scene_ids.")
-        if args.visualize_scene not in scenes:
-            print(f"[ERROR] Requested scene '{args.visualize_scene}' not found in processed graphs.")
+            LOGGER.warning("--visualize_scene overrides --scene_ids.")
+        if scenes is not None:
+            if args.visualize_scene not in scenes:
+                LOGGER.error(
+                    "Requested scene '%s' not found in processed graphs.",
+                    args.visualize_scene,
+                )
+                return
+        elif not (Path(args.root) / args.visualize_scene).exists():
+            LOGGER.error("Requested scene '%s' not found under root.", args.visualize_scene)
             return
         candidate_ids = [args.visualize_scene]
     elif args.scene_ids:
@@ -257,42 +365,50 @@ def main() -> None:
     if args.max_scenes is not None:
         candidate_ids = candidate_ids[: args.max_scenes]
 
-    print(f"Evaluating midpoint baseline on {len(candidate_ids)} scene(s)...\n")
+    LOGGER.info("Evaluating midpoint baseline on %d scene(s)...", len(candidate_ids))
 
     metrics_list: List[SceneMetrics] = []
     for idx, sid in enumerate(candidate_ids, start=1):
-        print(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
+        LOGGER.info("[%03d/%03d] %s", idx, len(candidate_ids), sid)
         scene_metrics_items = evaluate_scene(sid, args, rng)
         if not scene_metrics_items:
             continue
         metrics_list.extend(scene_metrics_items)
         for scene_metrics in scene_metrics_items:
-            print(f"    frame: {scene_metrics.frame_id}")
-            print(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
+            LOGGER.debug("Frame: %s", scene_metrics.frame_id)
+            LOGGER.debug(
+                "Matches: %d | grid pts: %d",
+                scene_metrics.matched_objects, scene_metrics.grid_points,
+            )
             hit_line = " | ".join(
                 f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
                 for r in sorted(scene_metrics.hit_masses)
             )
-            print(f"    {hit_line}")
+            LOGGER.debug("%s", hit_line)
             mass_line = " | ".join(
                 f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
                 for p in sorted(scene_metrics.mass_radii)
             )
             if mass_line:
-                print(f"    mass-radius: {mass_line}")
+                LOGGER.debug("Mass-radius: %s", mass_line)
             ang_err = ("n/a" if scene_metrics.angular_error_deg is None
                        else f"{scene_metrics.angular_error_deg:.2f}°")
-            print(f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
-                  f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
+            LOGGER.debug(
+                "TopK%d min dist: %.3f m | dist_err: %.3f m | ang_err: %s",
+                args.top_k_min_dist,
+                scene_metrics.topk_min_dist,
+                scene_metrics.distance_error,
+                ang_err,
+            )
             if scene_metrics.iou_error is not None:
-                print(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+                LOGGER.debug("View IoU error: %.3f", scene_metrics.iou_error)
 
     if not metrics_list:
-        print("No scenes produced metrics. Nothing to report.")
+        LOGGER.warning("No scenes produced metrics. Nothing to report.")
         args.log_file.parent.mkdir(parents=True, exist_ok=True)
         payload = "No scenes produced metrics.\n\n" + params_text + "\n"
         args.log_file.write_text(payload)
-        print(f"Empty summary logged to {args.log_file}")
+        LOGGER.info("Empty summary logged to %s", args.log_file)
         return
 
     table_text = build_metrics_table(metrics_list,
@@ -300,9 +416,7 @@ def main() -> None:
                                      args.mass_percentiles,
                                      args.top_k_min_dist)
     if table_text:
-        print("Scene/frame summary table -------------------------------")
-        print(table_text)
-        print("---------------------------------------------------------\n")
+        LOGGER.info("Scene/frame summary table -------------------------------\n%s", table_text)
 
     def agg(values: List[float]) -> Tuple[float, float]:
         arr = np.asarray(values, dtype=np.float64)
@@ -349,7 +463,7 @@ def main() -> None:
         agg_lines.insert(-1, f"  Angular error (deg)   : mean={mean_ang:.2f} | median={med_ang:.2f}")
     if mean_iou_err is not None and med_iou_err is not None:
         agg_lines.insert(-1, f"  View IoU error        : mean={mean_iou_err:.3f} | median={med_iou_err:.3f}")
-    print("\n".join(agg_lines))
+    LOGGER.info("%s", "\n".join(agg_lines))
 
     log_sections: List[str] = [params_text]
     if table_text:
@@ -358,7 +472,7 @@ def main() -> None:
     log_payload = "\n\n".join(log_sections).rstrip() + "\n"
     args.log_file.parent.mkdir(parents=True, exist_ok=True)
     args.log_file.write_text(log_payload)
-    print(f"Metrics summary logged to {args.log_file}")
+    LOGGER.info("Metrics summary logged to %s", args.log_file)
 
     args.save_metrics.parent.mkdir(parents=True, exist_ok=True)
     payload = [
@@ -377,7 +491,7 @@ def main() -> None:
         for m in metrics_list
     ]
     args.save_metrics.write_text(json.dumps(payload, indent=2))
-    print(f"Per-scene metrics saved to {args.save_metrics}")
+    LOGGER.info("Per-scene metrics saved to %s", args.save_metrics)
 
 
 if __name__ == "__main__":
