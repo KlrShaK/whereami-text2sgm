@@ -26,3 +26,4 @@ playground/graph_models/processed_data/*
 datasets/*
 playground/graph_models/models/wandb/*
 /out_dir/
+/playground/graph_models/models/eval/archieve/
