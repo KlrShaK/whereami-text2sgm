@@ -23,8 +23,10 @@ import open3d as o3d
 from visualize_eval_loc_mk4 import (  # noqa: E402
     SceneMetrics,
     _extract_floor_bbox,
+    aggregate_radius_metrics,
     build_metrics_table,
     camera_center_from_pose,
+    compute_binary_recall,
     compute_metrics,
     compute_view_iou_error,
     ensure_query_root,
@@ -32,6 +34,7 @@ from visualize_eval_loc_mk4 import (  # noqa: E402
     load_frame_jsons,
     load_scene,
     load_scene_graphs,
+    normalize_radii,
     select_frame,
 )
 
@@ -153,6 +156,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--hit_radii", nargs="+", type=float,
                         default=[0.75, 1.0, 1.5, 2.0, 2.5],
                         help="Radii (metres) for Hit@r mass curve.")
+    parser.add_argument("--recall_radii", nargs="+", type=float,
+                        default=[0.75, 1.0, 1.5, 2.0],
+                        help="Radii (metres) for binary Recall@r on final prediction.")
     parser.add_argument("--mass_percentiles", nargs="+", type=float,
                         default=[50.0, 90.0],
                         help="Percentiles for mass-radius metric.")
@@ -264,6 +270,7 @@ def evaluate_scene(scene_id: str,
         metrics.frame_id = str(frame.get("image_index", selection.path.name))
         metrics.matched_objects = 0
         metrics.distance_error = float(np.linalg.norm(pred_cam - gt_cam))
+        metrics.recall = compute_binary_recall(metrics.distance_error, args.recall_radii)
 
         if gt_dir is not None:
             dot = float(np.clip(np.dot(gt_dir, pred_dir), -1.0, 1.0))
@@ -318,7 +325,8 @@ def main() -> None:
         level=getattr(logging, args.log_level),
         format="[%(levelname)s] %(message)s",
     )
-    args.hit_radii = [float(r) for r in args.hit_radii]
+    args.hit_radii = normalize_radii(args.hit_radii, "hit_radii")
+    args.recall_radii = normalize_radii(args.recall_radii, "recall_radii")
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
@@ -385,6 +393,12 @@ def main() -> None:
                 for r in sorted(scene_metrics.hit_masses)
             )
             LOGGER.debug("%s", hit_line)
+            recall_line = " | ".join(
+                f"recall@{r:.2f}m: {scene_metrics.recall.get(r, 0.0):.3f}"
+                for r in sorted(scene_metrics.recall)
+            )
+            if recall_line:
+                LOGGER.debug("%s", recall_line)
             mass_line = " | ".join(
                 f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
                 for p in sorted(scene_metrics.mass_radii)
@@ -414,7 +428,8 @@ def main() -> None:
     table_text = build_metrics_table(metrics_list,
                                      args.hit_radii,
                                      args.mass_percentiles,
-                                     args.top_k_min_dist)
+                                     args.top_k_min_dist,
+                                     recall_radii=args.recall_radii)
     if table_text:
         LOGGER.info("Scene/frame summary table -------------------------------\n%s", table_text)
 
@@ -422,10 +437,8 @@ def main() -> None:
         arr = np.asarray(values, dtype=np.float64)
         return float(arr.mean()), float(np.median(arr))
 
-    hit_stats: Dict[float, Tuple[float, float]] = {}
-    for r in sorted(set(args.hit_radii)):
-        vals = [m.hit_masses.get(r, 0.0) for m in metrics_list]
-        hit_stats[r] = agg(vals)
+    hit_stats = aggregate_radius_metrics(metrics_list, args.hit_radii, attr="hit_masses")
+    recall_stats = aggregate_radius_metrics(metrics_list, args.recall_radii, attr="recall")
 
     mass_radius_stats: Dict[float, Tuple[float, float]] = {}
     for p in sorted(set(args.mass_percentiles)):
@@ -456,6 +469,9 @@ def main() -> None:
     for r in sorted(hit_stats):
         mean_hit, med_hit = hit_stats[r]
         agg_lines.insert(-1, f"  Hit@{r:.2f}m              : mean={mean_hit:.3f} | median={med_hit:.3f}")
+    for r in sorted(recall_stats):
+        mean_recall, med_recall = recall_stats[r]
+        agg_lines.insert(-1, f"  Recall@{r:.2f}m           : mean={mean_recall:.3f} | median={med_recall:.3f}")
     for p in sorted(mass_radius_stats):
         mean_r, med_r = mass_radius_stats[p]
         agg_lines.insert(-1, f"  Mass-radius R{p:.0f}% (m): mean={mean_r:.3f} | median={med_r:.3f}")
@@ -475,11 +491,12 @@ def main() -> None:
     LOGGER.info("Metrics summary logged to %s", args.log_file)
 
     args.save_metrics.parent.mkdir(parents=True, exist_ok=True)
-    payload = [
+    metrics_payload = [
         {
             "scene_id": m.scene_id,
             "frame_id": m.frame_id,
             "hit_masses": {str(k): v for k, v in m.hit_masses.items()},
+            "recall": {str(k): v for k, v in m.recall.items()},
             "mass_radii": {str(k): v for k, v in m.mass_radii.items()},
             "topk_min_dist": m.topk_min_dist,
             "distance_error": m.distance_error,
@@ -490,6 +507,35 @@ def main() -> None:
         }
         for m in metrics_list
     ]
+    hit_mass_summary = {
+        str(r): {"mean": mean_hit, "median": med_hit}
+        for r, (mean_hit, med_hit) in hit_stats.items()
+    }
+    recall_summary = {
+        str(r): {"mean": mean_recall, "median": med_recall}
+        for r, (mean_recall, med_recall) in recall_stats.items()
+    }
+    mass_radius_summary = {
+        str(p): {"mean": mean_r, "median": med_r}
+        for p, (mean_r, med_r) in mass_radius_stats.items()
+    }
+    payload = {
+        "metrics": metrics_payload,
+        "failures": [],
+        "aggregate": {
+            "hit_masses": hit_mass_summary,
+            "recall": recall_summary,
+            "mass_radii": mass_radius_summary,
+            "topk_min_dist": {"mean": mean_topk, "median": med_topk},
+            "distance_error": {"mean": mean_err, "median": med_err},
+            "angular_error_deg": None if mean_ang is None else {"mean": mean_ang, "median": med_ang},
+            "iou_error": None if mean_iou_err is None else {"mean": mean_iou_err, "median": med_iou_err},
+            "hit_radii": args.hit_radii,
+            "recall_radii": args.recall_radii,
+            "mass_percentiles": args.mass_percentiles,
+            "top_k_min_dist": args.top_k_min_dist,
+        },
+    }
     args.save_metrics.write_text(json.dumps(payload, indent=2))
     LOGGER.info("Per-scene metrics saved to %s", args.save_metrics)
 

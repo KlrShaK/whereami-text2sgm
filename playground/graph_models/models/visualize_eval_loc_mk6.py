@@ -704,9 +704,10 @@ def parse_args() -> argparse.Namespace:
                         help="Scene ID to focus on for visualisation.")
 
     parser.add_argument("--frame_policy",
-                        choices=["first", "index", "random", "max_visible", "max_pixels"],
+                        choices=["first", "index", "random", "max_visible", "max_pixels", "all"],
                         default="max_visible",
-                        help="Strategy to pick which parsed frame to evaluate per scene.")
+                        help="Strategy to pick parsed frame JSON(s) per scene. "
+                             "'all' evaluates every parsed frame in the scene.")
     parser.add_argument("--frame_index", type=int, default=0)
     parser.add_argument("--seed", type=int, default=0)
 
@@ -769,18 +770,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--save_metrics", type=Path)
     parser.add_argument("--log_file", type=Path, default=Path("eval_loc_summary_mk6.log"))
     parser.add_argument("--top_pose_count", type=int, default=5)
+    parser.add_argument("--resume", nargs="?", const="__save_metrics__", default=None,
+                        help="Resume from a prior checkpoint JSON. If a path is given, "
+                             "use that file; if --resume is passed without a path, "
+                             "defaults to the --save_metrics path.")
+    parser.add_argument("--checkpoint_interval", type=int, default=200,
+                        help="Save a checkpoint every N scenes (requires --save_metrics).")
     return parser.parse_args()
 
 
 def evaluate_scene(scene_id: str,
                    scene_graph: SceneGraph,
                    args: argparse.Namespace,
-                   rng: np.random.Generator) -> Optional[SceneMetrics]:
+                   rng: np.random.Generator) -> List[SceneMetrics]:
     mesh_root = Path(args.root)
     scene_dir = mesh_root / scene_id
     if not scene_dir.exists():
         logger.warning(f"Scene directory missing for {scene_id} - skipped.")
-        return None
+        return []
 
     query_root = ensure_query_root(args.query_root, Path(args.root))
     desc_dir = query_root / scene_id / "output" / "descriptions"
@@ -790,13 +797,39 @@ def evaluate_scene(scene_id: str,
     frames = load_parsed_frame_jsons(desc_dir)
     if not frames:
         logger.warning(f"No parsed frame JSONs under {desc_dir} - skipped.")
-        return None
+        return []
 
-    selection = select_parsed_frame(frames, args.frame_policy, args.frame_index, rng)
-    if selection is None:
-        logger.warning(f"Frame selection failed for {scene_id} - skipped.")
-        return None
+    if args.frame_policy == "all":
+        selected_frames = frames
+    else:
+        selection = select_parsed_frame(frames, args.frame_policy, args.frame_index, rng)
+        if selection is None:
+            logger.warning(f"Frame selection failed for {scene_id} - skipped.")
+            return []
+        selected_frames = [selection]
 
+    if args.frame_policy == "all" and len(selected_frames) > 1:
+        logger.info(f"    evaluating all {len(selected_frames)} parsed frames in scene")
+
+    metrics_items: List[SceneMetrics] = []
+    for frame_idx, selection in enumerate(selected_frames, start=1):
+        if args.frame_policy == "all" and len(selected_frames) > 1:
+            frame_id = str(selection.frame.get("source_frame", selection.path.name))
+            logger.info(f"    frame [{frame_idx:03d}/{len(selected_frames):03d}]: "
+                        f"{frame_id} ({selection.path.name})")
+        metric = _evaluate_selected_frame(scene_id, scene_graph, selection, scene_dir, args, rng)
+        if metric is not None:
+            metrics_items.append(metric)
+
+    return metrics_items
+
+
+def _evaluate_selected_frame(scene_id: str,
+                             scene_graph: SceneGraph,
+                             selection: FrameSelection,
+                             scene_dir: Path,
+                             args: argparse.Namespace,
+                             rng: np.random.Generator) -> Optional[SceneMetrics]:
     frame_data = selection.frame
 
     try:
@@ -1200,7 +1233,7 @@ def evaluate_scene(scene_id: str,
         matched_set: set[int] = {int(o) for o in obj_ids}
         frustum_scale = max(args.grid_step * 3.0, 0.6)
         try:
-            mesh_vis, obj_stats = build_segmented_mesh(scene_dir, seed=42)
+            mesh_vis, obj_stats = build_segmented_mesh(scene_dir, seed=42, dataset=args.dataset)
             colours = np.asarray(mesh_vis.vertex_colors)
             highlight = np.array([1.0, 0.3, 0.3], dtype=np.float64)
             for stats in obj_stats:
@@ -1372,6 +1405,47 @@ def evaluate_scene(scene_id: str,
     return metrics
 
 
+def _metric_to_dict(m: SceneMetrics) -> dict:
+    """Serialize a SceneMetrics to a JSON-compatible dict."""
+    return {
+        "scene_id": m.scene_id,
+        "frame_id": m.frame_id,
+        "hit_masses": {str(k): v for k, v in m.hit_masses.items()},
+        "mass_radii": {str(k): v for k, v in m.mass_radii.items()},
+        "topk_min_dist": m.topk_min_dist,
+        "distance_error": m.distance_error,
+        "angular_error_deg": m.angular_error_deg,
+        "iou_error": m.iou_error,
+        "grid_points": m.grid_points,
+        "matched_objects": m.matched_objects,
+    }
+
+
+def _save_checkpoint(path: Path, metrics: List[SceneMetrics]) -> None:
+    """Write an intermediate checkpoint with metrics collected so far."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "metrics": [_metric_to_dict(m) for m in metrics],
+    }, indent=2))
+    logger.info(f"    [checkpoint] {len(metrics)} metrics saved to {path}")
+
+
+def _metrics_from_dict(d: dict) -> SceneMetrics:
+    """Reconstruct a SceneMetrics from a saved JSON dict."""
+    return SceneMetrics(
+        scene_id=d["scene_id"],
+        frame_id=d["frame_id"],
+        hit_masses={float(k): v for k, v in d["hit_masses"].items()},
+        mass_radii={float(k): v for k, v in d["mass_radii"].items()},
+        topk_min_dist=d["topk_min_dist"],
+        distance_error=d["distance_error"],
+        angular_error_deg=d.get("angular_error_deg"),
+        grid_points=d["grid_points"],
+        matched_objects=d["matched_objects"],
+        iou_error=d.get("iou_error"),
+    )
+
+
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     args = parse_args()
@@ -1406,6 +1480,33 @@ def main() -> None:
     if args.max_scenes is not None:
         candidate_ids = candidate_ids[: args.max_scenes]
 
+    prior_metrics: List[SceneMetrics] = []
+    if args.resume is not None:
+        if args.resume == "__save_metrics__":
+            if args.save_metrics is None:
+                logger.error("--resume without a path requires --save_metrics to be set.")
+                return
+            args.resume = args.save_metrics
+        else:
+            args.resume = Path(args.resume)
+        if not args.resume.exists():
+            logger.info(f"Resume file {args.resume} not found — starting fresh.")
+            args.resume = None
+    if args.resume is not None:
+        prior_data = json.loads(args.resume.read_text())
+        all_prior_metrics = [_metrics_from_dict(d) for d in prior_data.get("metrics", [])]
+        prior_scene_ids = list(dict.fromkeys(m.scene_id for m in all_prior_metrics))
+        if prior_scene_ids:
+            last_scene = prior_scene_ids[-1]
+            keep_ids = set(prior_scene_ids[:-1])
+            prior_metrics = [m for m in all_prior_metrics if m.scene_id in keep_ids]
+            before = len(candidate_ids)
+            candidate_ids = [sid for sid in candidate_ids if sid not in keep_ids]
+            logger.info(f"Resuming: kept {len(prior_metrics)} results from "
+                        f"{len(keep_ids)} completed scenes, "
+                        f"re-evaluating from '{last_scene}', "
+                        f"{len(candidate_ids)} remaining")
+
     label_w = 1.0 - args.relation_weight - args.attribute_weight
     logger.info(f"Evaluating {len(candidate_ids)} scene(s) [mk6 - CLIP + relationship-aware matching]")
     logger.info(
@@ -1416,31 +1517,38 @@ def main() -> None:
     metrics_list: List[SceneMetrics] = []
     for idx, sid in enumerate(candidate_ids, start=1):
         logger.info(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
-        scene_metrics = evaluate_scene(sid, scenes[sid], args, rng)
-        if scene_metrics is None:
+        scene_metrics_items = evaluate_scene(sid, scenes[sid], args, rng)
+        if not scene_metrics_items:
             continue
-        metrics_list.append(scene_metrics)
-        logger.info(f"    frame: {scene_metrics.frame_id}")
-        logger.info(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
-        hit_line = " | ".join(
-            f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
-            for r in sorted(scene_metrics.hit_masses)
-        )
-        logger.info(f"    {hit_line}")
-        mass_line = " | ".join(
-            f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
-            for p in sorted(scene_metrics.mass_radii)
-        )
-        if mass_line:
-            logger.info(f"    mass-radius: {mass_line}")
-        ang_err = ("n/a" if scene_metrics.angular_error_deg is None
-                   else f"{scene_metrics.angular_error_deg:.2f}°")
-        logger.info(
-            f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
-            f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}"
-        )
-        if scene_metrics.iou_error is not None:
-            logger.info(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+        metrics_list.extend(scene_metrics_items)
+        for scene_metrics in scene_metrics_items:
+            logger.info(f"    frame: {scene_metrics.frame_id}")
+            logger.info(f"    matches: {scene_metrics.matched_objects} | grid pts: {scene_metrics.grid_points}")
+            hit_line = " | ".join(
+                f"hit@{r:.2f}m: {scene_metrics.hit_masses.get(r, 0.0):.3f}"
+                for r in sorted(scene_metrics.hit_masses)
+            )
+            logger.info(f"    {hit_line}")
+            mass_line = " | ".join(
+                f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
+                for p in sorted(scene_metrics.mass_radii)
+            )
+            if mass_line:
+                logger.info(f"    mass-radius: {mass_line}")
+            ang_err = ("n/a" if scene_metrics.angular_error_deg is None
+                       else f"{scene_metrics.angular_error_deg:.2f}°")
+            logger.info(
+                f"    topK{args.top_k_min_dist} min dist: {scene_metrics.topk_min_dist:.3f} m | "
+                f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}"
+            )
+            if scene_metrics.iou_error is not None:
+                logger.info(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+        if (args.save_metrics
+                and args.checkpoint_interval > 0
+                and idx % args.checkpoint_interval == 0):
+            _save_checkpoint(args.save_metrics, prior_metrics + metrics_list)
+
+    metrics_list = prior_metrics + metrics_list
 
     if not metrics_list:
         logger.warning("No scenes produced metrics. Nothing to report.")
@@ -1523,21 +1631,7 @@ def main() -> None:
         logger.info(f"Metrics summary logged to {args.log_file}")
 
     if args.save_metrics:
-        payload = [
-            {
-                "scene_id": m.scene_id,
-                "frame_id": m.frame_id,
-                "hit_masses": {str(k): v for k, v in m.hit_masses.items()},
-                "mass_radii": {str(k): v for k, v in m.mass_radii.items()},
-                "topk_min_dist": m.topk_min_dist,
-                "distance_error": m.distance_error,
-                "angular_error_deg": m.angular_error_deg,
-                "iou_error": m.iou_error,
-                "grid_points": m.grid_points,
-                "matched_objects": m.matched_objects,
-            }
-            for m in metrics_list
-        ]
+        payload = [_metric_to_dict(m) for m in metrics_list]
         hit_mass_summary = {
             str(r): {"mean": mean_hit, "median": med_hit}
             for r, (mean_hit, med_hit) in hit_stats.items()

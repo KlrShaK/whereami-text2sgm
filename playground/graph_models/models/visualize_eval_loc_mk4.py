@@ -42,9 +42,9 @@ import csv
 import json
 import math
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -118,19 +118,23 @@ class SceneMetrics:
     angular_error_deg: Optional[float]
     grid_points: int
     matched_objects: int
+    recall: Dict[float, float] = field(default_factory=dict)
     iou_error: Optional[float] = None
 
 
 def build_metrics_table(metrics_list: List[SceneMetrics],
                         hit_radii: List[float],
                         mass_percentiles: List[float],
-                        topk_k: int) -> str:
+                        topk_k: int,
+                        recall_radii: Optional[List[float]] = None) -> str:
     hit_radii = sorted(set(float(r) for r in hit_radii))
     mass_percentiles = sorted(set(float(p) for p in mass_percentiles))
+    recall_radii = [] if recall_radii is None else sorted(set(float(r) for r in recall_radii))
     headers = [
         "Scene",
         "Frame",
         *[f"Hit@{r:.2f}m" for r in hit_radii],
+        *[f"Recall@{r:.2f}m" for r in recall_radii],
         *[f"R{p:.0f}%" for p in mass_percentiles],
         f"TopK{topk_k} (m)",
         "Err (m)",
@@ -142,12 +146,14 @@ def build_metrics_table(metrics_list: List[SceneMetrics],
     rows: List[List[str]] = []
     for m in metrics_list:
         hit_vals = [m.hit_masses.get(r, 0.0) for r in hit_radii]
+        recall_vals = [m.recall.get(r, 0.0) for r in recall_radii]
         rad_vals = [m.mass_radii.get(p, float("nan")) for p in mass_percentiles]
         ang_err = "-" if m.angular_error_deg is None else f"{m.angular_error_deg:.2f}"
         rows.append([
             m.scene_id,
             m.frame_id,
             *[f"{v:.3f}" for v in hit_vals],
+            *[f"{v:.3f}" for v in recall_vals],
             *[f"{v:.3f}" if np.isfinite(v) else "-" for v in rad_vals],
             f"{m.topk_min_dist:.3f}",
             f"{m.distance_error:.3f}",
@@ -195,6 +201,40 @@ def format_args_section(args: argparse.Namespace) -> str:
         value = getattr(args, key)
         lines.append(f"{key}: {_stringify(value)}")
     return "\n".join(lines)
+
+
+def normalize_radii(values: Iterable[float], name: str) -> List[float]:
+    parsed: List[float] = []
+    for raw in values:
+        value = float(raw)
+        if not np.isfinite(value) or value <= 0.0:
+            raise ValueError(f"{name} must contain finite values > 0, got {raw!r}.")
+        parsed.append(value)
+    return sorted(set(parsed))
+
+
+def compute_binary_recall(distance_error: float,
+                          recall_radii: Sequence[float]) -> Dict[float, float]:
+    return {
+        float(r): float(1.0 if float(distance_error) <= float(r) else 0.0)
+        for r in sorted(set(float(v) for v in recall_radii))
+    }
+
+
+def aggregate_radius_metrics(metrics_list: List[SceneMetrics],
+                             radii: Sequence[float],
+                             attr: str) -> Dict[float, Tuple[float, float]]:
+    out: Dict[float, Tuple[float, float]] = {}
+    for radius in sorted(set(float(v) for v in radii)):
+        values: List[float] = []
+        for metric in metrics_list:
+            metric_map = getattr(metric, attr, {})
+            if isinstance(metric_map, dict):
+                values.append(float(metric_map.get(radius, 0.0)))
+        if values:
+            arr = np.asarray(values, dtype=np.float64)
+            out[radius] = (float(arr.mean()), float(np.median(arr)))
+    return out
 
 
 # --------------------------------------------------------------------------- #
@@ -894,8 +934,12 @@ def parse_args() -> argparse.Namespace:
 
 
 def load_scene_graphs(graphs_dir: Path,
-                      scene_use_attributes: bool = False) -> Dict[str, SceneGraph]:
-    g3d_path = graphs_dir / "3dssg" / "3dssg_graphs_processed_edgelists_relationembed.pt"
+                      scene_use_attributes: bool = False,
+                      dataset: str = "3rscan") -> Dict[str, SceneGraph]:
+    if dataset == "scannet":
+        g3d_path = graphs_dir / "scannet_scene_graphs.pt"
+    else:
+        g3d_path = graphs_dir / "3dssg" / "3dssg_graphs_processed_edgelists_relationembed.pt"
     if not g3d_path.exists():
         raise FileNotFoundError(g3d_path)
     # Processed graph bundle is a trusted local pickle-like payload (not just weights).
@@ -1446,7 +1490,7 @@ def evaluate_scene(scene_id: str,
         matched_set: set[int] = {int(o) for o in obj_ids}
         frustum_scale = max(args.grid_step * 3.0, 0.6)
         try:
-            mesh_vis, obj_stats = build_segmented_mesh(scene_dir, seed=42)
+            mesh_vis, obj_stats = build_segmented_mesh(scene_dir, seed=42, dataset=args.dataset)
             colours = np.asarray(mesh_vis.vertex_colors)
             highlight = np.array([1.0, 0.3, 0.3], dtype=np.float64)
             for stats in obj_stats:
@@ -1634,7 +1678,7 @@ def main() -> None:
 
     print(f"Dataset mode: {args.dataset}")
 
-    scenes = load_scene_graphs(args.graphs, scene_use_attributes=args.scene_use_attributes)
+    scenes = load_scene_graphs(args.graphs, scene_use_attributes=args.scene_use_attributes, dataset=args.dataset)
 
     candidate_ids = list(scenes.keys())
     if args.visualize_scene:

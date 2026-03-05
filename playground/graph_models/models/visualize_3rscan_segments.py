@@ -29,27 +29,32 @@ __all__ = [
 ]
 
 
-def _load_segmentation(scene_path: Path, base_vertices: np.ndarray) -> Tuple[np.ndarray, Dict[int, int], Dict[int, str]]:
+def _load_segmentation(scene_path: Path, base_vertices: np.ndarray,
+                       dataset: str = "3rscan") -> Tuple[np.ndarray, Dict[int, int], Dict[int, str]]:
     """
     Assign instance IDs and semantic labels to each vertex of the textured mesh.
 
-    Because the segmentation JSON is aligned with a simplified mesh, we rely on
-    the annotated point cloud (`labels.instances.annotated.v2.ply`) and transfer
-    its per-point `objectId` to the mesh via nearest-neighbour search.
+    Supports both 3RScan (via annotated PLY + semseg JSON) and ScanNet (via
+    segment-indices JSON + aggregation JSON).
 
     Args:
-        scene_path (Path): 3RScan scene directory.
-        base_vertices (np.ndarray): (N, 3) array of the original OBJ vertices.
+        scene_path (Path): Scene directory.
+        base_vertices (np.ndarray): (N, 3) array of the mesh vertices.
+        dataset (str): ``"3rscan"`` or ``"scannet"``.
 
     Returns:
         tuple[np.ndarray, dict[int, int], dict[int, str]]:
             - vert_obj: per-vertex instance IDs aligned with `base_vertices`.
-            - seg_to_obj: identity mapping kept for compatibility with other code.
-            - obj_to_label: objectId → human-readable label (lowercased).
+            - seg_to_obj: segment-to-object mapping.
+            - obj_to_label: objectId → human-readable label.
 
     Raises:
         FileNotFoundError: If required annotation files are missing.
     """
+    if dataset == "scannet":
+        return _load_segmentation_scannet(scene_path, base_vertices)
+
+    # --- 3RScan path (original) ---
     semseg_json = scene_path / "semseg.v2.json"
     ply_path = scene_path / "labels.instances.annotated.v2.ply"
     if not semseg_json.exists() or not ply_path.exists():
@@ -70,26 +75,87 @@ def _load_segmentation(scene_path: Path, base_vertices: np.ndarray) -> Tuple[np.
     return vert_obj.astype(np.int32), seg_to_obj, obj_to_label
 
 
+def _load_segmentation_scannet(scene_path: Path, base_vertices: np.ndarray
+                               ) -> Tuple[np.ndarray, Dict[int, int], Dict[int, str]]:
+    """ScanNet segmentation: segment-indices + aggregation JSONs."""
+    sid = scene_path.name
+    segs_path = scene_path / f"{sid}_vh_clean_2.0.010000.segs.json"
+    agg_path = scene_path / f"{sid}.aggregation.json"
+
+    if not segs_path.exists():
+        raise FileNotFoundError(f"Missing ScanNet segment indices: {segs_path}")
+    if not agg_path.exists():
+        raise FileNotFoundError(f"Missing ScanNet aggregation metadata: {agg_path}")
+
+    seg_indices_raw = json.loads(segs_path.read_text()).get("segIndices", [])
+    seg_indices = np.asarray(seg_indices_raw, dtype=np.int64)
+    if len(seg_indices) != len(base_vertices):
+        raise ValueError(
+            f"ScanNet segmentation length mismatch for '{sid}': "
+            f"segIndices={len(seg_indices)} vs vertices={len(base_vertices)}"
+        )
+
+    agg_data = json.loads(agg_path.read_text())
+    seg_groups = agg_data.get("segGroups", [])
+
+    seg_to_obj: Dict[int, int] = {}
+    obj_to_label: Dict[int, str] = {}
+    for group in seg_groups:
+        if not isinstance(group, dict):
+            continue
+        try:
+            object_id = int(group.get("objectId", group.get("id", 0)))
+        except (TypeError, ValueError):
+            continue
+        obj_to_label[object_id] = group.get("label", "").strip()
+        for seg in group.get("segments", []):
+            try:
+                seg_to_obj[int(seg)] = object_id
+            except (TypeError, ValueError):
+                continue
+
+    vert_obj = np.array(
+        [seg_to_obj.get(int(s), 0) for s in seg_indices], dtype=np.int32
+    )
+    return vert_obj, seg_to_obj, obj_to_label
+
+
+def _find_scannet_mesh_path(scene_path: Path) -> Path:
+    """Locate the ScanNet clean mesh PLY inside *scene_path*."""
+    sid = scene_path.name
+    for name in (f"{sid}_vh_clean_2.ply", f"{sid}_vh_clean_2.labels.ply"):
+        p = scene_path / name
+        if p.exists():
+            return p
+    raise FileNotFoundError(f"No ScanNet mesh found in {scene_path}")
+
+
 def build_segmented_mesh(scene_path: Path,
                          seed: int = 7,
-                         only_ids: Optional[Sequence[int]] = None) -> Tuple[o3d.geometry.TriangleMesh, List[Dict[str, object]]]:
+                         only_ids: Optional[Sequence[int]] = None,
+                         dataset: str = "3rscan") -> Tuple[o3d.geometry.TriangleMesh, List[Dict[str, object]]]:
     """
     Construct an Open3D mesh with per-vertex colors encoding instance IDs.
 
-    The function duplicates OBJ vertices per triangle so that each face can be
+    The function duplicates vertices per triangle so that each face can be
     rendered with an unambiguous color. It also computes per-object statistics
     (centroid, bbox, palette) used by the viewer for overlays and labels.
 
     Args:
-        scene_path (Path): 3RScan scene directory.
-        rng (np.random.Generator): Random number generator for color palette.
+        scene_path (Path): Scene directory (3RScan or ScanNet).
+        seed (int): Random seed for color palette.
+        only_ids: Optional subset of object IDs to include in stats.
+        dataset (str): ``"3rscan"`` or ``"scannet"``.
 
     Returns:
         tuple[o3d.geometry.TriangleMesh, list[dict[str, object]]]:
             - Colored mesh ready to be displayed.
             - List of per-object metadata dictionaries.
     """
-    mesh_path = scene_path / "mesh.refined.v2.obj"
+    if dataset == "scannet":
+        mesh_path = _find_scannet_mesh_path(scene_path)
+    else:
+        mesh_path = scene_path / "mesh.refined.v2.obj"
     mesh = o3d.io.read_triangle_mesh(str(mesh_path), enable_post_processing=True)
     mesh.compute_vertex_normals()
 
@@ -98,7 +164,7 @@ def build_segmented_mesh(scene_path: Path,
     expanded_verts = verts[faces.reshape(-1)]
     expanded_faces = np.arange(len(expanded_verts), dtype=np.int32).reshape(-1, 3)
 
-    vert_seg_raw, seg_to_obj, obj_to_label = _load_segmentation(scene_path, verts)
+    vert_seg_raw, seg_to_obj, obj_to_label = _load_segmentation(scene_path, verts, dataset=dataset)
     vert_obj = vert_seg_raw[faces.reshape(-1)]
 
     unique_obj_ids = sorted({oid for oid in vert_obj if oid >= 0})

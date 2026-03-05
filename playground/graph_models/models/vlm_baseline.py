@@ -175,6 +175,13 @@ def parse_args() -> argparse.Namespace:
         help="Radii (m) for Hit@r metrics.",
     )
     parser.add_argument(
+        "--recall_radii",
+        nargs="+",
+        type=float,
+        default=[0.75, 1.0, 1.5, 2.0],
+        help="Radii (m) for binary Recall@r on final prediction.",
+    )
+    parser.add_argument(
         "--mass_percentiles",
         nargs="+",
         type=float,
@@ -507,6 +514,13 @@ def single_point_metrics(
     return hit_masses, mass_radii
 
 
+def compute_binary_recall(distance_error: float, recall_radii: Sequence[float]) -> Dict[float, float]:
+    return {
+        float(radius): float(1.0 if float(distance_error) <= float(radius) else 0.0)
+        for radius in sorted(set(float(r) for r in recall_radii))
+    }
+
+
 def discover_mesh(scene_dir: Path) -> Path:
     for name in PREFERRED_MESH_FILES:
         path = scene_dir / name
@@ -750,18 +764,79 @@ def _to_float_metric_map(raw: object) -> Dict[float, float]:
     return parsed
 
 
+def _normalize_radii(values: Iterable[float], name: str) -> List[float]:
+    parsed: List[float] = []
+    for raw in values:
+        value = float(raw)
+        if not np.isfinite(value) or value <= 0.0:
+            raise ValueError(f"{name} must contain finite values > 0, got {raw!r}.")
+        parsed.append(value)
+    return sorted(set(parsed))
+
+
+def _metric_map_from_results(
+    item: dict,
+    map_key: str,
+    fallback_distance_key: Optional[str] = None,
+    fallback_radii: Optional[Sequence[float]] = None,
+) -> Dict[float, float]:
+    metric_map = _to_float_metric_map(item.get(map_key))
+    if metric_map:
+        return metric_map
+    if fallback_distance_key is None or fallback_radii is None:
+        return metric_map
+    distance_value = item.get(fallback_distance_key)
+    if distance_value is None:
+        return metric_map
+    try:
+        distance = float(distance_value)
+    except (TypeError, ValueError):
+        return metric_map
+    if not np.isfinite(distance):
+        return metric_map
+    if map_key == "recall":
+        return compute_binary_recall(distance, fallback_radii)
+    return metric_map
+
+
+def aggregate_radius_metric_from_results(
+    results: List[dict],
+    radii: Sequence[float],
+    map_key: str,
+    fallback_distance_key: Optional[str] = None,
+    fallback_radii: Optional[Sequence[float]] = None,
+) -> Dict[float, Tuple[float, float]]:
+    stats: Dict[float, Tuple[float, float]] = {}
+    for radius in sorted(set(float(v) for v in radii)):
+        values: List[float] = []
+        for item in results:
+            metric_map = _metric_map_from_results(
+                item,
+                map_key=map_key,
+                fallback_distance_key=fallback_distance_key,
+                fallback_radii=fallback_radii,
+            )
+            values.append(float(metric_map.get(radius, 0.0)))
+        if values:
+            stats[radius] = _aggregate(values)
+    return stats
+
+
 def build_metrics_table(
     results: List[dict],
     hit_radii: Sequence[float],
     mass_percentiles: Sequence[float],
     topk_k: int,
+    recall_radii: Optional[Sequence[float]] = None,
 ) -> str:
     hit_radii_sorted = sorted(set(float(r) for r in hit_radii))
+    recall_radii_sorted = [] if recall_radii is None else sorted(set(float(r) for r in recall_radii))
     mass_percentiles_sorted = sorted(set(float(p) for p in mass_percentiles))
     headers = [
         "Scene",
         "Frame",
         *[f"Hit@{r:.2f}m" for r in hit_radii_sorted],
+        *[f"Recall@{r:.2f}m" for r in recall_radii_sorted],
         *[f"R{p:.0f}%" for p in mass_percentiles_sorted],
         f"TopK{topk_k} (m)",
         "Err (m)",
@@ -774,6 +849,12 @@ def build_metrics_table(
     rows: List[List[str]] = []
     for item in results:
         hit_map = _to_float_metric_map(item.get("hit_masses"))
+        recall_map = _metric_map_from_results(
+            item,
+            map_key="recall",
+            fallback_distance_key="distance_error",
+            fallback_radii=recall_radii_sorted,
+        )
         mass_map = _to_float_metric_map(item.get("mass_radii"))
         ang_err = item.get("angular_error_deg")
         iou_err = item.get("iou_error")
@@ -781,6 +862,7 @@ def build_metrics_table(
             str(item.get("scene_id", "")),
             str(item.get("frame_id", "")),
             *[f"{hit_map.get(r, 0.0):.3f}" for r in hit_radii_sorted],
+            *[f"{recall_map.get(r, 0.0):.3f}" for r in recall_radii_sorted],
             *[
                 f"{mass_map.get(p, float('nan')):.3f}"
                 if np.isfinite(mass_map.get(p, float("nan"))) else "-"
@@ -836,12 +918,14 @@ def compute_aggregate_metrics(
     results: List[dict],
     args: argparse.Namespace,
 ) -> Tuple[dict, List[str]]:
-    hit_stats: Dict[float, Tuple[float, float]] = {}
-    for r in sorted(set(float(x) for x in args.hit_radii)):
-        vals = []
-        for item in results:
-            vals.append(_to_float_metric_map(item.get("hit_masses")).get(r, 0.0))
-        hit_stats[r] = _aggregate(vals)
+    hit_stats = aggregate_radius_metric_from_results(results, args.hit_radii, map_key="hit_masses")
+    recall_stats = aggregate_radius_metric_from_results(
+        results,
+        args.recall_radii,
+        map_key="recall",
+        fallback_distance_key="distance_error",
+        fallback_radii=args.recall_radii,
+    )
 
     mass_radius_stats: Dict[float, Tuple[float, float]] = {}
     for p in sorted(set(float(x) for x in args.mass_percentiles)):
@@ -885,6 +969,9 @@ def compute_aggregate_metrics(
     for r in sorted(hit_stats):
         mean_hit, med_hit = hit_stats[r]
         agg_lines.insert(-1, f"  Hit@{r:.2f}m              : mean={mean_hit:.3f} | median={med_hit:.3f}")
+    for r in sorted(recall_stats):
+        mean_recall, med_recall = recall_stats[r]
+        agg_lines.insert(-1, f"  Recall@{r:.2f}m           : mean={mean_recall:.3f} | median={med_recall:.3f}")
     for p in sorted(mass_radius_stats):
         mean_r, med_r = mass_radius_stats[p]
         agg_lines.insert(-1, f"  Mass-radius R{p:.0f}% (m): mean={mean_r:.3f} | median={med_r:.3f}")
@@ -898,6 +985,10 @@ def compute_aggregate_metrics(
             str(r): {"mean": mean_hit, "median": med_hit}
             for r, (mean_hit, med_hit) in hit_stats.items()
         },
+        "recall": {
+            str(r): {"mean": mean_recall, "median": med_recall}
+            for r, (mean_recall, med_recall) in recall_stats.items()
+        },
         "mass_radii": {
             str(p): {"mean": mean_r, "median": med_r}
             for p, (mean_r, med_r) in mass_radius_stats.items()
@@ -907,6 +998,7 @@ def compute_aggregate_metrics(
         "angular_error_deg": None if mean_ang is None else {"mean": mean_ang, "median": med_ang},
         "iou_error": None if mean_iou is None else {"mean": mean_iou, "median": med_iou},
         "hit_radii": [float(r) for r in args.hit_radii],
+        "recall_radii": [float(r) for r in args.recall_radii],
         "mass_percentiles": [float(p) for p in args.mass_percentiles],
         "top_k_min_dist": int(args.top_k_min_dist),
         "h_fov_deg": float(args.h_fov_deg),
@@ -922,7 +1014,8 @@ def save_json(path: Path, payload: object) -> None:
 
 def main() -> None:
     args = parse_args()
-    args.hit_radii = [float(r) for r in args.hit_radii]
+    args.hit_radii = _normalize_radii(args.hit_radii, "hit_radii")
+    args.recall_radii = _normalize_radii(args.recall_radii, "recall_radii")
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
@@ -948,9 +1041,28 @@ def main() -> None:
     failures: List[FailureRecord] = []
     processed_new = 0
 
+    skipped_scenes = 0
     for s_idx, scene_dir in enumerate(scene_dirs, start=1):
         scene_id = scene_dir.name
-        print(f"[{s_idx:04d}/{len(scene_dirs):04d}] Scene {scene_id}")
+
+        # Check for pending frames before doing any heavy I/O.
+        frame_paths = frame_json_paths(scene_dir, args.max_frames_per_scene)
+        if not frame_paths:
+            failures.append(FailureRecord(scene_id=scene_id, frame_id="*", reason="No frame-*.json files found"))
+            continue
+
+        if completed:
+            has_pending = False
+            for fp in frame_paths:
+                fid = str(json.loads(fp.read_text()).get("image_index", fp.stem))
+                if (scene_id, fid) not in completed:
+                    has_pending = True
+                    break
+            if not has_pending:
+                skipped_scenes += 1
+                continue
+
+        print(f"[{s_idx:04d}/{len(scene_dirs):04d}] Scene {scene_id} (skipped {skipped_scenes} completed scenes)")
 
         try:
             topdown_image, camera_npz = resolve_topdown_paths(scene_dir)
@@ -965,12 +1077,6 @@ def main() -> None:
             scene_iou_context = build_scene_iou_context(scene_dir)
         except Exception as exc:  # noqa: BLE001
             print(f"  [WARN] IoU disabled for scene {scene_id}: {exc}")
-
-        frame_paths = frame_json_paths(scene_dir, args.max_frames_per_scene)
-        if not frame_paths:
-            failures.append(FailureRecord(scene_id=scene_id, frame_id="*", reason="No frame-*.json files found"))
-            print("  [WARN] No frame JSON files.")
-            continue
 
         for f_idx, frame_path in enumerate(frame_paths, start=1):
             try:
@@ -1014,6 +1120,7 @@ def main() -> None:
                             hit_radii=args.hit_radii,
                             mass_percentiles=args.mass_percentiles,
                         )
+                        recall = compute_binary_recall(dist_m, args.recall_radii)
                         iou_error = None
                         if scene_iou_context is not None:
                             iou_error = compute_view_iou_error(
@@ -1029,6 +1136,7 @@ def main() -> None:
                             "scene_id": scene_id,
                             "frame_id": frame_id,
                             "hit_masses": {str(k): v for k, v in hit_masses.items()},
+                            "recall": {str(k): v for k, v in recall.items()},
                             "mass_radii": {str(k): v for k, v in mass_radii.items()},
                             "topk_min_dist": float(dist_m),
                             "distance_error": float(dist_m),
@@ -1098,6 +1206,7 @@ def main() -> None:
         hit_radii=args.hit_radii,
         mass_percentiles=args.mass_percentiles,
         topk_k=args.top_k_min_dist,
+        recall_radii=args.recall_radii,
     )
     aggregate, aggregate_lines = compute_aggregate_metrics(results, args)
     aggregate_lines = list(aggregate_lines)

@@ -81,7 +81,11 @@ def _embed_word2vec(text: str, mode: str = "token") -> List[float]:
 
 def discover_frame_jsons(data_root: Path,
                          scene_ids: Optional[List[str]] = None) -> List[Path]:
-    """Return all frame-*.json paths (excluding *_parsed.json) under data_root."""
+    """Return all frame JSON paths (excluding *_parsed.json) under data_root.
+
+    Supports both 3RScan (``frame-NNNNNN.json``) and ScanNet (``NNNNNN.json``)
+    naming conventions.
+    """
     if scene_ids:
         dirs = []
         for sid in scene_ids:
@@ -93,8 +97,10 @@ def discover_frame_jsons(data_root: Path,
 
     paths: List[Path] = []
     for d in dirs:
-        for p in sorted(d.glob("frame-*.json")):
+        for p in sorted(d.glob("*.json")):
             if p.stem.endswith("_parsed"):
+                continue
+            if p.name == "all_descriptions.json":
                 continue
             paths.append(p)
     return paths

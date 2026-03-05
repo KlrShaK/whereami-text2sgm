@@ -96,23 +96,26 @@ canonical_label_for_matching = getattr(vizmod, "canonical_label", None)
 from visualize_eval_loc_mk4 import (  # noqa: E402
     FrameSelection,
     SceneMetrics,
+    aggregate_radius_metrics,
     build_metrics_table,
-    format_args_section,
     camera_center_from_pose,
+    compute_binary_recall,
     compute_metrics,
     compute_view_iou_error,
-    select_prediction_point,
-    top_n_fov_poses,
-    softmax_probs,
-    proximity_bonus,
-    add_heatmap_markers,
-    add_arrow_markers,
     create_camera_frustum,
-    load_scene_graphs,
     debug_label_matches,
+    format_args_section,
+    load_scene_graphs,
+    normalize_radii,
+    add_arrow_markers,
+    add_heatmap_markers,
+    proximity_bonus,
+    select_prediction_point,
+    softmax_probs,
+    top_n_fov_poses,
     _extract_floor_bbox,
-    _visible_triangles_from_view,
     _cluster_weighted_prediction,
+    _visible_triangles_from_view,
 )
 
 
@@ -398,6 +401,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prob_eps", type=float, default=1e-6)
     parser.add_argument("--hit_radii", nargs="+", type=float,
                         default=[0.75, 1.0, 1.5, 2.0, 2.5])
+    parser.add_argument("--recall_radii", nargs="+", type=float,
+                        default=[0.75, 1.0, 1.5, 2.0])
     parser.add_argument("--mass_percentiles", nargs="+", type=float,
                         default=[50.0, 90.0])
     parser.add_argument("--top_k_min_dist", type=int, default=10)
@@ -422,6 +427,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--top_pose_count", type=int, default=5)
     parser.add_argument("--log_level", choices=["DEBUG", "INFO", "WARNING", "ERROR"],
                         default="INFO")
+    parser.add_argument("--resume", nargs="?", const="__save_metrics__", default=None,
+                        help="Resume from a prior checkpoint JSON. If a path is given, "
+                             "use that file; if --resume is passed without a path, "
+                             "defaults to the --save_metrics path.")
+    parser.add_argument("--checkpoint_interval", type=int, default=200,
+                        help="Save a checkpoint every N scenes (requires --save_metrics).")
     return parser.parse_args()
 
 
@@ -727,6 +738,7 @@ def _evaluate_selected_frame(scene_id: str,
 
     pred_source = f"{pred_source_primary}:{args.prediction_strategy}"
     metrics.distance_error = float(np.linalg.norm(pred_cam_primary - gt_cam))
+    metrics.recall = compute_binary_recall(metrics.distance_error, args.recall_radii)
     if gt_dir is not None and pred_dir_primary is not None:
         dot = float(np.clip(np.dot(gt_dir, pred_dir_primary), -1.0, 1.0))
         metrics.angular_error_deg = float(math.degrees(math.acos(dot)))
@@ -857,7 +869,7 @@ def _evaluate_selected_frame(scene_id: str,
         matched_set: set[int] = {int(o) for o in obj_ids}
         frustum_scale = max(args.grid_step * 3.0, 0.6)
         try:
-            mesh_vis, obj_stats = build_segmented_mesh(scene_dir, seed=42)
+            mesh_vis, obj_stats = build_segmented_mesh(scene_dir, seed=42, dataset=args.dataset)
             colours = np.asarray(mesh_vis.vertex_colors)
             highlight = np.array([1.0, 0.3, 0.3], dtype=np.float64)
             for stats in obj_stats:
@@ -1109,6 +1121,62 @@ def _format_failures_section(failures: List[FrameEvalFailure]) -> str:
     return "\n".join(lines)
 
 
+def _metric_to_dict(m: SceneMetrics) -> dict:
+    """Serialize a SceneMetrics to a JSON-compatible dict."""
+    return {
+        "scene_id": m.scene_id,
+        "frame_id": m.frame_id,
+        "hit_masses": {str(k): v for k, v in m.hit_masses.items()},
+        "recall": {str(k): v for k, v in m.recall.items()},
+        "mass_radii": {str(k): v for k, v in m.mass_radii.items()},
+        "topk_min_dist": m.topk_min_dist,
+        "distance_error": m.distance_error,
+        "angular_error_deg": m.angular_error_deg,
+        "iou_error": m.iou_error,
+        "grid_points": m.grid_points,
+        "matched_objects": m.matched_objects,
+    }
+
+
+def _save_checkpoint(path: Path,
+                     metrics: List[SceneMetrics],
+                     failures: List[FrameEvalFailure]) -> None:
+    """Write an intermediate checkpoint with metrics and failures collected so far."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({
+        "metrics": [_metric_to_dict(m) for m in metrics],
+        "failures": [
+            {
+                "scene_id": f.scene_id,
+                "frame_id": f.frame_id,
+                "parsed_path": f.parsed_path,
+                "raw_path": f.raw_path,
+                "stage": f.stage,
+                "reason": f.reason,
+            }
+            for f in failures
+        ],
+    }, indent=2))
+    logger.info(f"    [checkpoint] {len(metrics)} metrics + {len(failures)} failures saved to {path}")
+
+
+def _metrics_from_dict(d: dict) -> SceneMetrics:
+    """Reconstruct a SceneMetrics from a saved JSON dict."""
+    return SceneMetrics(
+        scene_id=d["scene_id"],
+        frame_id=d["frame_id"],
+        hit_masses={float(k): v for k, v in d["hit_masses"].items()},
+        mass_radii={float(k): v for k, v in d["mass_radii"].items()},
+        topk_min_dist=d["topk_min_dist"],
+        distance_error=d["distance_error"],
+        angular_error_deg=d.get("angular_error_deg"),
+        grid_points=d["grid_points"],
+        matched_objects=d["matched_objects"],
+        recall={float(k): v for k, v in d.get("recall", {}).items()},
+        iou_error=d.get("iou_error"),
+    )
+
+
 def main() -> None:
     args = parse_args()
     logging.basicConfig(
@@ -1116,13 +1184,14 @@ def main() -> None:
         format="%(message)s",
         stream=sys.stdout,
     )
-    args.hit_radii = [float(r) for r in args.hit_radii]
+    args.hit_radii = normalize_radii(args.hit_radii, "hit_radii")
+    args.recall_radii = normalize_radii(args.recall_radii, "recall_radii")
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     params_text = format_args_section(args)
     rng = np.random.default_rng(seed=args.seed)
     logger.info(f"Dataset mode: {args.dataset}")
 
-    scenes = load_scene_graphs(args.graphs, scene_use_attributes=args.scene_use_attributes)
+    scenes = load_scene_graphs(args.graphs, scene_use_attributes=args.scene_use_attributes, dataset=args.dataset)
 
     candidate_ids = list(scenes.keys())
     if args.visualize_scene:
@@ -1147,6 +1216,47 @@ def main() -> None:
     if args.max_scenes is not None:
         candidate_ids = candidate_ids[: args.max_scenes]
 
+    prior_metrics: List[SceneMetrics] = []
+    prior_failures: List[FrameEvalFailure] = []
+    if args.resume is not None:
+        if args.resume == "__save_metrics__":
+            if args.save_metrics is None:
+                logger.error("--resume without a path requires --save_metrics to be set.")
+                return
+            args.resume = args.save_metrics
+        else:
+            args.resume = Path(args.resume)
+        if not args.resume.exists():
+            logger.info(f"Resume file {args.resume} not found — starting fresh.")
+            args.resume = None
+    if args.resume is not None:
+        prior_data = json.loads(args.resume.read_text())
+        all_prior_metrics = [_metrics_from_dict(d) for d in prior_data.get("metrics", [])]
+        all_prior_failures = [
+            FrameEvalFailure(**f) for f in prior_data.get("failures", [])
+        ]
+        prior_scene_ids: List[str] = []
+        seen: set = set()
+        for m in all_prior_metrics:
+            if m.scene_id not in seen:
+                prior_scene_ids.append(m.scene_id)
+                seen.add(m.scene_id)
+        for f in all_prior_failures:
+            if f.scene_id not in seen:
+                prior_scene_ids.append(f.scene_id)
+                seen.add(f.scene_id)
+        if prior_scene_ids:
+            last_scene = prior_scene_ids[-1]
+            keep_ids = seen - {last_scene}
+            prior_metrics = [m for m in all_prior_metrics if m.scene_id in keep_ids]
+            prior_failures = [f for f in all_prior_failures if f.scene_id in keep_ids]
+            before = len(candidate_ids)
+            candidate_ids = [sid for sid in candidate_ids if sid not in keep_ids]
+            logger.info(f"Resuming: kept {len(prior_metrics)} metrics + "
+                        f"{len(prior_failures)} failures from {len(keep_ids)} completed scenes, "
+                        f"re-evaluating from '{last_scene}', "
+                        f"{len(candidate_ids)} scenes remaining")
+
     logger.info(f"Evaluating {len(candidate_ids)} scene(s) [mk5 — parsed descriptions]...\n")
 
     metrics_list: List[SceneMetrics] = []
@@ -1166,6 +1276,12 @@ def main() -> None:
                 for r in sorted(scene_metrics.hit_masses)
             )
             logger.info(f"    {hit_line}")
+            recall_line = " | ".join(
+                f"recall@{r:.2f}m: {scene_metrics.recall.get(r, 0.0):.3f}"
+                for r in sorted(scene_metrics.recall)
+            )
+            if recall_line:
+                logger.info(f"    {recall_line}")
             mass_line = " | ".join(
                 f"R{p:.0f}%: {scene_metrics.mass_radii.get(p, float('nan')):.3f} m"
                 for p in sorted(scene_metrics.mass_radii)
@@ -1178,6 +1294,15 @@ def main() -> None:
                         f"dist_err: {scene_metrics.distance_error:.3f} m | ang_err: {ang_err}\n")
             if scene_metrics.iou_error is not None:
                 logger.info(f"    view IoU error: {scene_metrics.iou_error:.3f}")
+        if (args.save_metrics
+                and args.checkpoint_interval > 0
+                and idx % args.checkpoint_interval == 0):
+            _save_checkpoint(args.save_metrics,
+                             prior_metrics + metrics_list,
+                             prior_failures + failures)
+
+    metrics_list = prior_metrics + metrics_list
+    failures = prior_failures + failures
 
     if not metrics_list:
         logger.info("No scenes produced metrics. Nothing to report.")
@@ -1192,7 +1317,8 @@ def main() -> None:
     table_text = build_metrics_table(metrics_list,
                                      args.hit_radii,
                                      args.mass_percentiles,
-                                     args.top_k_min_dist)
+                                     args.top_k_min_dist,
+                                     recall_radii=args.recall_radii)
     if table_text:
         logger.info("Scene/frame summary table -------------------------------")
         logger.info(table_text)
@@ -1202,10 +1328,8 @@ def main() -> None:
         arr = np.asarray(values, dtype=np.float64)
         return float(arr.mean()), float(np.median(arr))
 
-    hit_stats: Dict[float, Tuple[float, float]] = {}
-    for r in sorted(set(args.hit_radii)):
-        vals = [m.hit_masses.get(r, 0.0) for m in metrics_list]
-        hit_stats[r] = agg(vals)
+    hit_stats = aggregate_radius_metrics(metrics_list, args.hit_radii, attr="hit_masses")
+    recall_stats = aggregate_radius_metrics(metrics_list, args.recall_radii, attr="recall")
 
     mass_radius_stats: Dict[float, Tuple[float, float]] = {}
     for p in sorted(set(args.mass_percentiles)):
@@ -1237,6 +1361,10 @@ def main() -> None:
         mean_hit, med_hit = hit_stats[r]
         agg_lines.insert(-1,
                          f"  Hit@{r:.2f}m              : mean={mean_hit:.3f} | median={med_hit:.3f}")
+    for r in sorted(recall_stats):
+        mean_recall, med_recall = recall_stats[r]
+        agg_lines.insert(-1,
+                         f"  Recall@{r:.2f}m           : mean={mean_recall:.3f} | median={med_recall:.3f}")
     for p in sorted(mass_radius_stats):
         mean_r, med_r = mass_radius_stats[p]
         agg_lines.insert(-1,
@@ -1262,24 +1390,14 @@ def main() -> None:
         logger.info(f"Metrics summary logged to {args.log_file}")
 
     if args.save_metrics:
-        payload = [
-            {
-                "scene_id": m.scene_id,
-                "frame_id": m.frame_id,
-                "hit_masses": {str(k): v for k, v in m.hit_masses.items()},
-                "mass_radii": {str(k): v for k, v in m.mass_radii.items()},
-                "topk_min_dist": m.topk_min_dist,
-                "distance_error": m.distance_error,
-                "angular_error_deg": m.angular_error_deg,
-                "iou_error": m.iou_error,
-                "grid_points": m.grid_points,
-                "matched_objects": m.matched_objects,
-            }
-            for m in metrics_list
-        ]
+        payload = [_metric_to_dict(m) for m in metrics_list]
         hit_mass_summary = {
             str(r): {"mean": mean_hit, "median": med_hit}
             for r, (mean_hit, med_hit) in hit_stats.items()
+        }
+        recall_summary = {
+            str(r): {"mean": mean_recall, "median": med_recall}
+            for r, (mean_recall, med_recall) in recall_stats.items()
         }
         mass_radius_summary = {
             str(p): {"mean": mean_r, "median": med_r}
@@ -1301,6 +1419,7 @@ def main() -> None:
             ],
             "aggregate": {
                 "hit_masses": hit_mass_summary,
+                "recall": recall_summary,
                 "mass_radii": mass_radius_summary,
                 "topk_min_dist": {"mean": mean_topk, "median": med_topk},
                 "distance_error": {"mean": mean_err, "median": med_err},
@@ -1308,6 +1427,7 @@ def main() -> None:
                                       else {"mean": mean_ang, "median": med_ang}),
                 "iou_error": None if mean_iou_err is None else {"mean": mean_iou_err, "median": med_iou_err},
                 "hit_radii": args.hit_radii,
+                "recall_radii": args.recall_radii,
                 "mass_percentiles": args.mass_percentiles,
                 "top_k_min_dist": args.top_k_min_dist,
                 "top_k": args.top_k,
