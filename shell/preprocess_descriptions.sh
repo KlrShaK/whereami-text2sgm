@@ -3,9 +3,12 @@
 
 PROJECT_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models"
 
-# Caption JSON root (frame-*.json files with descriptions)
+# Caption JSON root (contains <scene_id>/output/descriptions/ with frame JSONs)
 # QUERY_ROOT="/home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3RScan_processed"
-QUERY_ROOT="/media/klrshak/Backup/Datasets/3RScan_processed"
+# QUERY_ROOT="/media/klrshak/Backup/Datasets/3RScan_processed"
+
+# # ScanNet example:
+QUERY_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
 
 # Requires OPENAI_API_KEY to be set in the shell environment.
 # Example:

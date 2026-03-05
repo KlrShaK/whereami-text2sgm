@@ -2,6 +2,8 @@
 # Evaluate localisation using GPT-parsed cached description graphs (mk5).
 
 PROJECT_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/models"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
 # 3RScan mesh root (scene folders with meshes + instance labels)
 # SCENE_ROOT="/home/klrshak/work/VisionLang/3RScan/data/3RScan"
@@ -18,24 +20,46 @@ GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_mod
 DATASET="3rscan"
 
 # # ScanNet example:
-# DATASET="scannet"
-# SCENE_ROOT="/media/klrshak/Backup/Datasets/Scannet_300_Scenes"
-# QUERY_ROOT="/media/klrshak/Backup/Datasets/Scannet_300_Scenes"
-# GRAPHS_DIR=""
+DATASET="scannet"
+SCENE_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
+QUERY_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
+GRAPHS_DIR="/media/klrshak/Backup/Datasets/scannet_scenes_100/processed_data/generated"
 
 
-# Optional: restrict to a subset of scene IDs (space separated). Leave empty for all.
-# SCENE_IDS=(0ad2d3a5-79e2-2212-9a9e-2502a05fa678 8eabc42c-5af7-2f32-87c4-bf646779aa62 283ccfed-107c-24d5-8b72-5f6004ef4f94 422885ad-192d-25fc-8631-c3a978a9d3d4)
+# Optional: restrict to a subset of scene IDs loaded from file (one per line).
+# Override with: SCENE_IDS_FILE=/path/to/scene_ids.txt ./shell/visualize_eval_loc_mk5.sh
 SCENE_IDS=()
+
+# RUNNING ON A SUBSET OF SCENES: (comment out if running on all scenes)
+# SCENE_IDS_FILE="${SCENE_IDS_FILE:-$REPO_ROOT/playground/testing/subset_100_scene_ids.txt}"
+# if [ -f "$SCENE_IDS_FILE" ]; then
+#   mapfile -t SCENE_IDS < <(grep -vE '^[[:space:]]*(#|$)' "$SCENE_IDS_FILE")
+#   echo "[INFO] Loaded ${#SCENE_IDS[@]} scene IDs from $SCENE_IDS_FILE"
+# else
+#   echo "[WARN] SCENE_IDS_FILE not found: $SCENE_IDS_FILE (running on all scenes)"
+# fi
+
+
+PREDICTION_STRATEGY="weighted"  # Options: "argmax", "random", "weighted"
+
+# FOV defaults per dataset
+if [ "$DATASET" = "scannet" ]; then
+  H_FOV_DEG=58.30   # ScanNet
+  V_FOV_DEG=45.33   # ScanNet
+else
+  H_FOV_DEG=39.31   # 3RScan
+  V_FOV_DEG=64.76   # 3RScan
+fi
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
   # --show_heatmap
   # --show_arrows
   # --show_3d
-  --save_metrics "./eval/eval_metrics_mk5_all.json"
-  --log_file "./eval/eval_loc_summary_mk5_all.log"
-  --frame_policy all
+  --save_candidates "./eval/eval_candidates_mk5_${PREDICTION_STRATEGY}_${DATASET}.json"
+  --save_metrics "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}.json"
+  --log_file "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}.log"
+  --frame_policy max_visible  # Options: "first", "index", "random", "max_visible", "max_pixels", "all"
   --query_embedding_mode doc
   --homogenize_label_embeddings
   --dynamic_top_k
@@ -45,7 +69,8 @@ EXTRA_ARGS=(
   --distance_bonus_weight 0.5
   --distance_bonus_decay 2.0
   --grid_step 0.25
-  --prediction_strategy "weighted"
+  --prediction_strategy "$PREDICTION_STRATEGY"
+  --log_level INFO
 )
 
 cd "$PROJECT_DIR" || exit 1
@@ -56,6 +81,8 @@ CMD=(
   --dataset "$DATASET"
   --graphs "$GRAPHS_DIR"
   --query_root "$QUERY_ROOT"
+  --h_fov_deg "$H_FOV_DEG"
+  --v_fov_deg "$V_FOV_DEG"
 )
 
 if [ ${#SCENE_IDS[@]} -gt 0 ]; then

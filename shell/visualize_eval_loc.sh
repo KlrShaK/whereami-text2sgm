@@ -15,6 +15,18 @@ QUERY_ROOT="/home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3RScan_2_2_
 # Processed graphs directory (contains processed_data/3dssg/*.pt)
 GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data"
 
+# Dataset layout for loaders: 3rscan | scannet
+DATASET="3rscan"
+
+# FOV defaults per dataset
+if [ "$DATASET" = "scannet" ]; then
+  H_FOV_DEG=58.30   # ScanNet
+  V_FOV_DEG=45.33   # ScanNet
+else
+  H_FOV_DEG=39.31   # 3RScan
+  V_FOV_DEG=64.76   # 3RScan
+fi
+
 # Optional: restrict to a subset of scene IDs (space separated). Leave empty for all.
 # SCENE_IDS=(41385867-a238-2435-8152-dc84ef14eae1 )
 # SCENE_IDS=(5341b7d3-8a66-2cdd-8633-0a3da632befa 0cac75b1-8d6f-2d13-8c17-9099db8915bc e61b0e04-bada-2f31-82d6-72831a602ba7 1d234004-e280-2b1a-8ec8-560046b9fc96 0cac75dc-8d6f-2d13-8d08-9c497bd6acdc)
@@ -65,8 +77,11 @@ cd "$PROJECT_DIR" || exit 1
 CMD=(
   python visualize_eval_loc_mk4.py
   --root "$SCENE_ROOT"
+  --dataset "$DATASET"
   --graphs "$GRAPHS_DIR"
   --query_root "$QUERY_ROOT"
+  --h_fov_deg "$H_FOV_DEG"
+  --v_fov_deg "$V_FOV_DEG"
 )
 
 # CMD=(

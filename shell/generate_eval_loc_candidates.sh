@@ -14,12 +14,21 @@ DATASET="3rscan"
 # QUERY_ROOT="/media/klrshak/Backup/Datasets/Scannet_300_Scenes"
 
 PYTHON_BIN="${PYTHON_BIN:-python3}"
-OUTPUT_JSON="./eval/eval_pose_candidates_300_seed42.json"
+OUTPUT_JSON="./eval/eval_pose_candidates_100_seed42_${DATASET}.json"
+
+# FOV defaults per dataset
+if [ "$DATASET" = "scannet" ]; then
+  H_FOV_DEG=58.30   # ScanNet
+  V_FOV_DEG=45.33   # ScanNet
+else
+  H_FOV_DEG=39.31   # 3RScan
+  V_FOV_DEG=64.76   # 3RScan
+fi
 
 cd "$PROJECT_DIR" || { echo "Bad PROJECT_DIR: $PROJECT_DIR"; exit 1; }
 
 CMD=(
-  "$PYTHON_BIN" visualize_eval_loc_candidates.py
+  "$PYTHON_BIN" generate_eval_loc_candidates.py
   --root "$SCENE_ROOT"
   --dataset "$DATASET"
   --graphs "$GRAPHS_DIR"
@@ -29,6 +38,8 @@ CMD=(
   --scene_sample_policy random
   --seed 42
   --output_json "$OUTPUT_JSON"
+  --h_fov_deg "$H_FOV_DEG"
+  --v_fov_deg "$V_FOV_DEG"
 )
 
 CMD+=("$@")
