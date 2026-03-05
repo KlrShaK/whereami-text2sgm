@@ -57,6 +57,10 @@ def discover_mesh(scan_dir: Path) -> Path:
         path = scan_dir / name
         if path.exists():
             return path
+    # ScanNet naming: <scene_id>_vh_clean_2.ply
+    scannet_mesh = scan_dir / f"{scan_dir.name}_vh_clean_2.ply"
+    if scannet_mesh.exists():
+        return scannet_mesh
     raise FileNotFoundError(f"No known mesh file found in {scan_dir}")
 
 
@@ -67,6 +71,8 @@ def discover_scan_dirs(dataset_root: Path) -> List[Path]:
         if not child.is_dir():
             continue
         if any((child / name).exists() for name in PREFERRED_MESH_FILES):
+            scan_dirs.append(child)
+        elif (child / f"{child.name}_vh_clean_2.ply").exists():
             scan_dirs.append(child)
     return scan_dirs
 
@@ -415,6 +421,8 @@ def parse_args() -> argparse.Namespace:
                         help="Filename to use per scene in --all-scans mode. "
                              "Saved as <output>/<scene-id>/<output-name>, with "
                              "camera parameters in *_camera.npz (intrinsic + extrinsic).")
+    parser.add_argument("--dataset", required=True, choices=["3rscan", "scannet"],
+                        help="Dataset layout used under --root.")
     parser.add_argument("--plane", choices=("xy", "xz", "yz"), default="xy",
                         help="Projection plane. Top-down for 3RScan is usually 'xy'.")
     parser.add_argument("--floor_percentile", type=float, default=0.2,
