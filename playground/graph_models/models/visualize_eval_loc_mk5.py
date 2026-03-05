@@ -342,6 +342,55 @@ def ensure_query_root(query_root: Optional[Path], root: Path) -> Path:
 
 
 # --------------------------------------------------------------------------- #
+# Candidate export helpers (matching generate_eval_loc_candidates.py schema)  #
+# --------------------------------------------------------------------------- #
+
+def build_grid_candidates(cams: np.ndarray,
+                          counts: np.ndarray,
+                          probs: np.ndarray,
+                          top_n: int) -> List[Dict[str, object]]:
+    if top_n <= 0 or len(cams) == 0:
+        return []
+    order = np.argsort(-counts)
+    top_idx = order[: min(top_n, len(order))]
+    results: List[Dict[str, object]] = []
+    for idx in top_idx:
+        pos = cams[int(idx)]
+        results.append({
+            "position": [float(pos[0]), float(pos[1]), float(pos[2])],
+            "visible_count": int(counts[int(idx)]),
+            "prob": float(probs[int(idx)]),
+        })
+    return results
+
+
+def build_pose_candidates(positions: List[np.ndarray],
+                          directions: List[np.ndarray],
+                          weights: List[float],
+                          top_n: int) -> List[Dict[str, object]]:
+    if top_n <= 0 or not positions or not weights:
+        return []
+    weights_np = np.asarray(weights, dtype=np.float64)
+    order = np.argsort(-weights_np)
+    top_idx = order[: min(top_n, len(order))]
+    results: List[Dict[str, object]] = []
+    for idx in top_idx:
+        pos = positions[int(idx)]
+        dir_vec = directions[int(idx)] if directions else None
+        dir_out = None
+        if dir_vec is not None:
+            norm = float(np.linalg.norm(dir_vec))
+            if norm > 1e-6:
+                dir_out = (dir_vec / norm).tolist()
+        results.append({
+            "position": [float(pos[0]), float(pos[1]), float(pos[2])],
+            "direction": dir_out,
+            "visible_count": int(weights_np[int(idx)]),
+        })
+    return results
+
+
+# --------------------------------------------------------------------------- #
 # Main evaluation pipeline                                                    #
 # --------------------------------------------------------------------------- #
 
@@ -423,6 +472,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--distance_bonus_decay", type=float, default=2.0)
 
     parser.add_argument("--save_metrics", type=Path)
+    parser.add_argument("--save_candidates", type=Path, default=None,
+                        help="Path to write candidate poses JSON "
+                             "(same schema as generate_eval_loc_candidates.py).")
+    parser.add_argument("--top_candidates", type=int, default=10,
+                        help="Number of top grid candidates to export in candidates JSON.")
+    parser.add_argument("--top_pose_candidates", type=int, default=10,
+                        help="Number of top FOV pose candidates to export in candidates JSON.")
     parser.add_argument("--log_file", type=Path, default=Path("eval_loc_summary_mk5.log"))
     parser.add_argument("--top_pose_count", type=int, default=5)
     parser.add_argument("--log_level", choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -463,7 +519,7 @@ def _evaluate_selected_frame(scene_id: str,
                              selection: FrameSelection,
                              scene_dir: Path,
                              args: argparse.Namespace,
-                             rng: np.random.Generator) -> Tuple[Optional[SceneMetrics], Optional[FrameEvalFailure]]:
+                             rng: np.random.Generator) -> Tuple[Optional[SceneMetrics], Optional[FrameEvalFailure], Optional[Dict[str, object]]]:
     frame_data = selection.frame
 
     try:
@@ -477,13 +533,13 @@ def _evaluate_selected_frame(scene_id: str,
         logger.warning(f"[WARN] Failed to build caption graph for {scene_id}: {exc}")
         return None, _make_failure(scene_id, "parsed_graph_build",
                                    f"Failed to build caption graph: {exc}",
-                                   selection=selection, frame_data=frame_data)
+                                   selection=selection, frame_data=frame_data), None
 
     if not caption_meta:
         logger.warning(f"[WARN] {scene_id}: no parsed nodes matched visible objects — skipped.")
         return None, _make_failure(scene_id, "grounding",
                                    "no parsed nodes matched visible objects",
-                                   selection=selection, frame_data=frame_data)
+                                   selection=selection, frame_data=frame_data), None
 
     frame_id_dbg = str(frame_data.get("source_frame", selection.path.name))
 
@@ -513,13 +569,13 @@ def _evaluate_selected_frame(scene_id: str,
         logger.warning(f"[WARN] Invalid parsed frame path: {selection.path} — skipped.")
         return None, _make_failure(scene_id, "raw_frame_lookup",
                                    "Invalid parsed frame naming (expected *_parsed.json)",
-                                   selection=selection, frame_data=frame_data)
+                                   selection=selection, frame_data=frame_data), None
     if not original_path.exists():
         logger.warning(f"[WARN] Original frame JSON not found: {original_path} — skipped.")
         return None, _make_failure(scene_id, "raw_frame_lookup",
                                    "Original frame JSON not found",
                                    selection=selection, frame_data=frame_data,
-                                   raw_path=original_path)
+                                   raw_path=original_path), None
 
     original_frame = json.loads(original_path.read_text())
     gt_pose = original_frame.get("scene_pose")
@@ -528,7 +584,7 @@ def _evaluate_selected_frame(scene_id: str,
         return None, _make_failure(scene_id, "gt_pose",
                                    "scene_pose missing in raw frame JSON",
                                    selection=selection, frame_data=frame_data,
-                                   raw_path=original_path)
+                                   raw_path=original_path), None
 
     pose_mat = np.asarray(gt_pose, dtype=np.float64)
     gt_cam = camera_center_from_pose(pose_mat)
@@ -555,7 +611,7 @@ def _evaluate_selected_frame(scene_id: str,
         return None, _make_failure(scene_id, "object_match",
                                    "no cosine matches",
                                    selection=selection, frame_data=frame_data,
-                                   raw_path=original_path)
+                                   raw_path=original_path), None
 
     mesh, tri2obj, obj2faces = load_scene(scene_dir, dataset=args.dataset)
     rc = o3d.t.geometry.RaycastingScene()
@@ -603,7 +659,7 @@ def _evaluate_selected_frame(scene_id: str,
         return None, _make_failure(scene_id, "geometry",
                                    "matched objects missing geometry",
                                    selection=selection, frame_data=frame_data,
-                                   raw_path=original_path)
+                                   raw_path=original_path), None
 
     visible_dirs: List[List[np.ndarray]] = [[] for _ in range(len(cams))]
     visible_dists: List[List[float]] = [[] for _ in range(len(cams))]
@@ -623,7 +679,7 @@ def _evaluate_selected_frame(scene_id: str,
         return None, _make_failure(scene_id, "visibility",
                                    "matched objects invisible from grid",
                                    selection=selection, frame_data=frame_data,
-                                   raw_path=original_path)
+                                   raw_path=original_path), None
 
     dist_bonus = np.array(
         [proximity_bonus(np.asarray(d, dtype=np.float64), args.distance_bonus_decay)
@@ -814,6 +870,49 @@ def _evaluate_selected_frame(scene_id: str,
         logger.info(f"    view IoU: {iou_val:.3f} | IoU error: {iou_err:.3f}\n")
     else:
         logger.info("    view IoU: n/a (missing direction or empty visibility)\n")
+
+    # --- Candidate record (optional, for --save_candidates) ---
+    candidate_record: Optional[Dict[str, object]] = None
+    if getattr(args, "save_candidates", None) is not None:
+        grid_point_candidates = build_grid_candidates(
+            cams, counts, grid_probs, args.top_candidates,
+        )
+        max_visible_count = int(counts.max())
+        max_visible_points = int(np.sum(counts == max_visible_count))
+        fov_pose_candidates = build_pose_candidates(
+            arrow_positions, arrow_dirs, arrow_counts, args.top_pose_candidates,
+        )
+        description = original_frame.get("description", frame_data.get("description"))
+        visible_objects_count = len(original_frame.get("visible_objects", {}) or {})
+        candidate_record = {
+            "scene_id": scene_id,
+            "frame_id": frame_id_dbg,
+            "frame_path": str(original_path),
+            "description": description,
+            "timestamp": original_frame.get("timestamp"),
+            "visible_objects_count": visible_objects_count,
+            "matched_object_ids": [int(o) for o in obj_ids],
+            "matched_object_count": len(obj_ids),
+            "grid": {
+                "step": args.grid_step,
+                "eye_height": args.eye_height,
+                "points": len(cams),
+            },
+            "grid_max_visible_count": max_visible_count,
+            "grid_max_visible_point_count": max_visible_points,
+            "grid_point_candidates": grid_point_candidates,
+            "fov_pose_candidates": fov_pose_candidates,
+            "gt_pose": {
+                "position": gt_cam.tolist(),
+                "direction": gt_dir.tolist() if gt_dir is not None else None,
+                "scene_pose": pose_mat.tolist(),
+            },
+            "predicted_pose": {
+                "position": pred_cam_primary.tolist(),
+                "direction": pred_dir_primary.tolist() if pred_dir_primary is not None else None,
+                "source": pred_source,
+            },
+        }
 
     # --- Visualisation (same as mk4) ---
     if args.show_heatmap:
@@ -1038,19 +1137,19 @@ def _evaluate_selected_frame(scene_id: str,
         gui.Application.instance.add_window(vis_iou)
         gui.Application.instance.run()
 
-    return metrics, None
+    return metrics, None, candidate_record
 
 
 def evaluate_scene(scene_id: str,
                    scene_graph: SceneGraph,
                    args: argparse.Namespace,
-                   rng: np.random.Generator) -> Tuple[List[SceneMetrics], List[FrameEvalFailure]]:
+                   rng: np.random.Generator) -> Tuple[List[SceneMetrics], List[FrameEvalFailure], List[Dict[str, object]]]:
     mesh_root = Path(args.root)
     scene_dir = mesh_root / scene_id
     if not scene_dir.exists():
         msg = f"Scene directory missing for {scene_id}"
         logger.warning(f"[WARN] {msg} — skipped.")
-        return [], [_make_failure(scene_id, "scene_setup", msg)]
+        return [], [_make_failure(scene_id, "scene_setup", msg)], []
 
     query_root = ensure_query_root(args.query_root, Path(args.root))
     desc_dir = query_root / scene_id / "output" / "descriptions"
@@ -1061,7 +1160,7 @@ def evaluate_scene(scene_id: str,
     if not frames:
         msg = f"No parsed frame JSONs under {desc_dir}"
         logger.warning(f"[WARN] {msg} — skipped.")
-        return [], [_make_failure(scene_id, "scene_setup", msg)]
+        return [], [_make_failure(scene_id, "scene_setup", msg)], []
 
     if args.frame_policy == "all":
         selected_frames = frames
@@ -1070,7 +1169,7 @@ def evaluate_scene(scene_id: str,
         if selection is None:
             msg = "Frame selection failed"
             logger.warning(f"[WARN] {msg} for {scene_id} — skipped.")
-            return [], [_make_failure(scene_id, "frame_selection", msg)]
+            return [], [_make_failure(scene_id, "frame_selection", msg)], []
         selected_frames = [selection]
 
     if args.frame_policy == "all" and len(selected_frames) > 1:
@@ -1078,19 +1177,22 @@ def evaluate_scene(scene_id: str,
 
     metrics_items: List[SceneMetrics] = []
     failures: List[FrameEvalFailure] = []
+    candidates: List[Dict[str, object]] = []
     for frame_idx, selection in enumerate(selected_frames, start=1):
         if args.frame_policy == "all" and len(selected_frames) > 1:
             frame_id = str(selection.frame.get("source_frame", selection.path.name))
             logger.info(f"    frame [{frame_idx:03d}/{len(selected_frames):03d}]: "
                         f"{frame_id} ({selection.path.name})")
-        metric, failure = _evaluate_selected_frame(scene_id, scene_graph, selection, scene_dir, args, rng)
+        metric, failure, candidate = _evaluate_selected_frame(scene_id, scene_graph, selection, scene_dir, args, rng)
         if failure is not None:
             failures.append(failure)
             continue
         if metric is not None:
             metrics_items.append(metric)
+        if candidate is not None:
+            candidates.append(candidate)
 
-    return metrics_items, failures
+    return metrics_items, failures, candidates
 
 
 def _format_failures_section(failures: List[FrameEvalFailure]) -> str:
@@ -1261,10 +1363,12 @@ def main() -> None:
 
     metrics_list: List[SceneMetrics] = []
     failures: List[FrameEvalFailure] = []
+    candidates_list: List[Dict[str, object]] = []
     for idx, sid in enumerate(candidate_ids, start=1):
         logger.info(f"[{idx:03d}/{len(candidate_ids):03d}] {sid}")
-        scene_metrics_items, scene_failures = evaluate_scene(sid, scenes[sid], args, rng)
+        scene_metrics_items, scene_failures, scene_candidates = evaluate_scene(sid, scenes[sid], args, rng)
         failures.extend(scene_failures)
+        candidates_list.extend(scene_candidates)
         if not scene_metrics_items:
             continue
         metrics_list.extend(scene_metrics_items)
@@ -1435,6 +1539,42 @@ def main() -> None:
             },
         }, indent=2))
         logger.info(f"Metrics saved to {args.save_metrics}")
+
+    if args.save_candidates and candidates_list:
+        cand_payload = {
+            "scenes": candidates_list,
+            "skipped": [
+                {"scene_id": f.scene_id, "reason": f.reason}
+                for f in failures
+            ],
+            "args": {
+                "root": str(args.root),
+                "dataset": args.dataset,
+                "graphs": str(args.graphs),
+                "query_root": str(args.query_root) if args.query_root else None,
+                "frame_policy": args.frame_policy,
+                "seed": args.seed,
+                "max_scenes": args.max_scenes,
+                "top_k": args.top_k,
+                "grid_step": args.grid_step,
+                "eye_height": args.eye_height,
+                "prediction_strategy": args.prediction_strategy,
+                "cluster_bandwidth": args.cluster_bandwidth,
+                "max_cluster_points": args.max_cluster_points,
+                "h_fov_deg": args.h_fov_deg,
+                "v_fov_deg": args.v_fov_deg,
+                "arrow_stride": args.arrow_stride,
+                "top_candidates": args.top_candidates,
+                "top_pose_candidates": args.top_pose_candidates,
+                "score_tau": args.score_tau,
+                "distance_bonus_weight": args.distance_bonus_weight,
+                "distance_bonus_decay": args.distance_bonus_decay,
+            },
+            "selected_scene_ids": candidate_ids,
+        }
+        args.save_candidates.parent.mkdir(parents=True, exist_ok=True)
+        args.save_candidates.write_text(json.dumps(cand_payload, indent=2))
+        logger.info(f"Candidate poses saved to {args.save_candidates}")
 
 
 GUI_INITIALISED = False
