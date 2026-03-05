@@ -91,7 +91,20 @@ def parse_args() -> argparse.Namespace:
         "--root",
         type=Path,
         default=Path("/media/klrshak/Backup/Datasets/3RScan_processed"),
-        help="Root directory containing <scene_id>/ topdown image and frame JSONs.",
+        help="Root directory containing <scene_id>/ meshes (and optionally topdown/frames).",
+    )
+    parser.add_argument(
+        "--dataset",
+        choices=["3rscan", "scannet"],
+        default="3rscan",
+        help="Dataset layout: 3rscan or scannet.",
+    )
+    parser.add_argument(
+        "--query_root",
+        type=Path,
+        default=None,
+        help="Root containing per-scene topdown images and output/descriptions/*.json. "
+             "Defaults to --root when omitted.",
     )
     parser.add_argument(
         "--save_metrics",
@@ -148,6 +161,19 @@ def parse_args() -> argparse.Namespace:
         "--max_frames_per_scene",
         type=int,
         help="Optional maximum frames per scene (for debug runs).",
+    )
+    parser.add_argument(
+        "--frame_policy",
+        choices=["first", "index", "random", "max_visible", "max_pixels", "all"],
+        default="all",
+        help="Strategy for selecting frame JSON(s) per scene. "
+             "'all' evaluates every frame in the scene (default).",
+    )
+    parser.add_argument(
+        "--frame_index",
+        type=int,
+        default=0,
+        help="Frame index used when --frame_policy=index.",
     )
     parser.add_argument(
         "--seed",
@@ -365,22 +391,43 @@ def find_scene_dirs(root: Path, scene_ids: Optional[Sequence[str]], max_scenes: 
     return candidates
 
 
-def resolve_topdown_paths(scene_dir: Path) -> Tuple[Path, Path]:
-    image_path = scene_dir / DEFAULT_TOPDOWN_NAME
-    camera_path = scene_dir / "topdown_camera.npz"
-    if not image_path.exists():
-        raise FileNotFoundError(f"Missing topdown image: {image_path}")
-    if not camera_path.exists():
-        raise FileNotFoundError(f"Missing topdown camera sidecar: {camera_path}")
-    return image_path, camera_path
+def resolve_topdown_paths(
+    scene_dir: Path,
+    query_root: Optional[Path] = None,
+) -> Tuple[Path, Path]:
+    """Locate topdown image + camera npz.  Checks query_root/<scene>/ first,
+    then falls back to scene_dir/."""
+    candidates = [scene_dir]
+    if query_root is not None:
+        qr_scene = query_root / scene_dir.name
+        if qr_scene.exists():
+            candidates.insert(0, qr_scene)
+    for base in candidates:
+        image_path = base / DEFAULT_TOPDOWN_NAME
+        camera_path = base / "topdown_camera.npz"
+        if image_path.exists() and camera_path.exists():
+            return image_path, camera_path
+    raise FileNotFoundError(
+        f"Missing topdown image or camera sidecar for scene '{scene_dir.name}'. "
+        f"Searched: {[str(c) for c in candidates]}"
+    )
 
 
-def frame_json_paths(scene_dir: Path, max_frames: Optional[int]) -> List[Path]:
-    desc_dir = scene_dir / "output" / "descriptions"
+def frame_json_paths(
+    scene_dir: Path,
+    max_frames: Optional[int],
+    query_root: Optional[Path] = None,
+) -> List[Path]:
+    """Discover frame JSONs.  Checks query_root/<scene>/output/descriptions
+    first, then falls back to scene_dir/output/descriptions."""
+    qr = query_root if query_root is not None else scene_dir
+    desc_dir = qr / scene_dir.name / "output" / "descriptions"
+    if not desc_dir.exists():
+        desc_dir = scene_dir / "output" / "descriptions"
     frames = [
         p
-        for p in sorted(desc_dir.glob("frame-*.json"))
-        if not p.stem.endswith("_parsed")
+        for p in sorted(desc_dir.glob("*.json"))
+        if not p.stem.endswith("_parsed") and p.name != "all_descriptions.json"
     ]
     if max_frames is not None:
         frames = frames[:max_frames]
@@ -521,7 +568,13 @@ def compute_binary_recall(distance_error: float, recall_radii: Sequence[float]) 
     }
 
 
-def discover_mesh(scene_dir: Path) -> Path:
+def discover_mesh(scene_dir: Path, dataset: str = "3rscan") -> Path:
+    if dataset == "scannet":
+        sid = scene_dir.name
+        for name in (f"{sid}_vh_clean_2.ply", f"{sid}_vh_clean_2.labels.ply"):
+            path = scene_dir / name
+            if path.exists():
+                return path
     for name in PREFERRED_MESH_FILES:
         path = scene_dir / name
         if path.exists():
@@ -529,11 +582,11 @@ def discover_mesh(scene_dir: Path) -> Path:
     raise FileNotFoundError(f"No known mesh file found in {scene_dir}")
 
 
-def build_scene_iou_context(scene_dir: Path) -> SceneIoUContext:
+def build_scene_iou_context(scene_dir: Path, dataset: str = "3rscan") -> SceneIoUContext:
     if o3d is None:
         raise RuntimeError("open3d is required to compute IoU metrics but is not installed.")
 
-    mesh_path = discover_mesh(scene_dir)
+    mesh_path = discover_mesh(scene_dir, dataset=dataset)
     mesh = o3d.io.read_triangle_mesh(str(mesh_path), enable_post_processing=True)
     if mesh.is_empty():
         raise ValueError(f"Mesh is empty: {mesh_path}")
@@ -677,13 +730,14 @@ def visualize_debug_pose(
     scene_dir: Path,
     gt_pose: Pose3D,
     pred_pose: Pose3D,
+    dataset: str = "3rscan",
     marker_radius_m: float = 0.08,
     arrow_length_m: float = 0.8,
 ) -> None:
     # Lazy import to keep normal (non-visualize) runs on the fast path.
     import open3d as o3d
 
-    mesh_path = discover_mesh(scene_dir)
+    mesh_path = discover_mesh(scene_dir, dataset=dataset)
     mesh = o3d.io.read_triangle_mesh(str(mesh_path), enable_post_processing=True)
     if not mesh.has_vertex_normals():
         mesh.compute_vertex_normals()
@@ -1007,6 +1061,53 @@ def compute_aggregate_metrics(
     return aggregate, agg_lines
 
 
+def _select_frame_paths(
+    frame_paths: List[Path],
+    policy: str,
+    frame_index: int,
+    rng: np.random.Generator,
+) -> List[Path]:
+    """Apply a frame selection policy and return the selected path(s)."""
+    if not frame_paths:
+        return []
+
+    def _load(fp: Path) -> dict:
+        return json.loads(fp.read_text())
+
+    def _visible_count(fp: Path) -> int:
+        frame = _load(fp)
+        objs = frame.get("visible_objects", {}) or {}
+        return len(objs)
+
+    def _total_pixels(fp: Path) -> int:
+        frame = _load(fp)
+        objs = frame.get("visible_objects", {}) or {}
+        total = 0
+        for obj in objs.values():
+            try:
+                total += int((obj or {}).get("pixel_count", 0))
+            except (TypeError, ValueError):
+                continue
+        return total
+
+    if policy == "first":
+        return [frame_paths[0]]
+    if policy == "index":
+        return [frame_paths[frame_index % len(frame_paths)]]
+    if policy == "random":
+        return [frame_paths[int(rng.integers(0, len(frame_paths)))]]
+    if policy == "max_visible":
+        best = min(
+            frame_paths,
+            key=lambda fp: (-_visible_count(fp), -_total_pixels(fp), fp.name),
+        )
+        return [best]
+    if policy == "max_pixels":
+        return [max(frame_paths, key=_total_pixels)]
+
+    raise ValueError(f"Unknown frame selection policy '{policy}'")
+
+
 def save_json(path: Path, payload: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2))
@@ -1019,6 +1120,10 @@ def main() -> None:
     args.mass_percentiles = [float(p) for p in args.mass_percentiles]
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
+    rng = np.random.default_rng(seed=args.seed)
+
+    if args.query_root is None:
+        args.query_root = args.root
 
     start_time = time.time()
     hfov_rad = math.radians(args.h_fov_deg)
@@ -1046,10 +1151,14 @@ def main() -> None:
         scene_id = scene_dir.name
 
         # Check for pending frames before doing any heavy I/O.
-        frame_paths = frame_json_paths(scene_dir, args.max_frames_per_scene)
+        frame_paths = frame_json_paths(scene_dir, args.max_frames_per_scene, query_root=args.query_root)
         if not frame_paths:
             failures.append(FailureRecord(scene_id=scene_id, frame_id="*", reason="No frame-*.json files found"))
             continue
+
+        # Apply frame selection policy
+        if args.frame_policy != "all":
+            frame_paths = _select_frame_paths(frame_paths, args.frame_policy, args.frame_index, rng)
 
         if completed:
             has_pending = False
@@ -1065,7 +1174,7 @@ def main() -> None:
         print(f"[{s_idx:04d}/{len(scene_dirs):04d}] Scene {scene_id} (skipped {skipped_scenes} completed scenes)")
 
         try:
-            topdown_image, camera_npz = resolve_topdown_paths(scene_dir)
+            topdown_image, camera_npz = resolve_topdown_paths(scene_dir, query_root=args.query_root)
             intrinsic, extrinsic = load_topdown_camera(camera_npz)
         except Exception as exc:  # noqa: BLE001
             failures.append(FailureRecord(scene_id=scene_id, frame_id="*", reason=str(exc)))
@@ -1074,7 +1183,7 @@ def main() -> None:
 
         scene_iou_context: Optional[SceneIoUContext] = None
         try:
-            scene_iou_context = build_scene_iou_context(scene_dir)
+            scene_iou_context = build_scene_iou_context(scene_dir, dataset=args.dataset)
         except Exception as exc:  # noqa: BLE001
             print(f"  [WARN] IoU disabled for scene {scene_id}: {exc}")
 
@@ -1157,7 +1266,7 @@ def main() -> None:
                         completed.add(key)
                         processed_new += 1
                         if args.visualize:
-                            visualize_debug_pose(scene_id=scene_id, scene_dir=scene_dir, gt_pose=gt_pose, pred_pose=pred_pose)
+                            visualize_debug_pose(scene_id=scene_id, scene_dir=scene_dir, gt_pose=gt_pose, pred_pose=pred_pose, dataset=args.dataset)
                         break
                     except Exception as exc:  # noqa: BLE001
                         last_err = exc
