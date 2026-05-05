@@ -503,7 +503,7 @@ def visualize_scene_iou(scene_dir: Path,
 
         tint_gt_only = np.array([1.0, 0.1, 0.1])
         tint_pred_only = np.array([1.0, 0.9, 0.0])
-        tint_both = np.array([1.0, 0.5, 0.0])
+        tint_both = np.array([1.0, 0.35, 0.0])
         overlays = [
             ("iou_gt_only", gt_only, tint_gt_only, tint_strength),
             ("iou_pred_only", pred_only, tint_pred_only, tint_strength),
@@ -612,7 +612,7 @@ def visualize_scene_iou(scene_dir: Path,
         legend_panel.add_child(_legend_label("[=] Pred only visible (yellow tint)",
                                               gui.Color(1.0, 0.9, 0.2)))
         legend_panel.add_child(_legend_label("[=] Overlap (orange tint)",
-                                              gui.Color(1.0, 0.6, 0.15)))
+                                              gui.Color(1.0, 0.35, 0.0)))
 
         # --- Description panel (top-right) ---
         if description:
@@ -684,7 +684,7 @@ def visualize_scene_iou(scene_dir: Path,
     # indices from raycasting match and overlays get proper texture colors.
     tint_gt_only = np.array([1.0, 0.1, 0.1])
     tint_pred_only = np.array([1.0, 0.9, 0.0])
-    tint_both = np.array([1.0, 0.5, 0.0])
+    tint_both = np.array([1.0, 0.35, 0.0])
 
     base_for_tint = overlay_source_mesh
 
