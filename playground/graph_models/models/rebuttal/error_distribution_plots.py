@@ -24,7 +24,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Dict, List, Mapping, Tuple
+from typing import Callable, Dict, List, Mapping, Tuple
 
 os.environ.setdefault("MPLCONFIGDIR", "/tmp/matplotlib")
 
@@ -90,7 +90,7 @@ def configure_matplotlib() -> None:
             "font.size": 10,
             "axes.titlesize": 12,
             "axes.labelsize": 10,
-            "legend.fontsize": 9,
+            "legend.fontsize": 11,
             "xtick.labelsize": 9,
             "ytick.labelsize": 9,
             "pdf.fonttype": 42,
@@ -148,10 +148,12 @@ def plot_kde_position(
         density = kde.mean(axis=1) / (bw * (2 * np.pi) ** 0.5)
         c = COLOR[name]
         ax.plot(grid, density, label=name, color=c, lw=2)
+        peak_x = grid[int(np.argmax(density))]
+        ax.axvline(peak_x, color=c, ls="--", lw=1, alpha=0.7)
     ax.set_xlim(0, xmax)
     ax.set_xlabel("Position error (m)")
     ax.set_ylabel("Density")
-    ax.legend(loc="upper right", fontsize=8)
+    ax.legend(loc="upper right")
     ax.set_title("Position-error KDE")
 
 
@@ -172,7 +174,7 @@ def plot_cdf(
         ax.axvline(tau, color="grey", ls=":", lw=0.6)
     ax.set_xlabel("Position error (m)")
     ax.set_ylabel("Recall (= CDF)")
-    ax.legend(loc="lower right", fontsize=8)
+    ax.legend(loc="lower right")
     ax.set_title("Position-error CDF / Recall@τ_pos")
 
 
@@ -194,7 +196,7 @@ def plot_scatter(
     ax.set_ylim(0, 180)
     ax.set_xlabel("Position error (m)")
     ax.set_ylabel("Angular error (°)")
-    ax.legend(loc="upper right", fontsize=8)
+    ax.legend(loc="upper right")
     ax.set_title("dist × ang per query (gates: 0.3 m / 30°)")
 
 
@@ -230,6 +232,28 @@ def render_dataset(
     plt.close(fig)
 
 
+def render_panel(
+    dataset: str,
+    samples: Dict[str, List[Tuple[float, float]]],
+    suffix: str,
+    plot_fn: Callable[[Axes, Dict[str, List[Tuple[float, float]]]], None],
+) -> None:
+    fig, ax = plt.subplots(figsize=(5.8, 4.2))
+    plot_fn(ax, samples)
+    fig.tight_layout()
+    save_figure(fig, f"error_distribution_{dataset}_{suffix}")
+    plt.close(fig)
+
+
+def render_individual_panels(
+    dataset: str, samples: Dict[str, List[Tuple[float, float]]]
+) -> None:
+    render_panel(dataset, samples, "kde", plot_kde_position)
+    render_panel(dataset, samples, "cdf", plot_cdf)
+    render_panel(dataset, samples, "scatter", plot_scatter)
+    render_panel(dataset, samples, "mean_median", plot_mean_median)
+
+
 def main() -> None:
     configure_matplotlib()
     for ds in DATASETS:
@@ -240,6 +264,7 @@ def main() -> None:
             print(f"skipping {ds}: no samples found")
             continue
         render_dataset(ds, s)
+        render_individual_panels(ds, s)
 
 
 if __name__ == "__main__":
