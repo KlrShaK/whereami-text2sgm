@@ -77,8 +77,8 @@ def load_per_query(path: Path, position_key: str = "distance_error") -> List[Tup
 COLOR = {
     "Midpoint": "#888888",
     "Qwen baseline": "#009E73",
-    "LangLoc": "#D55E00",
-    "LangLoc top-10 oracle": "#0072B2",
+    "LangLoc": "#0072B2",
+    "LangLoc top-10 oracle": "#E69F00",
 }
 
 
@@ -134,7 +134,7 @@ def gather(dataset: str) -> Dict[str, List[Tuple[float, float]]]:
 def plot_kde_position(
     ax: Axes, samples: Dict[str, List[Tuple[float, float]]], xmax: float = 6.0
 ) -> None:
-    """Position-error KDE per method, with mean (dashed) and median (solid) marks."""
+    """Position-error KDE per method."""
     grid = np.linspace(0, xmax, 600)
     for name, data in samples.items():
         if not data:
@@ -148,13 +148,11 @@ def plot_kde_position(
         density = kde.mean(axis=1) / (bw * (2 * np.pi) ** 0.5)
         c = COLOR[name]
         ax.plot(grid, density, label=name, color=c, lw=2)
-        ax.axvline(pos.mean(), color=c, ls="--", lw=1, alpha=0.6)
-        ax.axvline(np.median(pos), color=c, ls=":", lw=1, alpha=0.9)
     ax.set_xlim(0, xmax)
     ax.set_xlabel("Position error (m)")
     ax.set_ylabel("Density")
     ax.legend(loc="upper right", fontsize=8)
-    ax.set_title("Position-error KDE (--- mean,  · · · median)")
+    ax.set_title("Position-error KDE")
 
 
 def plot_cdf(
