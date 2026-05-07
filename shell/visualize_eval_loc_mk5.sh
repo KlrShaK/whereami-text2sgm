@@ -20,10 +20,10 @@ GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_mod
 DATASET="3rscan"
 
 # # ScanNet example:
-DATASET="scannet"
-SCENE_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
-QUERY_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
-GRAPHS_DIR="/media/klrshak/Backup/Datasets/scannet_scenes_100/processed_data/generated"
+# DATASET="scannet"
+# SCENE_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
+# QUERY_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
+# GRAPHS_DIR="/media/klrshak/Backup/Datasets/scannet_scenes_100/processed_data/generated"
 
 
 # Optional: restrict to a subset of scene IDs loaded from file (one per line).
@@ -53,12 +53,12 @@ fi
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
-  # --show_heatmap
-  # --show_arrows
-  # --show_3d
-  --save_candidates "./eval/eval_candidates_mk5_${PREDICTION_STRATEGY}_${DATASET}.json"
-  --save_metrics "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}.json"
-  --log_file "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}.log"
+  --show_heatmap
+  --show_arrows
+  --show_3d
+  --save_candidates "./eval/eval_candidates_mk5_${PREDICTION_STRATEGY}_${DATASET}_SCRATCH.json"
+  --save_metrics "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}_SCRATCH.json"
+  --log_file "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}_SCRATCH.log"
   --frame_policy max_visible  # Options: "first", "index", "random", "max_visible", "max_pixels", "all"
   --query_embedding_mode doc
   --homogenize_label_embeddings
