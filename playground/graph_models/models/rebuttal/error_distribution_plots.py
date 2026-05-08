@@ -91,8 +91,8 @@ def configure_matplotlib() -> None:
             "axes.titlesize": 12,
             "axes.labelsize": 10,
             "legend.fontsize": 11,
-            "xtick.labelsize": 9,
-            "ytick.labelsize": 9,
+            "xtick.labelsize": 11,
+            "ytick.labelsize": 11,
             "pdf.fonttype": 42,
             "ps.fonttype": 42,
         }
@@ -212,7 +212,7 @@ def plot_mean_median(ax: Axes, samples: Dict[str, List[Tuple[float, float]]]) ->
         ax.text(i - w / 2, m, f"{m:.2f}", ha="center", va="bottom", fontsize=8)
         ax.text(i + w / 2, md, f"{md:.2f}", ha="center", va="bottom", fontsize=8)
     ax.set_xticks(x)
-    ax.set_xticklabels([method_tick_label(n) for n in names], fontsize=8)
+    ax.set_xticklabels([method_tick_label(n) for n in names])
     ax.set_ylabel("Position error (m)")
     ax.legend()
     ax.set_title("Mean vs median (skew = mean − median)")
