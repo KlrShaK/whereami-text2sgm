@@ -1,0 +1,94 @@
+Parameters used
+---------------
+arrow_len: 0.0
+arrow_stride: 2
+centroid_similarity_threshold: 0.7
+checkpoint_interval: 200
+cluster_bandwidth: 1.0
+dataset: scannet
+debug_match_all_scores: False
+debug_match_csv_dir: None
+debug_match_labels: False
+debug_match_topn: 5
+distance_bonus_decay: 2.0
+distance_bonus_weight: 0.5
+dynamic_top_k: True
+ensure_query_coverage: True
+exact_label_score: -1000000000.0
+eye_height: 1.6
+frame_index: 0
+frame_policy: max_visible
+graphs: /media/klrshak/Backup/Datasets/scannet_scenes_100/processed_data/generated
+grid_step: 0.25
+h_fov_deg: 58.3
+hit_radii: [0.75, 1.0, 1.5, 2.0, 2.5]
+homogenize_label_embeddings: True
+log_file: eval/eval_metrics_mk5_weighted_human_.log
+log_level: INFO
+mass_percentiles: [50.0, 90.0]
+max_cluster_points: 50
+max_scenes: None
+prediction_strategy: weighted
+prob_eps: 1e-06
+query_embedding_mode: doc
+query_root: /media/klrshak/Backup/Datasets/human_scenes
+recall_radii: [0.75, 1.0, 1.5, 2.0]
+resume: None
+root: /media/klrshak/Backup/Datasets/human_scenes
+save_candidates: eval/eval_candidates_mk5_weighted_human_.json
+save_metrics: eval/eval_metrics_mk5_weighted_human_.json
+scene_ids: None
+scene_use_attributes: False
+score_tau: 1.5
+score_threshold: 0.1
+seed: 0
+show_3d: False
+show_arrows: False
+show_heatmap: False
+top_candidates: 10
+top_k: 25
+top_k_min_dist: 10
+top_pose_candidates: 10
+top_pose_count: 5
+use_subgraph: False
+v_fov_deg: 45.33
+visualize_scene: None
+
+Scene/frame summary table
+
+Scene        | Frame  | Hit@0.75m | Hit@1.00m | Hit@1.50m | Hit@2.00m | Hit@2.50m | Recall@0.75m | Recall@1.00m | Recall@1.50m | Recall@2.00m | R50%  | R90%  | TopK10 (m) | Err (m) | Ang err (deg) | IoU err | Matches | Grid pts
+-------------+--------+-----------+-----------+-----------+-----------+-----------+--------------+--------------+--------------+--------------+-------+-------+------------+---------+---------------+---------+---------+---------
+scene0000_00 | 005215 | 0.019     | 0.037     | 0.078     | 0.136     | 0.219     | 0.000        | 0.000        | 0.000        | 0.000        | 3.657 | 5.284 | 2.351      | 4.077   | 68.18         | 0.867   | 9       | 1023    
+scene0000_01 | 001269 | 0.009     | 0.042     | 0.126     | 0.224     | 0.395     | 0.000        | 1.000        | 1.000        | 1.000        | 2.829 | 4.007 | 1.915      | 0.820   | 13.11         | 0.503   | 7       | 992     
+scene0003_01 | 000787 | 0.202     | 0.370     | 0.632     | 0.841     | 0.937     | 0.000        | 0.000        | 1.000        | 1.000        | 1.219 | 2.306 | 0.986      | 1.484   | 34.37         | 0.786   | 6       | 294     
+scene0006_00 | 001288 | 0.054     | 0.161     | 0.359     | 0.623     | 0.809     | 0.000        | 0.000        | 1.000        | 1.000        | 1.752 | 2.806 | 1.252      | 1.219   | 56.25         | 0.846   | 11      | 480     
+scene0016_00 | 000043 | 0.127     | 0.250     | 0.617     | 0.865     | 0.968     | 0.000        | 0.000        | 1.000        | 1.000        | 1.291 | 2.140 | 0.882      | 1.161   | 7.29          | 0.581   | 11      | 323     
+scene0018_00 | 000304 | 0.250     | 0.408     | 0.723     | 0.877     | 0.978     | 0.000        | 0.000        | 1.000        | 1.000        | 1.098 | 2.109 | 0.466      | 1.118   | 76.63         | 1.000   | 5       | 156     
+scene0021_00 | 000304 | 0.024     | 0.075     | 0.254     | 0.428     | 0.594     | 0.000        | 0.000        | 0.000        | 0.000        | 2.197 | 3.681 | 0.929      | 3.081   | 99.55         | 0.923   | 8       | 625     
+scene0034_00 | 000013 | 0.246     | 0.399     | 0.674     | 0.884     | 0.995     | 0.000        | 0.000        | 1.000        | 1.000        | 1.138 | 2.083 | 0.448      | 1.111   | 55.42         | 0.644   | 9       | 208     
+scene0038_01 | 000516 | 0.054     | 0.104     | 0.233     | 0.403     | 0.606     | 0.000        | 0.000        | 0.000        | 0.000        | 2.222 | 3.522 | 1.861      | 2.640   | 35.76         | 0.777   | 9       | 832     
+scene0044_00 | 000007 | 0.264     | 0.492     | 0.838     | 0.993     | 1.000     | 1.000        | 1.000        | 1.000        | 1.000        | 1.002 | 1.674 | 0.538      | 0.639   | 52.75         | 1.000   | 8       | 99      
+
+Aggregate metrics (mk5 — parsed descriptions) -----------
+  TopK10 min dist (m): mean=1.163 | median=0.958
+  Distance error (m)      : mean=1.735 | median=1.190
+  Hit@0.75m              : mean=0.125 | median=0.091
+  Hit@1.00m              : mean=0.234 | median=0.206
+  Hit@1.50m              : mean=0.454 | median=0.488
+  Hit@2.00m              : mean=0.628 | median=0.732
+  Hit@2.50m              : mean=0.750 | median=0.873
+  Recall@0.75m           : mean=0.100 | median=0.000
+  Recall@1.00m           : mean=0.200 | median=0.000
+  Recall@1.50m           : mean=0.700 | median=1.000
+  Recall@2.00m           : mean=0.700 | median=1.000
+  Mass-radius R50% (m): mean=1.841 | median=1.522
+  Mass-radius R90% (m): mean=2.961 | median=2.556
+  Angular error (deg)   : mean=49.93 | median=54.08
+  View IoU error     : mean=0.793 | median=0.816
+---------------------------------------------------------
+
+
+Failed frames summary
+--------------------
+Total failed frames: 0
+No failed frames.
