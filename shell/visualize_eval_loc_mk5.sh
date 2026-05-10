@@ -5,25 +5,34 @@ PROJECT_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_mo
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 
-# 3RScan mesh root (scene folders with meshes + instance labels)
-# SCENE_ROOT="/home/klrshak/work/VisionLang/3RScan/data/3RScan"
-SCENE_ROOT="/media/klrshak/Backup/Datasets/3RScan"
-
-# Caption JSON root (contains *_parsed.json files after preprocessing)
-# QUERY_ROOT="/home/klrshak/work/VisionLang/whereami-text2sgm/datasets/3RScan_processed"
-QUERY_ROOT="/media/klrshak/Backup/Datasets/3RScan_processed"
-
-# Processed graphs directory (contains processed_data/3dssg/*.pt)
-GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data"
-
-# Dataset layout for loaders: 3rscan | scannet
-DATASET="3rscan"
+# # 3RScan example:
+# # 3RScan mesh root (scene folders with meshes + instance labels)
+# SCENE_ROOT="/media/klrshak/Backup/Datasets/3RScan" # Complete dataset
+# # Caption JSON root (contains *_parsed.json files after preprocessing)
+# QUERY_ROOT="/media/klrshak/Backup/Datasets/3RScan_processed" # Complete dataset
+# # Processed graphs directory (contains processed_data/3dssg/*.pt)
+# GRAPHS_DIR="/home/klrshak/work/VisionLang/whereami-text2sgm/playground/graph_models/processed_data" # Complete dataset
+# DATASET="3rscan" # Complete dataset
 
 # # ScanNet example:
 # DATASET="scannet"
 # SCENE_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
 # QUERY_ROOT="/media/klrshak/Backup/Datasets/scannet_scenes_100/scans"
 # GRAPHS_DIR="/media/klrshak/Backup/Datasets/scannet_scenes_100/processed_data/generated"
+# DATASET="scannet"
+
+# Human annotations dataset: subset of ScanNet with human-authored descriptions.
+SCENE_ROOT="/media/klrshak/Backup/Datasets/human_scenes" # HUMAN ANNOTATIONS
+QUERY_ROOT="/media/klrshak/Backup/Datasets/human_scenes" # HUMAN ANNOTATIONS
+GRAPHS_DIR="/media/klrshak/Backup/Datasets/scannet_scenes_100/processed_data/generated" # HUMAN ANNOTATIONS
+DATASET="human" # HUMAN ANNOTATIONS
+
+
+# Dataset layout for Python loaders: human uses ScanNet layout.
+DATASET_LAYOUT="$DATASET"
+if [ "$DATASET" = "human" ]; then
+  DATASET_LAYOUT="scannet"
+fi
 
 
 # Optional: restrict to a subset of scene IDs loaded from file (one per line).
@@ -42,23 +51,32 @@ SCENE_IDS=()
 
 PREDICTION_STRATEGY="weighted"  # Options: "argmax", "random", "weighted"
 
-# FOV defaults per dataset
-if [ "$DATASET" = "scannet" ]; then
-  H_FOV_DEG=58.30   # ScanNet
-  V_FOV_DEG=45.33   # ScanNet
-else
-  H_FOV_DEG=39.31   # 3RScan
-  V_FOV_DEG=64.76   # 3RScan
-fi
+# FOV defaults per dataset. Human annotations inherit ScanNet camera defaults.
+case "$DATASET" in
+  scannet|human)
+    H_FOV_DEG=58.30   # ScanNet / human
+    V_FOV_DEG=45.33   # ScanNet / human
+    ;;
+  3rscan)
+    H_FOV_DEG=39.31   # 3RScan
+    V_FOV_DEG=64.76   # 3RScan
+    ;;
+  *)
+    echo "ERROR: Unknown DATASET '$DATASET' (expected 3rscan, scannet, or human)." >&2
+    exit 1
+    ;;
+esac
+
+NOTE=""  # Additional note for output files (e.g., to distinguish different runs / settings)
 
 # Additional CLI options (uncomment / edit as needed)
 EXTRA_ARGS=(
-  --show_heatmap
-  --show_arrows
-  --show_3d
-  --save_candidates "./eval/eval_candidates_mk5_${PREDICTION_STRATEGY}_${DATASET}_SCRATCH.json"
-  --save_metrics "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}_SCRATCH.json"
-  --log_file "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}_SCRATCH.log"
+  # --show_heatmap
+  # --show_arrows
+  # --show_3d
+  --save_candidates "./eval/eval_candidates_mk5_${PREDICTION_STRATEGY}_${DATASET}_${NOTE}.json"
+  --save_metrics "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}_${NOTE}.json"
+  --log_file "./eval/eval_metrics_mk5_${PREDICTION_STRATEGY}_${DATASET}_${NOTE}.log"
   --frame_policy max_visible  # Options: "first", "index", "random", "max_visible", "max_pixels", "all"
   --query_embedding_mode doc
   --homogenize_label_embeddings
@@ -78,7 +96,7 @@ cd "$PROJECT_DIR" || exit 1
 CMD=(
   python visualize_eval_loc_mk5.py
   --root "$SCENE_ROOT"
-  --dataset "$DATASET"
+  --dataset "$DATASET_LAYOUT"
   --graphs "$GRAPHS_DIR"
   --query_root "$QUERY_ROOT"
   --h_fov_deg "$H_FOV_DEG"
